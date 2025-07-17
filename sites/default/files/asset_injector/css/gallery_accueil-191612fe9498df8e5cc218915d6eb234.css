@@ -1,0 +1,71 @@
+.gallery-section {
+    padding: 2rem 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.gallery-section .section-title {
+    color: #104293; /* Bleu primaire de la charte */
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+    font-family: 'Cooper Hewitt', sans-serif; /* Police des titres */
+    font-weight: 700;
+}
+
+.gallery-section .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: #104293; /* Bleu primaire de la charte */
+}
+
+.gallery-section .gallery-container {
+    background-color: #e6f0fa;
+    border-radius: 8px;
+    padding-top: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.gallery-section .item img {
+    border-radius: 6px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease;
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+}
+
+.gallery-section .item p {
+    font-size: 15px;
+    font-style: italic;
+    font-family: 'Poppins', sans-serif; /* Police du corps du texte */
+    color: #555555; /* Gris neutre pour le texte */
+}
+
+.gallery-section .item img:hover {
+    transform: translateY(-5px);
+}
+
+.gallery-section .owl-nav button {
+    width: 45px;
+    height: 45px;
+    background-color: #104293 !important; /* Bleu primaire de la charte */
+    color: #ffffff !important;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-section .owl-nav button:hover {
+    background-color: #0A3D7E !important; /* Version plus foncée du bleu primaire */
+}

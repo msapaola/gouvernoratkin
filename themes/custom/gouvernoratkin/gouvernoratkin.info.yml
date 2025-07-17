@@ -1,0 +1,32 @@
+name: gouvernoratkin
+type: theme
+description: 'Gouvernorat thème 2024'
+core_version_requirement: ^10 || ^11
+base theme: false
+
+libraries:
+  - gouvernoratkin/bootstrap5-js
+  - gouvernoratkin/global-styling
+
+regions:
+  mobile_menu: "Mobile Menu"
+  logo: Logo
+  menu: Menu
+  top_menu: Top menu
+  sidebar: Sidebar
+  welcome: Welcome
+  gouv_word: "Gouv word" 
+  last_news: "Last News"
+  gallery: Gallery
+  aboutus: "About us"
+  content: "content"
+  singlepost: "Single Post"
+  singlepost_sidebar: "Single Post Sidebar"
+  singlepostevents: "Single Post Events"
+  singlepostgallery: "Single Post Gallery"
+  services: "Services"
+  sondage: "Sondage"
+  events: "Events"
+  footer: "Footer"
+  popup: "popup"
+ 

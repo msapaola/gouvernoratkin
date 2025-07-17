@@ -1,0 +1,192 @@
+
+
+/* Styles des titres */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cooper Hewitt', sans-serif;
+  color: #104293; /* Bleu primaire de la charte */
+}
+
+/* Bouton principal */
+.btn-primary {
+  background-color: #104293; /* Bleu primaire */
+  border-color: #104293;
+}
+
+.btn-primary:hover {
+  background-color: #0A3D7E; /* Version plus foncée du bleu primaire */
+  border-color: #0A3D7E;
+}
+
+/* Section hero */
+.hero {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/api/placeholder/1200/600');
+  background-size: cover;
+  background-position: center;
+  color: #ffffff; /* Blanc de la charte */
+  padding: 150px 0;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  color: #ffffff;
+  margin-bottom: 20px;
+  font-family: 'Cooper Hewitt', sans-serif; /* Titre */
+}
+
+.hero p {
+  font-size: 1.25rem;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: 'Poppins', sans-serif; /* Corps du texte */
+  color: #ffffff;
+}
+
+/* Sections générales */
+section {
+  padding: 60px 0;
+}
+
+section h2 {
+  margin-bottom: 30px;
+  position: relative;
+  padding-bottom: 15px;
+  font-family: 'Cooper Hewitt', sans-serif;
+  color: #104293;
+}
+
+section h2:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 60px;
+  background-color: #DB3832; /* Rouge de la charte */
+}
+
+/* Cartes */
+.card {
+  border: none;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+  height: 100%;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-title {
+  color: #104293; /* Bleu primaire */
+  font-family: 'Cooper Hewitt', sans-serif;
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+.card img {
+  height: 300px;
+  object-fit: cover;
+}
+
+/* Accent background */
+.accent-bg {
+  background-color: rgba(16, 66, 147, 0.1); /* Version transparente du bleu primaire */
+}
+
+/* Footer */
+.footer {
+  background-color: #1f2428; /* Noir de la charte */
+  color: #ffffff; /* Blanc de la charte */
+  padding: 30px 0;
+}
+
+/* Carousel */
+.carousel-item {
+  height: 400px;
+}
+
+.carousel-item img {
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Carte de langue */
+.language-card {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.language-card .icon {
+  font-size: 2rem;
+  color: #104293; /* Bleu primaire */
+  margin-bottom: 10px;
+}
+
+/* Timeline historique */
+.history-timeline {
+  position: relative;
+  padding-left: 50px;
+}
+
+.history-timeline:before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: #104293; /* Bleu primaire */
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.timeline-item:before {
+  content: '';
+  position: absolute;
+  left: -50px;
+  top: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #104293; /* Bleu primaire */
+}
+
+/* Diviseur de section */
+.section-divider {
+  height: 5px;
+  width: 100%;
+  background: linear-gradient(to right, #104293, #DB3832); /* Bleu à rouge */
+  margin: 20px 0;
+}
+
+/* Badge highlight */
+.badge-highlight {
+  background-color: #DB3832; /* Rouge de la charte */
+  color: #ffffff; /* Blanc de la charte */
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  margin-left: 8px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Tag festival avec Great Vibes */
+.festival-tag {
+  display: inline-block;
+  background-color: #104293; /* Bleu primaire */
+  color: #ffffff; /* Blanc de la charte */
+  padding: 3px 10px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  font-family: 'Great Vibes', cursive; /* Police décorative Great Vibes */
+}

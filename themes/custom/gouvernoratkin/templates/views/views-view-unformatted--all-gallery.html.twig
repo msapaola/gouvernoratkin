@@ -1,0 +1,39 @@
+{#
+/**
+ * @file
+ * Theme override to display a view of unformatted rows.
+ *
+ * Available variables:
+ * - title: The title of this group of rows. May be empty.
+ * - rows: A list of the view's row items.
+ *   - attributes: The row's HTML attributes.
+ *   - content: The row's content.
+ * - view: The view object.
+ * - default_row_class: A flag indicating whether default classes should be
+ *   used on rows.
+ *
+ * @see template_preprocess_views_view_unformatted()
+ */
+#}
+{% if title %}
+  <h3>{{ title }}</h3>
+{% endif %}
+    <!-- Header -->
+    <header class="page-header text-center">
+        <div class="container">
+            <h1><i class="bi bi-camera"></i> Galerie Photos du Gouvernorat</h1>
+            <p class="lead">Découvrez les dernières activités et événements à travers notre galerie photo</p>
+        </div>
+    </header>         
+    <main class="container">
+      <div class="row g-4">
+      {% for row in rows %}
+          {{- row.content -}}
+      {% endfor %}
+      </div>
+    </main>
+    
+    
+     
+     
+

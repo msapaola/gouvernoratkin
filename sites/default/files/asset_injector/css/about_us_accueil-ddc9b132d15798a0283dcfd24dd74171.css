@@ -1,0 +1,171 @@
+
+#about-section .container {
+  max-width: 100%; /* Limite la largeur du conteneur */
+}
+
+#about-section {
+  padding: 80px 0;
+  background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+}
+
+#about-section .about-title {
+  position: relative;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  font-family: 'Cooper Hewitt', sans-serif;
+  color: #104293; /* Bleu primaire de la charte */
+}
+
+#about-section .about-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background-color: #104293; /* Bleu primaire de la charte */
+}
+
+#about-section .about-subtitle {
+  color: #0095C9; /* Bleu secondaire de la charte */
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  font-family: 'Poppins', sans-serif; /* Corps du texte */
+}
+
+#about-section .about-description {
+  line-height: 1.8;
+  font-size: 1.1rem;
+  margin-bottom: 40px;
+  font-family: 'Poppins', sans-serif; /* Corps du texte */
+  color: #555555; /* Gris pour paragraphes */
+}
+
+#about-section .about-feature-box {
+  text-align: center;
+  padding: 30px 20px;
+  margin-bottom: 30px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  height: 100%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  background-color: #ffffff; /* Blanc de la charte */
+}
+
+#about-section .about-feature-box:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+#about-section .about-feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 20px;
+  border-radius: 50%;
+  background-color: rgba(16, 66, 147, 0.1); /* Ajusté pour utiliser le bleu primaire #104293 */
+  color: #104293; /* Bleu primaire de la charte */
+  font-size: 30px;
+}
+
+#about-section .highlight {
+  background-color: #FFF248; /* Jaune de la charte */
+  color: #1f2428; /* Noir de la charte */
+  padding: 2px 5px;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif; /* Corps du texte */
+}
+
+#about-section .about-feature-title {
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #104293; /* Bleu primaire de la charte */
+  font-family: 'Cooper Hewitt', sans-serif; /* Titres */
+}
+
+#about-section .about-cta-button {
+  background-color: #DB3832; /* Rouge de la charte */
+  color: #ffffff; /* Blanc de la charte */
+  border: none;
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 20px;
+  font-family: 'Poppins', sans-serif; /* Corps du texte */
+}
+
+#about-section .about-cta-button:hover {
+  background-color: #872025; /* Rouge foncé de la charte pour le hover */
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(219, 56, 50, 0.3);
+}
+
+#about-section .about-image-section {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+#about-section .carousel-item {
+  height: 400px;
+}
+
+#about-section .carousel-item img {
+  height: 100%;
+  object-fit: cover;
+  max-width: 100%;
+}
+
+#about-section .carousel-caption {
+  background-color: rgba(16, 66, 147, 0.7); /* Ajusté pour utiliser le bleu primaire #104293 */
+  border-radius: 5px;
+  padding: 15px;
+}
+
+#about-section .carousel-caption p {
+  color: #ffffff; /* Blanc de la charte */
+  font-family: 'Poppins', sans-serif; /* Corps du texte */
+}
+
+#aboutCarousel {
+  /* Contient le carousel */
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (max-width: 768px) {
+  #about-section {
+    padding: 40px 0;
+  }
+
+  #about-section .about-feature-box {
+    margin-bottom: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+
+  #about-section .carousel-item {
+    height: 300px; /* Hauteur réduite pour mobile */
+  }
+
+  @media (max-width: 480px) {
+    #about-section .carousel-item {
+      height: 250px;
+    }
+  }
+}

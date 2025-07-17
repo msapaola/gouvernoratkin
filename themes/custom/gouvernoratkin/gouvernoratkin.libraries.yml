@@ -1,0 +1,57 @@
+bootstrap5-js:
+  version: 5.3.3
+  js:
+    assets/js/jquery.min.js: {minified: true}
+    assets/js/jquery-ui.min.js: {minified: true}
+    assets/js/bootstrap.bundle.min.js: {minified: true}
+    assets/js/meanmenu.js: {}
+    assets/js/owl.carousel.min.js: {minified: true}
+    assets/js/magnific-popup.min.js: {minified: true}
+    assets/js/TweenMax.js: {}
+    assets/js/nice-select.min.js: {minified: true}
+    assets/js/form-validator.min.js: {minified: true}
+    assets/js/contact-form-script.js: {}
+    assets/js/ajaxchimp.min.js: { minified: true }
+    assets/js/owl.carousel2.thumbs.min.js: {minified: true}
+    assets/js/appear.min.js: {minified: true}
+    assets/js/odometer.min.js: {minified: true}
+    assets/js/countdown.min.js: {minified: true}
+    assets/js/jquery.touchSwipe.min.js: {minified: true}
+    assets/js/slick.min.js: {minified: true}  
+    assets/js/aos.js: {}
+    assets/js/custom.js: {}
+   
+global-styling:
+  css:
+    theme:
+        assets/css/nice-number.css: {}
+        assets/css/animate.min.css: {minified: true}
+        assets/css/bootstrap.min.css : {minified: true}
+        assets/css/fontawsome.min.css: {minified: true}
+        assets/css/flaticon.css: {}
+        assets/css/meanmenu.min.css: {minified: true}
+        assets/css/owl.carousel.min.css: {minified: true}
+        assets/js/owl.theme.default.min.css: {minified: true}
+        assets/css/nice-select.min.css: {minified: true}
+        assets/css/owl.theme.default.min.css: {minified: true}
+        assets/css/magnific-popup.min.css: {minified: true}
+        assets/css/jquery-ui.min.css: {minified: true}
+        assets/css/slick.min.css: {minified: true}
+        https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css: { type: external, minified: true }
+        assets/css/aos.css: {}
+        assets/css/odometer.min.css: {}
+        assets/css/style.css: {}
+        assets/css/responsive.css: {} 
+
+drupal.nav-tabs:
+  version: 5.3.3
+  js:
+    js/nav-tabs.js: {}
+  dependencies:
+    - core/matchmedia
+    - core/drupal
+    - core/once
+    - core/drupal.debounce
+    - core/collapse
+    - core/drupal.toolbar
+    - core/backbone

@@ -1,0 +1,50 @@
+[02-Mar-2025 19:27:21 UTC] Drupal\Core\Database\DatabaseExceptionWrapper: SQLSTATE[HY000]: General error: 2006 MySQL server has gone away: SELECT 1 FROM information_schema.tables WHERE ("table_schema" = :db_condition_placeholder_4) AND ("table_name" = :db_condition_placeholder_5); Array
+(
+    [:db_condition_placeholder_4] => u546312304_YAoJO
+    [:db_condition_placeholder_5] => cu68_config
+)
+ in /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Config/DatabaseStorage.php on line 120 #0 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Database/Connection.php(661): Drupal\mysql\Driver\Database\mysql\ExceptionHandler->handleExecutionException()
+#1 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Database/Schema.php(178): Drupal\Core\Database\Connection->query()
+#2 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Config/DatabaseStorage.php(120): Drupal\Core\Database\Schema->tableExists()
+#3 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Config/CachedStorage.php(95): Drupal\Core\Config\DatabaseStorage->readMultiple()
+#4 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Config/ConfigFactory.php(165): Drupal\Core\Config\CachedStorage->readMultiple()
+#5 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Config/ConfigFactory.php(104): Drupal\Core\Config\ConfigFactory->doLoadMultiple()
+#6 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Config/ConfigFactory.php(89): Drupal\Core\Config\ConfigFactory->doGet()
+#7 /home/u546312304/domains/merveillesenga.com/public_html/core/modules/automated_cron/src/EventSubscriber/AutomatedCron.php(50): Drupal\Core\Config\ConfigFactory->get()
+#8 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Component/DependencyInjection/Container.php(259): Drupal\automated_cron\EventSubscriber\AutomatedCron->__construct()
+#9 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Component/DependencyInjection/Container.php(177): Drupal\Component\DependencyInjection\Container->createService()
+#10 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Component/DependencyInjection/Container.php(454): Drupal\Component\DependencyInjection\Container->get()
+#11 /home/u546312304/domains/merveillesenga.com/public_html/vendor/symfony/event-dispatcher/EventDispatcher.php(243): Drupal\Component\DependencyInjection\Container->Drupal\Component\DependencyInjection\{closure}()
+#12 /home/u546312304/domains/merveillesenga.com/public_html/vendor/symfony/event-dispatcher/EventDispatcher.php(206): Symfony\Component\EventDispatcher\EventDispatcher::Symfony\Component\EventDispatcher\{closure}()
+#13 /home/u546312304/domains/merveillesenga.com/public_html/vendor/symfony/event-dispatcher/EventDispatcher.php(56): Symfony\Component\EventDispatcher\EventDispatcher->callListeners()
+#14 /home/u546312304/domains/merveillesenga.com/public_html/vendor/symfony/http-kernel/HttpKernel.php(114): Symfony\Component\EventDispatcher\EventDispatcher->dispatch()
+#15 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/StackMiddleware/StackedHttpKernel.php(63): Symfony\Component\HttpKernel\HttpKernel->terminate()
+#16 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/DrupalKernel.php(683): Drupal\Core\StackMiddleware\StackedHttpKernel->terminate()
+#17 /home/u546312304/domains/merveillesenga.com/public_html/vendor/drush/drush/src/Boot/DrupalBoot8.php(312): Drupal\Core\DrupalKernel->terminate()
+#18 [internal function]: Drush\Boot\DrupalBoot8->terminate()
+#19 {main}
+[05-Mar-2025 09:51:41 UTC] Drupal\Core\Database\DatabaseExceptionWrapper: SQLSTATE[HY000]: General error: 2006 MySQL server has gone away: SELECT 1 FROM information_schema.tables WHERE ("table_schema" = :db_condition_placeholder_4) AND ("table_name" = :db_condition_placeholder_5); Array
+(
+    [:db_condition_placeholder_4] => u546312304_YAoJO
+    [:db_condition_placeholder_5] => cu68_config
+)
+ in /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Config/DatabaseStorage.php on line 120 #0 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Database/Connection.php(661): Drupal\mysql\Driver\Database\mysql\ExceptionHandler->handleExecutionException()
+#1 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Database/Schema.php(178): Drupal\Core\Database\Connection->query()
+#2 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Config/DatabaseStorage.php(120): Drupal\Core\Database\Schema->tableExists()
+#3 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Config/CachedStorage.php(95): Drupal\Core\Config\DatabaseStorage->readMultiple()
+#4 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Config/ConfigFactory.php(165): Drupal\Core\Config\CachedStorage->readMultiple()
+#5 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Config/ConfigFactory.php(104): Drupal\Core\Config\ConfigFactory->doLoadMultiple()
+#6 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/Config/ConfigFactory.php(89): Drupal\Core\Config\ConfigFactory->doGet()
+#7 /home/u546312304/domains/merveillesenga.com/public_html/core/modules/automated_cron/src/EventSubscriber/AutomatedCron.php(50): Drupal\Core\Config\ConfigFactory->get()
+#8 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Component/DependencyInjection/Container.php(259): Drupal\automated_cron\EventSubscriber\AutomatedCron->__construct()
+#9 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Component/DependencyInjection/Container.php(177): Drupal\Component\DependencyInjection\Container->createService()
+#10 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Component/DependencyInjection/Container.php(454): Drupal\Component\DependencyInjection\Container->get()
+#11 /home/u546312304/domains/merveillesenga.com/public_html/vendor/symfony/event-dispatcher/EventDispatcher.php(243): Drupal\Component\DependencyInjection\Container->Drupal\Component\DependencyInjection\{closure}()
+#12 /home/u546312304/domains/merveillesenga.com/public_html/vendor/symfony/event-dispatcher/EventDispatcher.php(206): Symfony\Component\EventDispatcher\EventDispatcher::Symfony\Component\EventDispatcher\{closure}()
+#13 /home/u546312304/domains/merveillesenga.com/public_html/vendor/symfony/event-dispatcher/EventDispatcher.php(56): Symfony\Component\EventDispatcher\EventDispatcher->callListeners()
+#14 /home/u546312304/domains/merveillesenga.com/public_html/vendor/symfony/http-kernel/HttpKernel.php(114): Symfony\Component\EventDispatcher\EventDispatcher->dispatch()
+#15 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/StackMiddleware/StackedHttpKernel.php(63): Symfony\Component\HttpKernel\HttpKernel->terminate()
+#16 /home/u546312304/domains/merveillesenga.com/public_html/core/lib/Drupal/Core/DrupalKernel.php(683): Drupal\Core\StackMiddleware\StackedHttpKernel->terminate()
+#17 /home/u546312304/domains/merveillesenga.com/public_html/vendor/drush/drush/src/Boot/DrupalBoot8.php(312): Drupal\Core\DrupalKernel->terminate()
+#18 [internal function]: Drush\Boot\DrupalBoot8->terminate()
+#19 {main}

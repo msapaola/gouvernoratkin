@@ -1,0 +1,38 @@
+name: gouvernorat
+description: ''
+screenshot: screenshot.png
+'alt text': 'gouvernorat theme screenshot'
+core_version_requirement: ^11
+version: 1.0.0
+engine: twig
+type: theme
+'base theme': radix
+starterkit: true
+dependencies:
+  - 'drupal:serialization'
+'interface translation project': gouvernorat
+'interface translation server pattern': themes/custom/gouvernorat/translations/%language.po
+regions:
+  navbar_branding: 'Navbar branding'
+  navbar_left: 'Navbar left'
+  navbar_right: 'Navbar right'
+  header: Header
+  content: Content
+  page_bottom: 'Page bottom'
+  footer: Footer
+libraries:
+  - gouvernorat/style
+ckeditor5-stylesheets:
+  - build/css/main.style.css
+libraries-extend:
+  core/drupal.ajax:
+    - gouvernorat/drupal.ajax
+  core/drupal.checkbox:
+    - gouvernorat/drupal.checkbox
+  core/drupal.message:
+    - gouvernorat/drupal.message
+  core/drupal.progress:
+    - gouvernorat/drupal.progress
+  clientside_validation_jquery/cv.jquery.validate:
+    - gouvernorat/jquery.validate
+generator: 'radix_starterkit:1.0.0'

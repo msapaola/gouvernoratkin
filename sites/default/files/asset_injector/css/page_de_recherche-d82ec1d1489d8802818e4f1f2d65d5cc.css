@@ -1,0 +1,126 @@
+
+/* Style de base pour la liste d'articles */
+.article-list-page-search {
+    margin: 0 auto;
+    background-color: #ffffff; /* Blanc */
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Style pour chaque article dans la liste */
+.article-page-search {
+    display: flex;
+    padding: 30px;
+    position: relative;
+    transition: all 0.3s ease;
+    font-family: 'Poppins', sans-serif; /* Police du corps du texte */
+}
+
+/* Séparateur entre les articles */
+.article-list-page-search .article-page-search::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+}
+
+/* Suppression du séparateur pour le dernier article */
+.article-page-search:last-child::after {
+    display: none;
+}
+
+/* Effet de survol sur l'article */
+.article-page-search:hover {
+    background-color: #f9f9f9;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Style pour l'image de l'article */
+.article-image-page-search {
+    flex: 0 0 120px;
+    margin-right: 20px;
+}
+
+.article-image-page-search img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+/* Effet de survol sur l'image */
+.article-page-search:hover .article-image-page-search img {
+    transform: scale(1.05);
+}
+
+/* Contenu de l'article */
+.article-content-page-search {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Catégorie de l'article */
+.article-category-page-search {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #0095C9; /* Bleu secondaire */
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Titre de l'article */
+.article-title-page-search {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #104293; /* Bleu primaire */
+    line-height: 1.4;
+    font-family: 'Cooper Hewitt', sans-serif; /* Police pour les titres */
+}
+
+/* Date de l'article */
+.article-date-page-search {
+    font-size: 0.85rem;
+    color: #718096;
+    font-weight: 300;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Résumé de l'article */
+.article-summary-page-search {
+    font-size: 16px;
+    color: #4a5568;
+    margin-top: 10px;
+    line-height: 1.5;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Responsive pour écrans mobiles */
+@media (max-width: 480px) {
+    .article-page-search {
+        flex-direction: column;
+    }
+
+    .article-image-page-search {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .article-image-page-search img {
+        width: 100%;
+        height: 200px;
+        max-width: 300px;
+    }
+}

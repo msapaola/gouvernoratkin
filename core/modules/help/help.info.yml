@@ -1,0 +1,10 @@
+name: Help
+type: module
+description: 'Generates help pages and provides a Help block with page-level help.'
+package: Core
+# version: VERSION
+
+# Information added by Drupal.org packaging script on 2025-05-08
+version: '11.1.7'
+project: 'drupal'
+datestamp: 1746678275

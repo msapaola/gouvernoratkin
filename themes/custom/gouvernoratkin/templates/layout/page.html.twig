@@ -1,0 +1,311 @@
+ 
+ 
+ <!--========== BEGIN TWIG CLASSES ==========--> 
+ {% 
+  set logo_classes = (page.logo) ? 'col-3' : ''
+  %} 
+
+  {% 
+  set menu_classes = (page.menu) ? 'col-6' : ''
+  %} 
+
+  {% 
+  set sidebar_classes = (page.sidebar) ? 'col-3' : ''
+  %} 
+  
+  {% 
+  set singlepost_classes = (page.singlepost) ? 'blog-details pt-100' : ''  
+  %}
+
+ 
+<!--========== END TWIG CLASSES ==========--> 
+<!-- Navigation area start -->
+    <header>
+    <nav class="navbar navbar-expand-lg">
+      <div class="container">
+        {% if page.logo %}
+          {{page.logo}}
+        {% endif %}
+        
+        <!-- Boutons à droite sur mobile (recherche et contact) -->
+        <div class="d-flex d-lg-none mobile-actions">
+          <button class="popup-button"><i class="fas fa-search"></i></button>
+          <a href="/contact" class="btn-contact-mobile">
+            <i class="fas fa-envelope"></i>
+          </a>
+        </div>
+        
+        <!-- Bouton hamburger -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Menu principal -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          {% if page.menu %}
+            {{page.menu}}
+          {% endif %}
+          
+          <!-- Boutons à droite sur desktop (recherche et contact) -->
+          <div class="d-none d-lg-flex align-items-center">
+            <button class="popup-button"><i class="fas fa-search"></i></button>
+            <a href="/Contact" class="btn btn-contact">Contact</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+ <!-- Navigation area end --> 
+  
+ 
+  {% if page.top_menu %}
+  
+      <div class="container">
+          {{page.top_menu}}
+      </di>
+  
+   {% endif %}
+   
+   <!--========== BEGIN CONTENT ==========--> 
+				{% if page.content %}
+					{{ page.content }}
+				{% endif %}
+		
+<!--========== END CONTENT ==========--> 
+ <!-- Welcome Banner Area Start -->
+ {% if page.welcome %}
+    <!-- Section Bienvenue -->
+  <section class="welcome-section" id="welcome">
+     {{page.welcome}}
+    <div class="welcome-overlay"></div>
+    
+    <div class="container welcome-content">
+      <div class="row">
+        <div class="col-lg-8 col-md-10">
+          <h1 class="welcome-title">Bienvenue à Kinshasa</h1>
+          <p class="welcome-subtitle">
+            Découvrez la vibrante capitale de la République Démocratique du Congo, 
+            qui se réinvente chaque jour, mêlant tradition et modernité pour construire une ville tournée vers l’avenir.
+          </p>
+          
+          <div class="highlights-carousel">
+            <div class="highlight-item">
+              <h5 class="highlight-title"><i class="fas fa-heartbeat me-2"></i>Kinshasa, au cœur du changement</h5>
+              <p class="highlight-text">Centre culturel et économique rayonnant sur toute l'Afrique centrale.</p>
+            </div>
+          </div>
+          
+          <div class="social-media-mobile">
+            <div class="social-container">
+              <p class="social-text">Nous suivre</p>
+              <div class="social-icons-wrapper">
+                <a href="https://x.com/gouvernoratk?s=21&t=NMje2EnuC86EYrQumPVdFQ" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="https://www.facebook.com/GouvKinshasa?mibextid=wwXIfr&mibextid=wwXIfr" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/gouvernoratk?igsh=MW0zd3NlN3NudTU5dg%3D%3D&utm_source=qr" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="https://youtube.com/@gouvernoratdekinshasa?si=MwKmbGHxB-m8FxNb" class="social-icon"><i class="fab fa-youtube"></i></a>
+                <a href="https://www.tiktok.com/@gouvernoratk?_t=ZM-8uqtzzkLRLi&_r=1" class="social-icon"><i class="fab fa-tiktok"></i></a>
+              </div>
+            </div>
+          </div>
+          
+          <div class="cta-buttons">
+            <a href="#features" class="btn btn-primary-custom">Découvrir notre ville</a>
+            <a href="/contact" class="btn btn-secondary-custom"><i class="fas fa-envelope"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="social-media-desktop">
+      <p class="social-text">Nous suivre</p>
+      <a href="https://x.com/gouvernoratk?s=21&t=NMje2EnuC86EYrQumPVdFQ" class="social-icon"><i class="fab fa-twitter"></i></a>
+      <a href="https://www.facebook.com/GouvKinshasa?mibextid=wwXIfr&mibextid=wwXIfr" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+      <a href="https://www.instagram.com/gouvernoratk?igsh=MW0zd3NlN3NudTU5dg%3D%3D&utm_source=qr" class="social-icon"><i class="fab fa-instagram"></i></a>
+      <a href="https://youtube.com/@gouvernoratdekinshasa?si=MwKmbGHxB-m8FxNb" class="social-icon"><i class="fab fa-youtube"></i></a>
+      <a href="https://www.tiktok.com/@gouvernoratk?_t=ZM-8uqtzzkLRLi&_r=1" class="social-icon"><i class="fab fa-tiktok"></i></a>
+    </div>
+    
+    <a href="#features" class="scroll-indicator">
+      <i class="fas fa-chevron-down"></i>
+    </a>
+  </section>
+
+  <!-- Section des caractéristiques -->
+  <section class="features-section" id="features">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3 col-sm-6">
+          <div class="feature-card blue">
+            <div class="feature-icon blue">
+              <i class="fas fa-newspaper"></i>
+            </div>
+            <h3 class="feature-title">Actualités</h3>
+            <p class="feature-desc">Suivez les dernières informations et annonces officielles du gouvernorat de Kinshasa.</p>
+          </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6">
+          <div class="feature-card red">
+            <div class="feature-icon red">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <h3 class="feature-title">Événements</h3>
+            <p class="feature-desc">Découvrez notre agenda culturel, sportif et officiel pour ne rien manquer à Kinshasa.</p>
+          </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6">
+          <div class="feature-card green">
+            <div class="feature-icon green">
+              <i class="fas fa-info-circle"></i>
+            </div>
+            <h3 class="feature-title">À propos de Kinshasa</h3>
+            <p class="feature-desc">Partez à la découverte de son passé, de ses paysages et de sa richesse culturelle.</p>
+          </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6">
+          <div class="feature-card yellow">
+            <div class="feature-icon yellow">
+              <i class="fas fa-monument"></i>
+            </div>
+            <h3 class="feature-title">Culture et Patrimoine</h3>
+            <p class="feature-desc">Plongez dans la richesse culturelle et le patrimoine historique de Kinshasa.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+   {% endif %}
+ <!-- Welcome Banner Area End -->
+
+ <!-- Gouv Word Banner Area Start -->
+   {% if page.gouv_word %}
+        <section class="home-banner ptb-50">
+            {{page.gouv_word}}
+        </section>
+   {% endif %}
+<!-- Gouv Word Banner Area End -->
+
+<!-- Blog Area Start -->
+       {% if page.last_news %}
+        <section class="blog ptb-50 bg-f9fbfe">
+            <div class="container">
+                <div class="default-section-title default-section-title-middle">
+                    <h3>Dernières Nouvelles de Kinshasa</h3>
+                    <p>Restez informé sur la vie de notre ville</p>
+                </div>
+                {{ page.last_news }}
+            </div>
+        </section>
+    {% endif %} 
+<!-- Blog Area End -->
+<!-- Gallery Area Start -->
+     {% if page.gallery %}
+      <section class="container my-4 gallery-section">
+       <div class="default-section-title default-section-title-middle">      
+        <h3>Galerie photo du Gouvernorat</h3>
+        <p>Découvrez les activités officielles et les événements importants organisés par le Gouvernorat à travers cette galerie photo interactive.</p>
+        </div>
+        {{ page.gallery }}
+   </section>
+    {% endif %} 
+<!-- Gallery Area End -->
+<!-- Single Post Gallery Area Start -->
+{% if page.singlepostgallery %}
+        {{ page.singlepostgallery }}
+{% endif %} 
+<!-- Single Post Gallery Area End -->
+
+<!-- Who We Are Area Start --> 
+{% if page.aboutus %}
+       {{ page.aboutus }}
+{% endif %} 
+<!-- Who We Are Area End -->
+
+<!-- Service Area Start -->
+    {% if page.services %}
+        <section class="services pt-50 pb-70">
+            <div class="container">
+          {{ page.services }}
+            </div>
+        </section>
+     {% endif %}    
+<!-- Service Area End -->
+
+<!-- Fun Facts Area Start -->
+  {% if page.sondage %}
+       {{ page.sondage }}
+  {% endif %}  
+<!-- Fun Facts Area End -->
+
+<!-- Upcoming Events area Start -->
+{% if page.events %}
+        <section class="container pt-100">
+            <div class="default-section-title default-section-title-middle">
+             <h3>Événements à venir</h3>
+              <p>Kinshasa Action : Ne Manquez Rien !</p>
+             </div>
+                {{ page.events }}
+        </section>
+{% endif %} 
+<!-- Upcoming Events Area End -->
+
+<!-- Blog Details Area Start -->
+{% if page.singlepost %}
+ <section class="{{ singlepost_classes }}">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+               {{ page.singlepost }}
+            </div>
+            <div class="col-lg-4">
+                <div class="sidebar-area pl-20 pt-30">
+                {{ page.singlepost_sidebar }}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}  
+<!-- Blog Details Area End -->
+
+<!-- Events Details area Start --> 
+{% if page.singlepostevents %}
+        <section class="event-details pb-100">
+             {{ page.singlepostevents }}
+        </section>
+{% endif %}       
+
+<!-- Footer area start -->
+{% if page.footer %}
+        <section class="footer">
+            <div class="container">
+                <div class="footer-content ptb-100">
+                   <div class="row">
+                     {{ page.footer }}
+                   </div>
+                </div>
+                <div class="copyright">
+                    <p>Site web développé par <a target="_blank" href="">Merveille SENGA</a></p>
+                </div>
+            </div>
+        </section>
+{% endif %}         
+<!-- Footer Area end -->
+
+<!-- popup area start -->
+{% if page.popup %}
+        <div class="popup">
+          {{ page.popup }}
+        </div>
+{% endif %}          
+<!-- popup area end -->
+        
+<!--=== Start Go Top Button ===-->
+<div class="go-top">
+   <i class="fas fa-chevron-up"></i>
+</div>
+<!--=== End Go Top Button ===-->
+

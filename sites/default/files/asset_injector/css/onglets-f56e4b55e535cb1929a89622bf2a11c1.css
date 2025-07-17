@@ -1,0 +1,163 @@
+/* Style de base pour le conteneur des onglets */
+.tabs-wrapper {
+    margin: 1rem 0;
+    position: relative;
+    width: 100%;
+    overflow-x: auto; /* Permet le défilement horizontal sur mobile si nécessaire */
+}
+
+/* Suppression de la barre de défilement tout en gardant la fonctionnalité */
+.tabs-wrapper::-webkit-scrollbar {
+    height: 3px;
+}
+
+.tabs-wrapper::-webkit-scrollbar-thumb {
+    background-color: #dee2e6;
+    border-radius: 3px;
+}
+
+/* Styles pour la liste des onglets */
+.tabs-wrapper .nav-tabs {
+    border-bottom: 1px solid #dee2e6;
+    white-space: nowrap;
+    display: flex;
+    padding-bottom: 1px;
+}
+
+/* Style pour chaque élément de navigation */
+.tabs-wrapper .nav-item {
+    margin-bottom: -1px;
+    list-style: none;
+}
+
+/* Style général des liens dans les onglets */
+.tabs-wrapper .nav-item a {
+    color: #1f2428; /* Noir de la charte */
+    background-color: #f8f9fa;
+    border: 1px solid transparent;
+    border-radius: 0.25rem 0.25rem 0 0;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
+    text-align: center;
+    margin-right: 0.25rem;
+    text-decoration: none;
+    display: block;
+    font-family: 'Poppins', sans-serif; /* Police pour le corps du texte */
+}
+
+/* Effet de survol */
+.tabs-wrapper .nav-item a:hover {
+    background-color: #ffffff;
+    border-color: #dee2e6 #dee2e6 transparent;
+    color: #0095C9; /* Bleu secondaire pour survol */
+}
+
+/* Style pour l'onglet actif */
+.tabs-wrapper .nav-item a.is-active,
+.tabs-wrapper .nav-item.active a {
+    color: #104293; /* Bleu primaire pour onglet actif */
+    background-color: #ffffff;
+    border-color: #dee2e6 #dee2e6 #ffffff;
+    font-weight: 600;
+    position: relative;
+    font-family: 'Cooper Hewitt', sans-serif; /* Police pour les titres */
+}
+
+/* Indicateur visuel pour l'onglet actif */
+.tabs-wrapper .nav-item a.is-active::after,
+.tabs-wrapper .nav-item.active a::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #104293; /* Bleu primaire pour indicateur */
+}
+
+/* Responsive : mobile-first avec adaptations pour tailles d'écran supérieures */
+@media (max-width: 767.98px) {
+    .tabs-wrapper .nav-tabs {
+        justify-content: flex-start;
+        padding-bottom: 3px; /* Espace pour le défilement */
+    }
+    
+    .tabs-wrapper .nav-item a {
+        padding: 0.5rem 0.65rem;
+        font-size: 0.8125rem;
+    }
+}
+
+/* Moyenne taille d'écran (Tablette) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .tabs-wrapper .nav-tabs.flex-md-row {
+        flex-direction: row !important;
+        justify-content: center;
+    }
+    
+    .tabs-wrapper .nav-item a {
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Grande taille d'écran (Desktop) */
+@media (min-width: 992px) {
+    .tabs-wrapper {
+        overflow-x: visible; /* Pas besoin de défilement sur desktop */
+    }
+    
+    .tabs-wrapper .nav-tabs {
+        justify-content: left;
+    }
+    
+    .tabs-wrapper .nav-item a {
+        padding: 0.5rem 1.25rem;
+        font-size: 0.9375rem;
+    }
+}
+
+/* Accessibilité améliorée */
+.tabs-wrapper .nav-item a:focus {
+    outline: 2px solid #0095C9; /* Bleu secondaire pour focus */
+    outline-offset: -2px;
+    z-index: 1;
+}
+
+/* Style spécifique pour les onglets d'action */
+.tabs-wrapper .nav-item:nth-child(3) a {
+    color: #DB3832; /* Rouge pour l'action "Supprimer" */
+}
+
+.tabs-wrapper .nav-item:nth-child(3) a:hover {
+    background-color: #fff8f8;
+    color: #DB3832;
+}
+
+/* Styles supplémentaires pour assurer la compatibilité */
+.tabs-wrapper .nav-tabs.flex-column {
+    flex-direction: column;
+}
+
+@media (min-width: 768px) {
+    .tabs-wrapper .nav-tabs.flex-md-row {
+        flex-direction: row !important;
+    }
+}
+
+.tabs-wrapper .nav-tabs.flex-column .nav-item {
+    margin-right: 0;
+    margin-bottom: 0.25rem;
+}
+
+.tabs-wrapper .nav-tabs.flex-column .nav-item a {
+    margin-right: 0;
+}
+
+/* Nettoyage des flottants pour clearfix */
+.tabs-wrapper .clearfix::after {
+    display: block;
+    clear: both;
+    content: "";
+}

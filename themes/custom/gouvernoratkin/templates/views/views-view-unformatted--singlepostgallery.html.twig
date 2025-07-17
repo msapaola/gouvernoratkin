@@ -1,0 +1,46 @@
+{#
+/**
+ * @file
+ * Theme override to display a view of unformatted rows.
+ *
+ * Available variables:
+ * - title: The title of this group of rows. May be empty.
+ * - rows: A list of the view's row items.
+ *   - attributes: The row's HTML attributes.
+ *   - content: The row's content.
+ * - view: The view object.
+ * - default_row_class: A flag indicating whether default classes should be
+ *   used on rows.
+ *
+ * @see template_preprocess_views_view_unformatted()
+ */
+#}
+{% if title %}
+  <h3>{{ title }}</h3>
+{% endif %}
+         
+     <section id="gouvernorat-gallery-section" class="container my-5">
+      {% for row in rows %}
+          {{- row.content -}}
+      {% endfor %}
+     </section>
+    <!-- Modal plein écran avec ID spécifique -->
+    <div id="gov-fullscreen-modal" class="gov-fullscreen-modal">
+        <div class="gov-fullscreen-content">
+            <button class="gov-fullscreen-close">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="gov-fullscreen-nav">
+                <button class="gov-prev-btn">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="gov-next-btn">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <img src="" alt="" class="gov-fullscreen-img">
+        </div>
+    </div>
+     
+     
+
