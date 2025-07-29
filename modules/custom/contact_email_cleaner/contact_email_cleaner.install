@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Contact Email Cleaner module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function contact_email_cleaner_install() {
+  \Drupal::messenger()->addStatus(t('Le module Contact Email Cleaner a été installé avec succès.'));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function contact_email_cleaner_uninstall() {
+  \Drupal::messenger()->addStatus(t('Le module Contact Email Cleaner a été désinstallé.'));
+} 
