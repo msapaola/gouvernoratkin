@@ -5,8 +5,6 @@
  * Contact Email Cleaner module.
  */
 
-use Drupal\Core\Render\Element;
-
 /**
  * Implements hook_mail_alter().
  */
@@ -14,37 +12,23 @@ function contact_email_cleaner_mail_alter(&$message) {
   // Only process contact form emails.
   if ($message['module'] === 'contact' && in_array($message['key'], ['page_mail', 'page_copy', 'user_mail', 'user_copy'])) {
     
-    // Clean the body content by removing debug comments and improving formatting.
+    // Clean the body content by removing debug comments.
     if (!empty($message['body'])) {
       $cleaned_body = [];
       
       foreach ($message['body'] as $body_part) {
-        if (is_string($body_part)) {
-          // Clean string content.
-          $cleaned_part = _contact_email_cleaner_clean_content($body_part);
-          if (!empty($cleaned_part)) {
-            $cleaned_body[] = $cleaned_part;
-          }
-        }
-        elseif ($body_part instanceof \Drupal\Component\Render\MarkupInterface) {
-          // Clean markup content.
-          $cleaned_part = _contact_email_cleaner_clean_content((string) $body_part);
-          if (!empty($cleaned_part)) {
-            $cleaned_body[] = \Drupal\Component\Render\Markup::create($cleaned_part);
-          }
-        }
-        else {
-          // Keep other content types as is.
-          $cleaned_body[] = $body_part;
+        // Convert to string and clean content.
+        $body_string = is_string($body_part) ? $body_part : (string) $body_part;
+        $cleaned_part = _contact_email_cleaner_clean_content($body_string);
+        
+        if (!empty($cleaned_part)) {
+          $cleaned_body[] = $cleaned_part;
         }
       }
       
-      $message['body'] = $cleaned_body;
-    }
-    
-    // Set proper headers for HTML emails.
-    if (!empty($message['headers']['Content-Type']) && strpos($message['headers']['Content-Type'], 'text/html') !== FALSE) {
-      $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed';
+      if (!empty($cleaned_body)) {
+        $message['body'] = $cleaned_body;
+      }
     }
   }
 }
@@ -53,6 +37,10 @@ function contact_email_cleaner_mail_alter(&$message) {
  * Clean content by removing debug comments and improving formatting.
  */
 function _contact_email_cleaner_clean_content($content) {
+  if (empty($content)) {
+    return '';
+  }
+  
   // Remove Drupal debug comments.
   $content = preg_replace('/<!--\s*THEME DEBUG.*?-->/s', '', $content);
   $content = preg_replace('/<!--\s*FILE NAME SUGGESTIONS.*?-->/s', '', $content);
@@ -61,57 +49,13 @@ function _contact_email_cleaner_clean_content($content) {
   $content = preg_replace('/<!--\s*💡.*?-->/s', '', $content);
   $content = preg_replace('/<!--\s*✅.*?-->/s', '', $content);
   
+  // Remove any remaining HTML comments.
+  $content = preg_replace('/<!--.*?-->/s', '', $content);
+  
   // Remove empty lines and normalize spacing.
   $content = preg_replace('/\n\s*\n\s*\n/', "\n\n", $content);
+  $content = preg_replace('/\s+/', ' ', $content);
   $content = trim($content);
   
   return $content;
-}
-
-/**
- * Implements hook_theme().
- */
-function contact_email_cleaner_theme() {
-  return [
-    'contact_message_mail' => [
-      'variables' => [
-        'contact_message' => NULL,
-        'sender' => NULL,
-        'contact_form' => NULL,
-      ],
-    ],
-  ];
-}
-
-/**
- * Implements hook_mail().
- */
-function contact_email_cleaner_mail($key, &$message, $params) {
-  if ($message['module'] === 'contact' && in_array($key, ['page_mail', 'page_copy', 'user_mail', 'user_copy'])) {
-    
-    // Get the contact message and sender.
-    $contact_message = $params['contact_message'];
-    $sender = $params['sender'];
-    $contact_form = $params['contact_form'] ?? NULL;
-    
-    // Create a clean HTML template for the email.
-    $template = [
-      '#theme' => 'contact_message_mail',
-      '#contact_message' => $contact_message,
-      '#sender' => $sender,
-      '#contact_form' => $contact_form,
-    ];
-    
-    // Render the template.
-    $rendered = \Drupal::service('renderer')->renderRoot($template);
-    
-    // Clean the rendered content.
-    $cleaned_content = _contact_email_cleaner_clean_content($rendered);
-    
-    // Replace the body with our clean version.
-    $message['body'] = [$cleaned_content];
-    
-    // Set HTML content type.
-    $message['headers']['Content-Type'] = 'text/html; charset=UTF-8; format=flowed';
-  }
 } 
