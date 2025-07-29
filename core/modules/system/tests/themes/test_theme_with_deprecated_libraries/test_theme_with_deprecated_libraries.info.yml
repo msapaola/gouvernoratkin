@@ -1,7 +1,7 @@
 name: 'Test theme with deprecated libraries'
 type: theme
 description: 'Test theme to test themes with deprecated libraries.'
-# version: VERSION
+version: VERSION
 package: Testing
 base theme: test_theme
 
@@ -20,8 +20,3 @@ libraries-override:
 libraries-extend:
   theme_test/another_deprecated_library:
     - test_theme_with_deprecated_libraries/library
-
-# Information added by Drupal.org packaging script on 2025-05-08
-version: '11.1.7'
-project: 'drupal'
-datestamp: 1746678275

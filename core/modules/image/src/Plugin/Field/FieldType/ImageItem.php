@@ -72,7 +72,6 @@ class ImageItem extends FileItem {
         'width' => NULL,
         'height' => NULL,
       ],
-      'display_default' => TRUE,
     ] + parent::defaultStorageSettings();
   }
 

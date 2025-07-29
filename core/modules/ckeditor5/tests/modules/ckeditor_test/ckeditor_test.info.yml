@@ -4,8 +4,3 @@ description: "Provides test a test editor that with the ID ckeditor."
 package: Testing
 dependencies:
   - drupal:editor_test
-
-# Information added by Drupal.org packaging script on 2025-05-08
-version: '11.1.7'
-project: 'drupal'
-datestamp: 1746678275

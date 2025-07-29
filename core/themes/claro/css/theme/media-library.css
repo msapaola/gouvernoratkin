@@ -406,8 +406,7 @@
  * Style the media library grid items.
  */
 
-.media-library-item,
-.media-library-item__preview-wrapper {
+.media-library-item {
   position: relative;
 }
 

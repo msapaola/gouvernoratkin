@@ -106,18 +106,18 @@ class FormattableMarkup implements MarkupInterface, \Countable {
    *
    * Secure examples.
    * @code
-   * // Return the HTML string "Prefix $some_variable".
+   * // Returns the HTML string "Prefix $some_variable".
    * $this->placeholderFormat('Prefix @foo', ['@foo' => $some_variable]);
-   * // Convert an object to a sanitized string.
+   * // Convert object to a sanitized string.
    * $this->placeholderFormat('Non-sanitized replacement value: @foo', ['@foo' => (string) $safe_string_interface_object]);
-   * // Wrap $some_variable in an <em> tag.
+   * // Wraps $some_variable in an <em> tag.
    * $this->placeholderFormat('Prefix %foo', ['%foo' => $some_variable]);
    * // The following are using the : placeholder inside an HTML tag.
-   * $this->placeholderFormat('<a href=":foo">link text</a>', [':foo' => $some_variable]);
-   * $this->placeholderFormat('<a href=":foo" title="static text">link text</a>', [':foo' => $some_variable]);
-   * $this->placeholderFormat('<a href=":foo">link text</a>', [':foo' => $some_variable]);
-   * // Use a : placeholder inside an HTML tag.
-   * $this->placeholderFormat('<img src=":foo" />', [':foo' => '/image.png']);
+   * $this->placeholderFormat('<a href=":foo">link text</a>, ['@foo' => $some_variable]);
+   * $this->placeholderFormat('<a href=":foo" title="static text">link text</a>, ['@foo' => $some_variable]);
+   * $this->placeholderFormat('<a href=":foo">@foo</a>, ['@foo' => $some_variable]);
+   * // Use : placeholder inside an HTML tag.
+   * $this->placeholderFormat('<img src=":foo" />, ['@foo' => '/image.png']);
    * @endcode
    * The above are typical examples of using the placeholders correctly.
    *
@@ -128,7 +128,7 @@ class FormattableMarkup implements MarkupInterface, \Countable {
    * $this->placeholderFormat('<a @foo>link text</a>, ['@foo' => $some_variable]);
    * $this->placeholderFormat('<a href="@foo">link text</a>, ['@foo' => $some_variable]);
    * $this->placeholderFormat('<a title="@foo">link text</a>, ['@foo' => $some_variable]);
-   * // Implicitly convert an object to a string, which is not sanitized.
+   * // Convert object to a string nad not string that is not sanitized.
    * $this->placeholderFormat('Non-sanitized replacement value: @foo', ['@foo' => $safe_string_interface_object]);
    * @endcode
    * These are the more common mistakes that can be made. Make sure that your

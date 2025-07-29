@@ -43,7 +43,7 @@ interface ComposerProcessRunnerInterface
      *   ```
      * @param \PhpTuf\ComposerStager\API\Process\Service\OutputCallbackInterface|null $callback
      *   An optional PHP callback to run whenever there is process output.
-     * @param int<0, max> $timeout
+     * @param int $timeout
      *   An optional process timeout (maximum runtime) in seconds. If set to
      *   zero (0), no time limit is imposed.
      *

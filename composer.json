@@ -30,6 +30,7 @@
         "drupal/slick": "3.0.2",
         "drupal/slick_extras": "^2.0",
         "drupal/slick_views": "^3.0",
+        "drupal/smtp": "^1.4",
         "drupal/statistics": "^1.0",
         "drupal/tb_megamenu": "^3.0@alpha",
         "drush/drush": "^13.5"

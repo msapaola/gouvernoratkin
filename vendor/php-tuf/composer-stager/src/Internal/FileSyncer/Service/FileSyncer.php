@@ -55,7 +55,7 @@ final class FileSyncer implements FileSyncerInterface
         $this->assertSourceAndDestinationAreDifferent($source, $destination);
         $this->assertSourceIsValid($source);
 
-        $this->runCommand($exclusions, $source, $destination, $callback, $timeout);
+        $this->runCommand($exclusions, $source, $destination, $callback);
     }
 
     /** @infection-ignore-all This only makes any difference on Windows, whereas Infection is only run on Linux. */
@@ -107,17 +107,12 @@ final class FileSyncer implements FileSyncerInterface
         }
     }
 
-    /**
-     * @param int<0, max> $timeout
-     *
-     * @throws \PhpTuf\ComposerStager\API\Exception\IOException
-     */
+    /** @throws \PhpTuf\ComposerStager\API\Exception\IOException */
     private function runCommand(
         ?PathListInterface $exclusions,
         PathInterface $source,
         PathInterface $destination,
         ?OutputCallbackInterface $callback,
-        int $timeout = ProcessInterface::DEFAULT_TIMEOUT,
     ): void {
         $this->ensureDestinationDirectoryExists($destination);
         $command = $this->buildCommand($source, $destination, $exclusions);
@@ -128,7 +123,6 @@ final class FileSyncer implements FileSyncerInterface
                 $this->pathFactory->create('/', $source),
                 [],
                 $callback,
-                $timeout,
             );
         } catch (ExceptionInterface $e) {
             throw new IOException($e->getTranslatableMessage(), 0, $e);

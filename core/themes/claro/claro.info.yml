@@ -16,7 +16,7 @@ base theme: false
 description: A clean, accessible, and powerful Drupal administration theme.
 alt text: Screenshot of Claro, Drupal administration theme.
 package: Core
-# version: VERSION
+version: VERSION
 libraries:
   - core/drupal.message
   - core/normalize
@@ -175,8 +175,3 @@ regions:
   sidebar_first: First sidebar
 regions_hidden:
   - sidebar_first
-
-# Information added by Drupal.org packaging script on 2025-05-08
-version: '11.1.7'
-project: 'drupal'
-datestamp: 1746678275

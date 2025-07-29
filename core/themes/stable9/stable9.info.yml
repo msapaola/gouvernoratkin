@@ -2,7 +2,7 @@ name: Stable 9
 type: theme
 description: A base theme using Drupal 9.0.0's core markup and CSS.
 package: Core
-# version: VERSION
+version: VERSION
 base theme: false
 hidden: true
 
@@ -299,8 +299,3 @@ libraries-override:
     css:
       theme:
         css/field_ui_display_mode_table.css: css/field_ui/field_ui_display_mode_table.css
-
-# Information added by Drupal.org packaging script on 2025-05-08
-version: '11.1.7'
-project: 'drupal'
-datestamp: 1746678275

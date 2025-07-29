@@ -50,9 +50,6 @@ exports.command = function drupalInstall(
       value: encodeURIComponent(installData.user_agent),
       path: url.pathname,
     });
-    // Set the HTTP_USER_AGENT environment variable to detect the test
-    // environment in the command line.
-    process.env.HTTP_USER_AGENT = installData.user_agent;
   } catch (error) {
     this.assert.fail(error);
   }

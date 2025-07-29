@@ -86,7 +86,7 @@ class UserPermissionsForm extends FormBase {
    *   An array of role objects.
    */
   protected function getRoles() {
-    return $this->roleStorage->loadMultipleOverrideFree();
+    return $this->roleStorage->loadMultiple();
   }
 
   /**

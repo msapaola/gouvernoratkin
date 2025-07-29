@@ -2,7 +2,7 @@ name: 'Testing config import theme'
 type: theme
 base theme: stable9
 description: 'Theme for testing profile uninstall'
-# version: VERSION
+version: VERSION
 regions:
   sidebar_first: 'Left sidebar'
   sidebar_second: 'Right sidebar'
@@ -11,8 +11,3 @@ regions:
   footer: Footer
   highlighted: Highlighted
   help: Help
-
-# Information added by Drupal.org packaging script on 2025-05-08
-version: '11.1.7'
-project: 'drupal'
-datestamp: 1746678275

@@ -410,9 +410,7 @@
         return;
       }
       window.addEventListener('dialog:afterclose', () => {
-        // This empty the array while keeping the existing array reference,
-        // to keep event listeners working.
-        Drupal.MediaLibrary.currentSelection.length = 0;
+        Drupal.MediaLibrary.currentSelection = [];
       });
     },
   };

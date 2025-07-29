@@ -2,9 +2,4 @@ name: 'Test @DataType normalizer'
 type: module
 description: 'Provides test support for @DataType-level normalization.'
 package: Testing
-# version: VERSION
-
-# Information added by Drupal.org packaging script on 2025-05-08
-version: '11.1.7'
-project: 'drupal'
-datestamp: 1746678275
+version: VERSION
