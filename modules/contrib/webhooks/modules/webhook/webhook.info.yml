@@ -1,0 +1,12 @@
+name: Webhook
+type: module
+description: 'Provides a webhook entity.'
+package: Webhooks
+core_version_requirement: ^10 || ^11
+dependencies:
+  - webhooks
+
+# Information added by Drupal.org packaging script on 2025-05-19
+version: '3.0.0-alpha3'
+project: 'webhooks'
+datestamp: 1747659567

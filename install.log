@@ -143,7 +143,7 @@
         <select data-drupal-selector="edit-langcode" id="edit-langcode" name="langcode" class="form-select form-element form-element--type-select"><option value="af">Afrikaans</option><option value="ast">Asturianu</option><option value="az">Azərbaycanca</option><option value="id">Bahasa Indonesia</option><option value="jv">Basa Java</option><option value="bs">Bosanski</option><option value="br">Breton</option><option value="ca">Català</option><option value="cy">Cymraeg</option><option value="da">Dansk</option><option value="de">Deutsch</option><option value="et">Eesti</option><option value="en" selected="selected">English</option><option value="en-gb">English, British</option><option value="es">Español</option><option value="eo">Esperanto</option><option value="eu">Euskera</option><option value="fil">Filipino</option><option value="fr">Français</option><option value="fy">Frysk</option><option value="fo">Føroyskt</option><option value="ga">Gaeilge</option><option value="gl">Galego</option><option value="gd">Gàidhlig</option><option value="hr">Hrvatski</option><option value="it">Italiano</option><option value="rw">Kinyarwanda</option><option value="sw">Kiswahili</option><option value="ht">Kreyòl ayisyen</option><option value="ku">Kurdî</option><option value="lv">Latviešu</option><option value="lt">Lietuvių</option><option value="xx-lolspeak">Lolspeak</option><option value="hu">Magyar</option><option value="mg">Malagasy</option><option value="mt">Malti</option><option value="nl">Nederlands</option><option value="nb">Norsk, bokmål</option><option value="nn">Norsk, nynorsk</option><option value="oc">Occitan</option><option value="os">Ossetian</option><option value="pl">Polski</option><option value="pt-br">Português, Brasil</option><option value="pt">Português, Internacional</option><option value="pt-pt">Português, Portugal</option><option value="ro">Română</option><option value="rm-rumgr">Rumantsch Grischun</option><option value="rhg">Ruáinga</option><option value="gsw-berne">Schwyzerdütsch</option><option value="sco">Scots</option><option value="sq">Shqip</option><option value="en-x-simple">Simple English</option><option value="sk">Slovenčina</option><option value="sl">Slovenščina</option><option value="fi">Suomi</option><option value="sv">Svenska</option><option value="se">Sámi</option><option value="vi">Tiếng Việt</option><option value="tr">Türkçe</option><option value="is">Íslenska</option><option value="cs">Čeština</option><option value="haw">ʻŌlelo Hawaiʻi</option><option value="el">Ελληνικά</option><option value="be">Беларуская</option><option value="bg">Български</option><option value="ky">Кыргызча</option><option value="mk">Македонски</option><option value="ru">Русский</option><option value="sr">Српски</option><option value="tyv">Тыва дыл</option><option value="uk">Українська</option><option value="mn">монгол</option><option value="kk">Қазақ</option><option value="hy">Հայերեն</option><option value="he">עברית</option><option value="ug">ئۇيغۇرچە</option><option value="ur">اردو</option><option value="ar">العربية</option><option value="ms">بهاس ملايو</option><option value="prs">دری</option><option value="fa">فارسی</option><option value="ps">پښتو</option><option value="ne">नेपाली</option><option value="mr">मराठी</option><option value="hi">हिन्दी</option><option value="bn">বাংলা</option><option value="pa">ਪੰਜਾਬੀ</option><option value="gu">ગુજરાતી</option><option value="or">ଓଡିଆ</option><option value="ta">தமிழ்</option><option value="ta-lk">தமிழ், இலங்கை</option><option value="te">తెలుగు</option><option value="kn">ಕನ್ನಡ</option><option value="ml">മലയാളം</option><option value="si">සිංහල</option><option value="th">ภาษาไทย</option><option value="lo">ພາສາລາວ</option><option value="bo">བོད་སྐད་</option><option value="dz">རྫོང་ཁ</option><option value="my">ဗမာစကား</option><option value="ka">ქართული ენა</option><option value="am">አማርኛ</option><option value="km">ភាសាខ្មែរ</option><option value="ja">日本語</option><option value="zh-hans">简体中文</option><option value="zh-hant">繁體中文</option><option value="ko">한국어</option></select>
         </div>
 <div data-drupal-states="{&quot;invisible&quot;:{&quot;select[name=\u0022langcode\u0022]&quot;:{&quot;value&quot;:&quot;en&quot;}}}" id="edit-help" class="js-form-item form-item js-form-type-item form-type--item js-form-item-help form-item--help form-item--no-label">
-        <p>Translations will be downloaded from the <a href="https://localize.drupal.org/download">Drupal Translation website</a>. If you do not want this, select <a href="https://merveillesenga.com/core/install.php?langcode=en">English</a>.</p>
+        <p>Translations will be downloaded from the <a href="https://localize.drupal.org/download">Drupal Translation website</a>. If you do not want this, select <a href="https://darkorchid-rail-176211.hostingersite.com/core/install.php?langcode=en">English</a>.</p>
         </div>
 <input data-drupal-selector="form-pfiohlxhfegydbzxiyimbajrkuolvrthkavzjmiugis" type="hidden" name="form_build_id" value="form-PfioHLXhfEGYDBZXiYIMBAjRkUOlVrtHkAvzjmIUGis"/><input data-drupal-selector="edit-install-select-language-form" type="hidden" name="form_id" value="install_select_language_form"/><div data-drupal-selector="edit-actions" class="form-actions js-form-wrapper form-wrapper" id="edit-actions"><input data-drupal-selector="edit-submit" type="submit" id="edit-submit" name="op" value="Save and continue" class="button button--primary js-form-submit form-submit"/></div>
 
@@ -804,23 +804,23 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <meta http-equiv="refresh" content="0;url='https://merveillesenga.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1'" />
+        <meta http-equiv="refresh" content="0;url='https://darkorchid-rail-176211.hostingersite.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1'" />
 
-        <title>Redirecting to https://merveillesenga.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1</title>
+        <title>Redirecting to https://darkorchid-rail-176211.hostingersite.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1</title>
     </head>
     <body>
-        Redirecting to <a href="https://merveillesenga.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1">https://merveillesenga.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1</a>.
+        Redirecting to <a href="https://darkorchid-rail-176211.hostingersite.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1">https://darkorchid-rail-176211.hostingersite.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1</a>.
     </body>
 </html><!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8" />
-        <meta http-equiv="refresh" content="0;url='https://merveillesenga.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1&amp;id=2&amp;op=start'" />
+        <meta http-equiv="refresh" content="0;url='https://darkorchid-rail-176211.hostingersite.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1&amp;id=2&amp;op=start'" />
 
-        <title>Redirecting to https://merveillesenga.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1&amp;id=2&amp;op=start</title>
+        <title>Redirecting to https://darkorchid-rail-176211.hostingersite.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1&amp;id=2&amp;op=start</title>
     </head>
     <body>
-        Redirecting to <a href="https://merveillesenga.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1&amp;id=2&amp;op=start">https://merveillesenga.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1&amp;id=2&amp;op=start</a>.
+        Redirecting to <a href="https://darkorchid-rail-176211.hostingersite.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1&amp;id=2&amp;op=start">https://darkorchid-rail-176211.hostingersite.com/core/install.php?rewrite=ok&amp;langcode=fr&amp;profile=standard&amp;continue=1&amp;id=2&amp;op=start</a>.
     </body>
 </html><!DOCTYPE html>
 <html lang="fr" dir="ltr">
@@ -1526,7 +1526,7 @@
 <meta name="HandheldFriendly" content="true" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="icon" href="/core/themes/olivero/favicon.ico" type="image/vnd.microsoft.icon" />
-<link rel="alternate" type="application/rss+xml" title="" href="https://merveillesenga.com/rss.xml" />
+<link rel="alternate" type="application/rss+xml" title="" href="https://darkorchid-rail-176211.hostingersite.com/rss.xml" />
 
     <title>Welcome! | Gouvernorat de Kinshasa</title>
     <link rel="stylesheet" media="all" href="/sites/default/files/css/css_mTZUCqdMFY6dt86-qGV1eJ4CGaRwyiryX2d6gFitQDY.css?delta=0&amp;language=fr&amp;theme=olivero&amp;include=eJx9T1sSwyAIvJDGM6HShgmRDGhsbt-0U9OZfvSHxy67QJJS8VEbcMjaNuApXYhnKos5O6ziGiIYOmHaUSVs0lEx-3j4yJKWi7ghZrcTdgvvOK2SG3-FBXa6QyUp3vBclUGPizQETbPvlPEXK6Aq3VURjqDhk10z1HH4q57o9DSX_n01tDaL1tTqGBn9EwWwa-g" />

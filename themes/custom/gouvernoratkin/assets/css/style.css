@@ -313,6 +313,13 @@ p:last-child {
 }
 .navbar-toggler:focus { box-shadow: none; outline: none; }
 
+.navbar-collapse {
+    /* Annule les valeurs spécifiées par Bootstrap pour ces propriétés Flexbox */
+    flex-basis: initial; /* ou 'auto' si c'est la valeur par défaut pour l'élément */
+    flex-grow: initial;   /* La valeur initiale est 0 */
+    align-items: initial; /* La valeur initiale dépend du conteneur parent */
+}
+
 @media (max-width: 991px) {
   .navbar-collapse {
     background-color: var(--whiteColor);

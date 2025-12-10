@@ -1,0 +1,6 @@
+services:
+  webhooks_test.event_subscriber:
+    class: Drupal\webhooks_test\EventSubscriber\WebhooksTestSubscriber
+    arguments: ['@messenger', '@state']
+    tags:
+      - { name: event_subscriber }

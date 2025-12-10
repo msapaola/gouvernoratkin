@@ -1,0 +1,9 @@
+entity.webhook_config.collection:
+  route_name: entity.webhook_config.collection
+  title: 'List'
+  base_route: entity.webhook_config.collection
+webhooks.admin_settings:
+  route_name: webhooks.admin_settings
+  title: 'Settings'
+  weight: 100
+  base_route: entity.webhook_config.collection

@@ -715,6 +715,11 @@ $settings['file_chmod_file'] = 0644;
  */
 $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
 
+$settings['trusted_host_patterns'] = [
+    '^darkorchid-rail-176211\.hostingersite\.com$', 
+    '^.+\.darkorchid-rail-176211\.hostingersite\.com$',
+];
+    
 /**
  * Override the default service container class.
  *
@@ -762,10 +767,12 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
  *
  * @see https://www.drupal.org/docs/installing-drupal/trusted-host-settings
  */
-$settings['trusted_host_patterns'] = [
-  '^merveillesenga\.com$',
-  '^.+\.merveillesenga\.com$',
-];
+/** 
+*$settings['trusted_host_patterns'] = [
+*  '^merveillesenga\.com$',
+*  '^.+\.merveillesenga\.com$',
+*];
+/**
 # $settings['trusted_host_patterns'] = [];
 
 /**

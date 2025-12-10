@@ -1,0 +1,5 @@
+webhook.add_form:
+  route_name: entity.webhook.add_form
+  title: 'Add webhook'
+  appears_on:
+    - entity.webhook.collection

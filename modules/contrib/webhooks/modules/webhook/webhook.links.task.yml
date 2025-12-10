@@ -1,0 +1,18 @@
+entity.webhook.view:
+  title: View
+  route_name: entity.webhook.canonical
+  base_route: entity.webhook.canonical
+entity.webhook.edit_form:
+  title: Edit
+  route_name: entity.webhook.edit_form
+  base_route: entity.webhook.canonical
+entity.webhook.delete_form:
+  title: Delete
+  route_name: entity.webhook.delete_form
+  base_route: entity.webhook.canonical
+  weight: 10
+entity.webhook.collection:
+  title: Webhooks
+  route_name: entity.webhook.collection
+  base_route: system.admin_content
+  weight: 10
