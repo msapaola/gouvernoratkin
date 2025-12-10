@@ -240,7 +240,7 @@ p:last-child {
 .navbar-brand img { 
     width: 100%; 
     height: auto; 
-    max-width: 300px;
+    max-width: 250px;
     object-fit:cover;
     
 }
