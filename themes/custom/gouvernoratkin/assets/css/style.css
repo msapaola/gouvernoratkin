@@ -240,7 +240,7 @@ p:last-child {
 .navbar-brand img { 
     width: 100%; 
     height: auto; 
-    max-width: 200px;
+    max-width: 300px;
     object-fit:cover;
     
 }
@@ -875,6 +875,11 @@ p:last-child {
       .social-container {
         padding: 10px;
       }
+
+      .navbar-brand img {
+        max-width: 200px;
+    }
+
     }
 
 /* Footer Area CSS */
