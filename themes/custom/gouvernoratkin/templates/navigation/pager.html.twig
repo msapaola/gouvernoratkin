@@ -31,6 +31,7 @@
  */
 #}
 {% if items %}
+<div class="container">
   <nav class="pager"  role="navigation" aria-labelledby="{{ heading_id }}" aria-label="{{ 'Pagination'|t }}">
     <h4 id="{{ heading_id }}" class="visually-hidden">{{ 'Pagination'|t }}</h4>
     <ul class="pagination js-pager__items">
@@ -100,4 +101,5 @@
       {% endif %}
     </ul>
   </nav>
+</div>
 {% endif %}
