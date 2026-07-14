@@ -1,0 +1,486 @@
+<!--========== BEGIN TWIG CLASSES ==========--> 
+ {% 
+  set logo_classes = (page.logo) ? 'col-3' : ''
+  %} 
+
+  {% 
+  set menu_classes = (page.menu) ? 'col-6' : ''
+  %} 
+
+  {% 
+  set sidebar_classes = (page.sidebar) ? 'col-3' : ''
+  %} 
+  
+  {% 
+  set singlepost_classes = (page.singlepost) ? 'blog-details pt-100' : ''  
+  %}
+
+ 
+<!--========== END TWIG CLASSES ==========--> 
+<!-- Navigation area start -->
+    <header>
+    <nav class="navbar navbar-expand-lg">
+      <div class="container">
+        {% if page.logo %}
+          {{page.logo}}
+        {% endif %}
+        
+        <!-- Boutons à droite sur mobile (recherche et contact) -->
+        <div class="d-flex d-lg-none mobile-actions">
+          <button class="popup-button"><i class="fas fa-search"></i></button>
+          <a href="/contact" class="btn-contact-mobile">
+            <i class="fas fa-envelope"></i>
+          </a>
+        </div>
+        
+        <!-- Bouton hamburger -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <i class="fas fa-bars"></i>
+        </button>
+        
+        <!-- Menu principal -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          {% if page.menu %}
+            {{page.menu}}
+          {% endif %}
+          
+          <!-- Boutons à droite sur desktop (recherche et contact) -->
+          <div class="d-none d-lg-flex align-items-center">
+            <button class="popup-button"><i class="fas fa-search"></i></button>
+            <a href="/Contact" class="btn btn-contact">Contact</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+ <!-- Navigation area end --> 
+  
+ 
+  {% if page.top_menu %}
+  
+      <div class="container">
+          {{page.top_menu}}
+      </di>
+  
+   {% endif %}
+   
+   <!--========== BEGIN CONTENT ==========--> 
+   
+<style>
+/* Styles additionnels spécifiques à la page À propos minimisés */
+
+/* Mise en évidence du texte */
+.text-highlight {
+  font-weight: 700;
+  color: var(--mainColor);
+}
+
+/* Conteneur d'image avec légende superposée */
+.about-image-container {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--boxShadow);
+}
+
+.about-image-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 15px;
+}
+
+/* Boîte de caractéristique (Piliers) */
+.feature-box-about {
+  background: var(--whiteColor);
+  border-radius: 10px;
+  padding: 30px;
+  height: 100%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  transition: var(--transition);
+}
+
+.feature-box-about:hover {
+  transform: translateY(-10px);
+}
+
+.feature-box-about .feature-icon {
+  font-size: 2.5rem;
+  color: var(--mainColor);
+  margin-bottom: 20px;
+}
+
+/* Chronologie (Timeline) */
+.about-timeline {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.about-timeline::after {
+  content: '';
+  position: absolute;
+  width: 6px;
+  background-color: var(--mainColor);
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  margin-left: -3px;
+}
+
+.timeline-container {
+  padding: 10px 40px;
+  position: relative;
+  width: 50%;
+  box-sizing: border-box;
+}
+
+.timeline-container.left { left: 0; }
+.timeline-container.right { left: 50%; }
+
+.timeline-content {
+  padding: 20px 30px;
+  background-color: var(--whiteColor);
+  position: relative;
+  border-radius: 6px;
+  box-shadow: var(--boxShadow);
+}
+
+.timeline-date {
+  display: inline-block;
+  background-color: var(--mainColor);
+  color: var(--whiteColor);
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+@media screen and (max-width: 768px) {
+  .about-timeline::after { left: 31px; }
+  .timeline-container {
+    width: 100%;
+    padding-left: 70px;
+    padding-right: 25px;
+  }
+  .timeline-container.right { left: 0%; }
+}
+</style>
+
+<!-- Section principale -->
+<section class="ptb-100">
+    <div class="container">
+        <div class="default-section-title default-section-title-middle">
+            <h3 class="mb-5" data-aos="fade-up">
+                Qui sommes-nous ?
+            </h3>
+            <p class="text-center mb-5" data-aos="fade-up" data-aos-delay="200" style="font-size: 1.1rem;">
+                Le Gouvernorat de Kinshasa est l'institution dédiée à la gestion et au développement de la capitale de la République Démocratique du Congo. Nous œuvrons chaque jour pour <span class="text-highlight">améliorer la qualité de vie des Kinoises et des Kinois</span>. Notre engagement vise à transformer Kinshasa en une métropole moderne, dynamique et accueillante, tout en préservant son riche patrimoine culturel et historique.
+            </p>
+        </div>
+        
+        <div class="row align-items-center mb-5">
+            <div class="col-lg-6" data-aos="zoom-in" data-aos-delay="100">
+                <p>
+                    En tant qu'autorité administrative de la ville-province, le Gouvernorat de Kinshasa coordonne l'ensemble des services publics et met en œuvre les politiques de développement urbain. Notre action s'articule autour de plusieurs axes prioritaires :
+                </p>
+                <ul>
+                    <li>Développement des infrastructures urbaines</li>
+                    <li>Amélioration des services sociaux de base</li>
+                    <li>Gestion durable de l'environnement</li>
+                    <li>Promotion de l'entreprenariat local</li>
+                    <li>Renforcement de la gouvernance participative</li>
+                </ul>
+                <p class="mt-3">
+                    Nous travaillons en étroite collaboration avec les différentes parties prenantes, notamment les communes, la société civile, le secteur privé et les partenaires internationaux, afin d'assurer un développement harmonieux et inclusif de notre capitale.
+                </p>
+            </div>
+            <div class="col-lg-6" data-aos="zoom-in" data-aos-delay="100">
+                <div class="about-image-container">
+                    <img src="/sites/default/files/inline-images/bumba_tracteur.jpg" alt="Gouvernorat de Kinshasa" width="1600" height="1066" class="img-fluid">
+                    <div class="about-image-overlay">
+                        <p class="mb-0 text-white font-italic text-center">
+                            Kinshasa, ville dynamique en pleine transformation
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sous-sections -->
+        <div class="row mt-5">
+            <div class="col-md-6 mb-4">
+                <h3 data-aos="fade-up">Géographie de Kinshasa</h3>
+                <p data-aos="fade-up" data-aos-delay="200">
+                    Kinshasa s'étend sur une superficie de <strong>9 965 km²</strong>, offrant un cadre exceptionnel avec plus de 90 % de zones rurales et forestières préservées. Située sur la rive sud du majestueux fleuve Congo, au niveau du Pool Malebo, la ville bénéficie d'une position stratégique et d'un paysage unique qui en font une destination remarquable.
+                </p>
+            </div>
+            <div class="col-md-6 mb-4">
+                <h3 data-aos="fade-up">Population</h3>
+                <p data-aos="fade-up" data-aos-delay="200">
+                    En 2024, Kinshasa compte environ <strong>17 millions d'habitants</strong>, ce qui en fait la plus grande agglomération francophone au monde. Le <strong>français</strong> est la langue officielle, tandis que le <strong>lingala</strong> enrichit la vie quotidienne en tant que lingua franca, reflétant la diversité et la vitalité de notre population.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section des piliers -->
+<section class="ptb-100 bg-f9fbfe">
+    <div class="container">
+        <div class="default-section-title default-section-title-middle">
+            <h3 class="mb-5" data-aos="fade-up">Nos Piliers Fondamentaux</h3>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="zoom-in" data-aos-delay="100">
+                <div class="feature-box-about">
+                    <h4 class="mb-3" style="color: var(--mainColor); font-family: var(--fontFamily-heading);">Notre Mission</h4>
+                    <p>Servir la population kinoise avec intégrité et efficacité en assurant une gouvernance transparente et participative pour le développement durable et équilibré de notre capitale.</p>
+                    <p>Nous nous engageons à faciliter l'accès aux services essentiels et à créer un environnement propice à l'épanouissement de tous les citoyens.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="zoom-in" data-aos-delay="200">
+                <div class="feature-box-about">
+                    <h4 class="mb-3" style="color: var(--mainColor); font-family: var(--fontFamily-heading);">Notre Vision</h4>
+                    <p>Faire de Kinshasa une métropole moderne, inclusive et résiliente, reconnue comme un pôle de développement économique, culturel et technologique majeur en Afrique centrale.</p>
+                    <p>Nous aspirons à créer une ville où il fait bon vivre, avec des infrastructures de qualité et des opportunités pour tous.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="zoom-in" data-aos-delay="300">
+                <div class="feature-box-about">
+                    <h4 class="mb-3" style="color: var(--mainColor); font-family: var(--fontFamily-heading);">Nos Valeurs</h4>
+                    <p><strong>Transparence :</strong> Nous agissons avec intégrité et ouverture dans toutes nos décisions.</p>
+                    <p><strong>Innovation :</strong> Nous encourageons les solutions créatives face aux défis urbains.</p>
+                    <p><strong>Proximité :</strong> Nous restons à l'écoute des besoins de la population.</p>
+                    <p><strong>Excellence :</strong> Nous visons constamment l'amélioration de nos services.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section historique -->
+<section class="ptb-100">
+    <div class="container">
+        <div class="default-section-title default-section-title-middle">
+            <h3 class="mb-5" data-aos="fade-up">Notre Évolution Historique</h3>
+            <p class="text-center mb-5" data-aos="fade-up" data-aos-delay="200" style="font-size: 1.1rem;">
+                Depuis sa création, le Gouvernorat de Kinshasa a connu une évolution significative, marquée par des réalisations importantes qui ont contribué au développement de la capitale congolaise.
+            </p>
+        </div>
+        
+        <div class="about-timeline">
+            <div class="timeline-container left" data-aos="fade-right">
+                <div class="timeline-content">
+                    <span class="timeline-date">1881</span>
+                    <h4 style="color: var(--mainColor);">Fondation de Léopoldville</h4>
+                    <p class="mb-0">Fondée par Henry Morton Stanley, la ville est initialement un poste commercial et administratif sous le nom de Léopoldville.</p>
+                </div>
+            </div>
+            <div class="timeline-container right" data-aos="fade-left">
+                <div class="timeline-content">
+                    <span class="timeline-date">1923</span>
+                    <h4 style="color: var(--mainColor);">Capitale du Congo belge</h4>
+                    <p class="mb-0">Léopoldville devient la capitale administrative du Congo belge, stimulant son développement urbain.</p>
+                </div>
+            </div>
+            <div class="timeline-container left" data-aos="fade-right">
+                <div class="timeline-content">
+                    <span class="timeline-date">1960</span>
+                    <h4 style="color: var(--mainColor);">Indépendance de la RDC</h4>
+                    <p class="mb-0">La ville devient la capitale de la République Démocratique du Congo indépendante.</p>
+                </div>
+            </div>
+            <div class="timeline-container right" data-aos="fade-left">
+                <div class="timeline-content">
+                    <span class="timeline-date">1966</span>
+                    <h4 style="color: var(--mainColor);">Renommage en Kinshasa</h4>
+                    <p class="mb-0">La ville est rebaptisée Kinshasa pour affirmer l'identité nationale.</p>
+                </div>
+            </div>
+            <div class="timeline-container left" data-aos="fade-right">
+                <div class="timeline-content">
+                    <span class="timeline-date">2006</span>
+                    <h4 style="color: var(--mainColor);">Décentralisation</h4>
+                    <p class="mb-0">Mise en œuvre de la politique de décentralisation renforçant l'autonomie administrative et financière du Gouvernorat.</p>
+                </div>
+            </div>
+            <div class="timeline-container right" data-aos="fade-left">
+                <div class="timeline-content">
+                    <span class="timeline-date">2022</span>
+                    <h4 style="color: var(--mainColor);">Transformation numérique</h4>
+                    <p class="mb-0">Initiation du programme de digitalisation des services administratifs pour améliorer l'efficacité et la transparence de la gouvernance locale.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section administrative -->
+<section class="ptb-100 bg-f9fbfe">
+    <div class="container">
+        <div class="default-section-title default-section-title-middle">
+            <h3 class="mb-5" data-aos="fade-up">Organisation Administrative</h3>
+            <p class="text-center mb-5" data-aos="fade-up" data-aos-delay="200" style="font-size: 1.1rem;">
+                Kinshasa est une ville-province unique, organisée en 24 communes regroupées en 4 districts, témoignant de son dynamisme et de sa diversité administrative.
+            </p>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6 col-lg-3 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h4 style="color: var(--mainColor); font-family: var(--fontFamily-heading);">District de Lukunga</h4>
+                        <ul class="list-unstyled mt-3 mb-0" style="color: var(--paragraphColor); line-height: 2;">
+                            <li>Barumbu</li><li>Gombe</li><li>Kinshasa</li><li>Kintambo</li><li>Lingwala</li><li>Mont Ngafula</li><li>Ngaliema</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h4 style="color: var(--mainColor); font-family: var(--fontFamily-heading);">District de Funa</h4>
+                        <ul class="list-unstyled mt-3 mb-0" style="color: var(--paragraphColor); line-height: 2;">
+                            <li>Bandalungwa</li><li>Bumbu</li><li>Kalamu</li><li>Kasa-Vubu</li><li>Makala</li><li>Ngiri-Ngiri</li><li>Selembao</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h4 style="color: var(--mainColor); font-family: var(--fontFamily-heading);">District de Mont-Amba</h4>
+                        <ul class="list-unstyled mt-3 mb-0" style="color: var(--paragraphColor); line-height: 2;">
+                            <li>Kisenso</li><li>Lemba</li><li>Limete</li><li>Matete</li><li>Ngaba</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-body">
+                        <h4 style="color: var(--mainColor); font-family: var(--fontFamily-heading);">District de Tshangu</h4>
+                        <ul class="list-unstyled mt-3 mb-0" style="color: var(--paragraphColor); line-height: 2;">
+                            <li>Kimbanseke</li><li>Maluku</li><li>Masina</li><li>Ndjili</li><li>Nsele</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section économie et culture -->
+<section class="ptb-100">
+    <div class="container">
+        <div class="default-section-title default-section-title-middle">
+            <h3 class="mb-5" data-aos="fade-up">Économie et Culture</h3>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 mb-4" data-aos="zoom-in" data-aos-delay="100">
+                <div class="card h-100 border-0 shadow-sm p-3">
+                    <div class="card-body">
+                        <h4 class="mb-3" style="color: var(--mainColor); font-family: var(--fontFamily-heading);">Économie</h4>
+                        <p class="mb-0">
+                            Kinshasa est le cœur économique de la RDC, avec des secteurs prospères comme le commerce, l'industrie légère (textile, agroalimentaire) et les services (banques, télécommunications). Le quartier de Gombe, véritable centre d'affaires, abrite de nombreuses entreprises et institutions financières, faisant de la ville un pôle économique incontournable.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4" data-aos="zoom-in" data-aos-delay="200">
+                <div class="card h-100 border-0 shadow-sm p-3">
+                    <div class="card-body">
+                        <h4 class="mb-3" style="color: var(--mainColor); font-family: var(--fontFamily-heading);">Culture</h4>
+                        <p class="mb-0">
+                            Kinshasa est un carrefour culturel majeur en Afrique, berceau de la rumba congolaise et foyer de créativité. Avec des institutions prestigieuses comme l'Université de Kinshasa et le Stade des Martyrs, la ville rayonne par sa vitalité artistique et son riche patrimoine culturel.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section Hôtel de Ville -->
+<section class="ptb-100 bg-f9fbfe">
+    <div class="container">
+        <div class="default-section-title default-section-title-middle">
+            <h3 class="mb-5" data-aos="fade-up">Rôle de l'Hôtel de Ville</h3>
+            <p class="text-center mb-5" data-aos="fade-up" data-aos-delay="100" style="font-size: 1.1rem;">
+                L’Hôtel de Ville de Kinshasa, siège du Gouvernorat, est au cœur de la gestion et du développement de la ville-province, incarnant notre engagement pour une capitale moderne et prospère.
+            </p>
+        </div>
+        <div class="row">
+            <div class="col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <h4 style="color: var(--mainColor);">Responsabilités</h4>
+                <ul class="mt-3">
+                    <li>Gestion des finances publiques</li>
+                    <li>Planification urbaine</li>
+                    <li>Coordination des 24 communes</li>
+                    <li>Services techniques (voirie, assainissement, transports, etc.)</li>
+                </ul>
+            </div>
+            <div class="col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <h4 style="color: var(--mainColor);">Initiatives récentes</h4>
+                <ul class="mt-3">
+                    <li>Programme "Kinshasa ezo bonga" pour moderniser la ville</li>
+                    <li>Mesures pour améliorer l’assainissement et la mobilité</li>
+                    <li>Régulation du secteur publicitaire et harmonisation de l’aménagement urbain</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Section CTA -->
+<section class="ptb-100 text-center" style="background-color: var(--mainColor); color: var(--whiteColor);">
+    <div class="container">
+        <h2 class="mb-4 text-white" data-aos="fade-up" style="font-family: var(--fontFamily-heading); color: white;">Découvrez nos projets et initiatives</h2>
+        <p class="mb-5 mx-auto text-white" data-aos="fade-up" data-aos-delay="100" style="max-width: 800px; font-size: 1.1rem; opacity: 0.9; color: white;">
+            Vous souhaitez en savoir plus sur nos réalisations, nos projets en cours et nos perspectives d’avenir ? Consultez notre section dédiée aux initiatives du Gouvernorat de Kinshasa et découvrez comment nous travaillons à l’amélioration continue de notre capitale.
+        </p>
+        <div data-aos="fade-up" data-aos-delay="200">
+            <!-- Utilisation du bouton par défaut du thème -->
+            <a class="default-button" href="https://merveillesenga.com/evenements">
+                <span>Explorer nos projets</span>
+            </a>
+        </div>
+    </div>
+</section>
+		
+<!--========== END CONTENT ==========--> 
+
+<!-- Footer area start -->
+{% if page.footer %}
+        <section class="footer">
+            <div class="container">
+                <div class="footer-content ptb-100">
+                   <div class="row">
+                     {{ page.footer }}
+                   </div>
+                </div>
+                <div class="copyright">
+                    <p>powered by <a target="_blank" href="">Agence pour le Développement du Numérique de Kinshasa (APDNK)</a></p>
+                </div>
+            </div>
+        </section>
+{% endif %}         
+<!-- Footer Area end -->
+
+<!-- popup area start -->
+{% if page.popup %}
+        <div class="popup">
+          {{ page.popup }}
+        </div>
+{% endif %}          
+<!-- popup area end -->
+        
+<!--=== Start Go Top Button ===-->
+<div class="go-top">
+   <i class="fas fa-chevron-up"></i>
+</div>
+<!--=== End Go Top Button ===-->
