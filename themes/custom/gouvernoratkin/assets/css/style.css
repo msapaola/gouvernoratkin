@@ -3982,3 +3982,33 @@ blockquote p {
 .gallery-section .owl-nav button:hover {
     background-color: var(--darkBlue) !important;
 }
+
+/* ==========================================================================
+   Menu: Multi-level & Hover (Desktop)
+   ========================================================================== */
+@media (min-width: 992px) {
+    /* Ouverture au survol pour le niveau 1 */
+    .navbar .dropdown:hover > .dropdown-menu {
+        display: block;
+        margin-top: 0;
+    }
+    
+    /* Positionnement du niveau 2 et 3 (sur le côté droit) */
+    .navbar .dropdown-menu .dropdown-menu {
+        top: 0;
+        left: 100%;
+        margin-left: 0;
+        border-radius: 0 4px 4px 4px;
+        display: none;
+    }
+    
+    /* Ouverture au survol pour les niveaux profonds */
+    .navbar .dropdown-menu .dropdown:hover > .dropdown-menu {
+        display: block;
+    }
+
+    /* Le parent doit rester en position relative */
+    .navbar .dropdown-menu .dropdown {
+        position: relative;
+    }
+}
