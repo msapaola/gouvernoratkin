@@ -56,11 +56,7 @@
     </div>
 {% endif %}
 
-<!--========== BEGIN CONTENT ==========-->
-{% if page.content %}
-    {{ page.content }}
-{% endif %}
-<!--========== END CONTENT ==========-->
+<!--========== CONTENT GÉRÉ VIA drupal_view ci-dessous ==========-->
 
 <!-- ===== BANNIÈRE SERVICES AUX CITOYENS ===== -->
 <div class="services-page-header">
@@ -76,18 +72,19 @@
     </h1>
     <p class="services-page-subtitle">Retrouvez l'ensemble des démarches et services proposés par le Gouvernorat de Kinshasa à la population kinoise.</p>
     
-    <!-- Barre de recherche principale -->
+    <!-- Barre de recherche : connectée au filtre exposé de la vue -->
     <div class="services-search-bar">
-      <form action="" method="get" class="services-search-form" id="services-search-form">
+      <form action="/services-aux-citoyens" method="get" class="services-search-form" id="services-search-form">
         <div class="search-input-wrapper">
           <i class="fas fa-search search-icon-decorative"></i>
           <input 
             type="text" 
-            name="search_api_fulltext"
+            name="title"
             id="services-search-input"
             class="services-search-input" 
             placeholder="Rechercher une démarche (ex : naissance, permis, acte ...)"
             autocomplete="off"
+            value=""
           />
           <button type="submit" class="services-search-btn" id="services-search-submit">
             <i class="fas fa-search me-2"></i>Rechercher

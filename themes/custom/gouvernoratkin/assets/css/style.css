@@ -4498,3 +4498,72 @@ blockquote p {
     color: var(--mainColor);
     gap: 0.6rem;
 }
+
+/* ==========================================================================
+   Sidebar : styles sur la liste HTML générée par la vue block_categories
+   ========================================================================== */
+
+/* Reset de la liste native de Views dans la sidebar */
+.services-sidebar .views-element-container ul,
+.services-sidebar .item-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.services-sidebar .views-element-container ul li,
+.services-sidebar .item-list ul li {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.services-sidebar .views-element-container ul li:last-child,
+.services-sidebar .item-list ul li:last-child {
+    border-bottom: none;
+}
+
+/* Style des liens dans la sidebar */
+.services-sidebar .views-element-container ul li a,
+.services-sidebar .item-list ul li a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.5rem;
+    color: var(--blackColor);
+    text-decoration: none;
+    font-family: var(--fontFamily-body);
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.services-sidebar .views-element-container ul li a::after,
+.services-sidebar .item-list ul li a::after {
+    content: '\f054';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 0.7rem;
+    color: #adb5bd;
+    transition: color 0.2s ease;
+}
+
+.services-sidebar .views-element-container ul li a:hover,
+.services-sidebar .item-list ul li a:hover {
+    background: #edf4ff;
+    color: var(--mainColor);
+    padding-left: 2rem;
+}
+
+.services-sidebar .views-element-container ul li a:hover::after,
+.services-sidebar .item-list ul li a:hover::after {
+    color: var(--mainColor);
+}
+
+/* Cacher le titre de la vue "block_categories" dans la sidebar */
+.services-sidebar .views-element-container h3,
+.services-sidebar .view-header {
+    display: none;
+}
+
+/* Cacher le formulaire exposé dans la zone principale (géré par notre bannière) */
+.services-list-container .views-exposed-form {
+    display: none;
+}
