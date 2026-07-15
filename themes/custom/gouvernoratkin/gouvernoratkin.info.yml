@@ -17,6 +17,7 @@ regions:
   welcome: Welcome
   gouv_word: "Gouv word" 
   last_news: "Last News"
+  gallery: Gallery
   aboutus: "About us"
   content: "content"
   singlepost: "Single Post"
