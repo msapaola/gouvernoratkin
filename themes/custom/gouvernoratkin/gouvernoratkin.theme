@@ -11,9 +11,10 @@ use Drupal\taxonomy\Entity\Term;
  * Implements hook_theme_suggestions_page_alter().
  */
 function gouvernoratkin_theme_suggestions_page_alter(array &$suggestions, array $variables) {
-  // Suggérer page--services-aux-citoyens pour la vue Services aux citoyens
-  $route_name = \Drupal::routeMatch()->getRouteName();
-  if ($route_name == 'view.services_citoyens.page_1') {
+  // Suggérer page--services-aux-citoyens basé sur l'alias d'URL actuel
+  $current_path = \Drupal::service('path.current')->getPath();
+  $alias = \Drupal::service('path_alias.manager')->getAliasByPath($current_path);
+  if ($alias == '/services-aux-citoyens') {
     $suggestions[] = 'page__services_aux_citoyens';
   }
 }
@@ -22,9 +23,10 @@ function gouvernoratkin_theme_suggestions_page_alter(array &$suggestions, array 
  * Implements hook_preprocess_page().
  */
 function gouvernoratkin_preprocess_page(&$variables) {
-  $route_name = \Drupal::routeMatch()->getRouteName();
+  $current_path = \Drupal::service('path.current')->getPath();
+  $alias = \Drupal::service('path_alias.manager')->getAliasByPath($current_path);
   
-  if ($route_name == 'view.services_citoyens.page_1') {
+  if ($alias == '/services-aux-citoyens') {
     // Charger la taxonomie service_au_citoyen sous forme d'arbre
     $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
     $terms = $term_storage->loadTree('service_au_citoyen', 0, NULL, TRUE);

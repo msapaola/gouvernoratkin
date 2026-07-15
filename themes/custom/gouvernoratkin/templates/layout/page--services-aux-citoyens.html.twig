@@ -125,36 +125,40 @@
 
         <!-- Liste des catégories parents (1er niveau) -->
         <ul class="sidebar-categories-list">
-          {% for parent in services_categories_tree %}
-            {% set has_active_child = false %}
-            {% for child in parent.children %}
-              {% if child.tid == active_category_tid %}
-                {% set has_active_child = true %}
-              {% endif %}
+          {% for root in services_categories_tree %}
+            {# 'root' est le terme de niveau 0 (Services aux citoyens) #}
+            {% for category in root.children %}
+              {# 'category' sont les enfants de niveau 1 (ex: Habitat et logement, Loisirs...) #}
+              {% set has_active_child = false %}
+              {% for grandchild in category.children %}
+                {% if grandchild.tid == active_category_tid %}
+                  {% set has_active_child = true %}
+                {% endif %}
+              {% endfor %}
+              
+              <li class="sidebar-parent-item {{ category.tid == active_category_tid or has_active_child ? 'expanded' }}">
+                {% if category.children is not empty %}
+                  <div class="sidebar-parent-header {{ category.tid == active_category_tid or has_active_child ? 'active' }}">
+                    <span class="cat-label">{{ category.name }}</span>
+                    <span class="cat-toggle-icon"><i class="fas {{ category.tid == active_category_tid or has_active_child ? 'fa-chevron-down' : 'fa-chevron-right' }}"></i></span>
+                  </div>
+                  <ul class="sidebar-child-list" style="{{ category.tid == active_category_tid or has_active_child ? 'display: block;' : 'display: none;' }}">
+                    {% for grandchild in category.children %}
+                      <li class="sidebar-child-item {{ grandchild.tid == active_category_tid ? 'active' }}">
+                        <a href="/services-aux-citoyens/{{ grandchild.tid }}{{ app.request.query.get('title') ? '?title=' ~ app.request.query.get('title') : '' }}" class="sidebar-child-link">
+                          {{ grandchild.name }}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <a href="/services-aux-citoyens/{{ category.tid }}{{ app.request.query.get('title') ? '?title=' ~ app.request.query.get('title') : '' }}" class="sidebar-parent-link-direct {{ category.tid == active_category_tid ? 'active' }}">
+                    <span class="cat-label">{{ category.name }}</span>
+                    <span class="cat-arrow"><i class="fas fa-chevron-right"></i></span>
+                  </a>
+                {% endif %}
+              </li>
             {% endfor %}
-            
-            <li class="sidebar-parent-item {{ parent.tid == active_category_tid or has_active_child ? 'expanded' }}">
-              {% if parent.children is not empty %}
-                <div class="sidebar-parent-header {{ parent.tid == active_category_tid or has_active_child ? 'active' }}">
-                  <span class="cat-label">{{ parent.name }}</span>
-                  <span class="cat-toggle-icon"><i class="fas {{ parent.tid == active_category_tid or has_active_child ? 'fa-chevron-down' : 'fa-chevron-right' }}"></i></span>
-                </div>
-                <ul class="sidebar-child-list" style="{{ parent.tid == active_category_tid or has_active_child ? 'display: block;' : 'display: none;' }}">
-                  {% for child in parent.children %}
-                    <li class="sidebar-child-item {{ child.tid == active_category_tid ? 'active' }}">
-                      <a href="/services-aux-citoyens/{{ child.tid }}{{ app.request.query.get('title') ? '?title=' ~ app.request.query.get('title') : '' }}" class="sidebar-child-link">
-                        {{ child.name }}
-                      </a>
-                    </li>
-                  {% endfor %}
-                </ul>
-              {% else %}
-                <a href="/services-aux-citoyens/{{ parent.tid }}{{ app.request.query.get('title') ? '?title=' ~ app.request.query.get('title') : '' }}" class="sidebar-parent-link-direct {{ parent.tid == active_category_tid ? 'active' }}">
-                  <span class="cat-label">{{ parent.name }}</span>
-                  <span class="cat-arrow"><i class="fas fa-chevron-right"></i></span>
-                </a>
-              {% endif %}
-            </li>
           {% endfor %}
         </ul>
 
