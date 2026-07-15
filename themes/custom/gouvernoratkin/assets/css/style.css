@@ -4178,6 +4178,7 @@ blockquote p {
     display: flex;
     flex-direction: column;
     gap: 0;
+    counter-reset: services-counter;
 }
 
 .services-result-item {
@@ -4465,6 +4466,13 @@ blockquote p {
     color: var(--mainColor);
     text-decoration: none;
     transition: color 0.2s ease;
+}
+
+.service-teaser-title a::before {
+    counter-increment: services-counter;
+    content: counter(services-counter) ". ";
+    font-weight: 700;
+    color: inherit;
 }
 
 .service-teaser-title a:hover {
