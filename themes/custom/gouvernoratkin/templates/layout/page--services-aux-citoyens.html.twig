@@ -107,10 +107,10 @@
       </div>
       <div class="services-list-container">
       {# ================================================================
-         Remplacez 'services_citoyens' par le nom machine de votre vue.
-         'page_1' est le nom système du display Page.
+         On passe active_category_tid en argument à la vue pour activer
+         le filtrage contextuel par catégorie.
          ================================================================ #}
-        {{ drupal_view('services_citoyens', 'page_1') }}
+        {{ drupal_view('services_citoyens', 'page_1', active_category_tid) }}
       </div>
     </div>
 
