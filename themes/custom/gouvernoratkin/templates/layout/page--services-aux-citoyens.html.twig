@@ -109,11 +109,11 @@
         <h2 class="services-list-title">Tous les services</h2>
       </div>
       <div class="services-list-container">
-        {# ================================================================
-           Remplacez 'services_citoyens' et 'page_list' par le nom machine
-           de votre vue et de son display une fois créée dans Drupal admin.
-           ================================================================ #}
-        {{ drupal_view('services_citoyens', 'page_list') }}
+      {# ================================================================
+         Remplacez 'services_citoyens' par le nom machine de votre vue.
+         'page_1' est le nom système du display Page.
+         ================================================================ #}
+        {{ drupal_view('services_citoyens', 'page_1') }}
       </div>
     </div>
 
