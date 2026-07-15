@@ -1,6 +1,8 @@
 bootstrap5-js:
   version: 5.3.3
   js:
+    assets/js/jquery.min.js: {minified: true}
+    assets/js/jquery-ui.min.js: {minified: true}
     assets/js/bootstrap.bundle.min.js: {minified: true}
     assets/js/meanmenu.js: {}
     assets/js/owl.carousel.min.js: {minified: true}
@@ -18,13 +20,12 @@ bootstrap5-js:
     assets/js/slick.min.js: {minified: true}  
     assets/js/aos.js: {}
     assets/js/custom.js: {}
-  dependencies:
-    - core/jquery
-    - core/drupal
+   
 global-styling:
   css:
     theme:
         assets/css/nice-number.css: {}
+        assets/css/animate.min.css: {minified: true}
         assets/css/bootstrap.min.css : {minified: true}
         assets/css/fontawsome.min.css: {minified: true}
         assets/css/flaticon.css: {}
