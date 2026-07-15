@@ -1,0 +1,77 @@
+<?php
+
+/**
+ * @file
+ * Fonctions de preprocess et suggestions de thèmes pour Gouvernoratkin.
+ */
+
+use Drupal\taxonomy\Entity\Term;
+
+/**
+ * Implements hook_theme_suggestions_page_alter().
+ */
+function gouvernoratkin_theme_suggestions_page_alter(array &$suggestions, array $variables) {
+  // Suggérer page--services-aux-citoyens pour la vue Services aux citoyens
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  if ($route_name == 'view.services_citoyens.page_1') {
+    $suggestions[] = 'page__services_aux_citoyens';
+  }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function gouvernoratkin_preprocess_page(&$variables) {
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  
+  if ($route_name == 'view.services_citoyens.page_1') {
+    // Charger la taxonomie service_au_citoyen sous forme d'arbre
+    $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+    $terms = $term_storage->loadTree('service_au_citoyen', 0, NULL, TRUE);
+    
+    $tree = [];
+    $terms_by_id = [];
+    
+    // Indexer tous les termes
+    foreach ($terms as $term) {
+      $tid = $term->id();
+      $terms_by_id[$tid] = [
+        'tid' => $tid,
+        'name' => $term->label(),
+        'children' => [],
+        'parents' => [],
+      ];
+      
+      // Stocker les parents s'il y en a
+      foreach ($term->parents as $parent) {
+        if ($parent != '0') {
+          $terms_by_id[$tid]['parents'][] = (int) $parent;
+        }
+      }
+    }
+    
+    // Construire la structure parent/enfant
+    foreach ($terms_by_id as $tid => &$term_data) {
+      if (empty($term_data['parents'])) {
+        // C'est un terme de premier niveau
+        $tree[$tid] = &$term_data;
+      } else {
+        // C'est un sous-terme, on l'associe à ses parents
+        foreach ($term_data['parents'] as $parent_id) {
+          if (isset($terms_by_id[$parent_id])) {
+            $terms_by_id[$parent_id]['children'][$tid] = &$term_data;
+          }
+        }
+      }
+    }
+    
+    $variables['services_categories_tree'] = $tree;
+    
+    // Récupérer la catégorie active depuis le filtre contextuel de l'URL
+    $active_tid = \Drupal::routeMatch()->getParameter('arg_0');
+    if (!$active_tid) {
+      $active_tid = \Drupal::request()->query->get('category');
+    }
+    $variables['active_category_tid'] = $active_tid;
+  }
+}

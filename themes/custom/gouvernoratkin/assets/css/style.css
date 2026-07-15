@@ -4521,9 +4521,44 @@ blockquote p {
     border-bottom: none;
 }
 
-/* Style des liens dans la sidebar */
-.services-sidebar .views-element-container ul li a,
-.services-sidebar .item-list ul li a {
+/* ==========================================================================
+   Sidebar: Accordéon Hiérarchique des Catégories (e-Sénégal style)
+   ========================================================================== */
+.sidebar-parent-item {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.sidebar-parent-item:last-child {
+    border-bottom: none;
+}
+
+/* En-tête de catégorie parente */
+.sidebar-parent-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.5rem;
+    color: var(--blackColor);
+    font-family: var(--fontFamily-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: #fdfdfd;
+    transition: all 0.2s ease;
+}
+
+.sidebar-parent-header:hover {
+    background: #edf4ff;
+    color: var(--mainColor);
+}
+
+.sidebar-parent-header.active {
+    background: var(--mainColor);
+    color: var(--whiteColor);
+}
+
+/* Lien direct parent (si pas d'enfants) */
+.sidebar-parent-link-direct {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -4532,38 +4567,91 @@ blockquote p {
     text-decoration: none;
     font-family: var(--fontFamily-body);
     font-size: 0.9rem;
+    font-weight: 600;
     transition: all 0.2s ease;
 }
 
-.services-sidebar .views-element-container ul li a::after,
-.services-sidebar .item-list ul li a::after {
-    content: '\f054';
-    font-family: 'Font Awesome 5 Free';
-    font-weight: 900;
-    font-size: 0.7rem;
-    color: #adb5bd;
-    transition: color 0.2s ease;
-}
-
-.services-sidebar .views-element-container ul li a:hover,
-.services-sidebar .item-list ul li a:hover {
+.sidebar-parent-link-direct:hover {
     background: #edf4ff;
     color: var(--mainColor);
     padding-left: 2rem;
 }
 
-.services-sidebar .views-element-container ul li a:hover::after,
-.services-sidebar .item-list ul li a:hover::after {
+.sidebar-parent-link-direct.active {
+    background: var(--mainColor);
+    color: var(--whiteColor);
+}
+
+/* Toggles & Flèches */
+.cat-toggle-icon, .cat-arrow {
+    color: inherit;
+    opacity: 0.6;
+    font-size: 0.75rem;
+}
+
+/* Liste des enfants (sous-catégories) */
+.sidebar-child-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.sidebar-child-item {
+    border-bottom: 1px solid #e9ecef;
+}
+
+.sidebar-child-item:last-child {
+    border-bottom: none;
+}
+
+.sidebar-child-link {
+    display: block;
+    padding: 0.75rem 2rem 0.75rem 2.5rem;
+    color: var(--paragraphColor);
+    font-family: var(--fontFamily-body);
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.sidebar-child-link::before {
+    content: '';
+    position: absolute;
+    left: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #adb5bd;
+}
+
+.sidebar-child-link:hover {
     color: var(--mainColor);
+    padding-left: 2.8rem;
+    background: #edf4ff;
 }
 
-/* Cacher le titre de la vue "block_categories" dans la sidebar */
-.services-sidebar .views-element-container h3,
-.services-sidebar .view-header {
-    display: none;
+.sidebar-child-link:hover::before {
+    background: var(--mainColor);
 }
 
-/* Cacher le formulaire exposé dans la zone principale (géré par notre bannière) */
+/* Style de la sous-catégorie ACTIVE (Surligné Vert comme e-Sénégal) */
+.sidebar-child-item.active .sidebar-child-link {
+    color: #088832 !important; /* Vert forêt */
+    font-weight: 600;
+    background: #f0fdf4; /* Fond vert très clair */
+}
+
+.sidebar-child-item.active .sidebar-child-link::before {
+    background: #088832;
+    transform: translateY(-50%) scale(1.3);
+}
+
+/* Cacher le formulaire exposé dans la zone de contenu (géré par la barre dans la bannière) */
 .services-list-container .views-exposed-form {
     display: none;
 }

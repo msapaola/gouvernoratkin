@@ -74,7 +74,7 @@
     
     <!-- Barre de recherche : connectée au filtre exposé de la vue -->
     <div class="services-search-bar">
-      <form action="/services-aux-citoyens" method="get" class="services-search-form" id="services-search-form">
+      <form action="" method="get" class="services-search-form" id="services-search-form">
         <div class="search-input-wrapper">
           <i class="fas fa-search search-icon-decorative"></i>
           <input 
@@ -84,7 +84,7 @@
             class="services-search-input" 
             placeholder="Rechercher une démarche (ex : naissance, permis, acte ...)"
             autocomplete="off"
-            value=""
+            value="{{ app.request.query.get('title')|e('html_attr') }}"
           />
           <button type="submit" class="services-search-btn" id="services-search-submit">
             <i class="fas fa-search me-2"></i>Rechercher
@@ -125,21 +125,48 @@
           </h3>
         </div>
 
-        <!-- Liste des catégories injectée via une vue Drupal -->
+        <!-- Liste des catégories injectée hiérarchiquement depuis gouvernoratkin.theme -->
         <ul class="sidebar-categories-list">
-          <li class="sidebar-category-item active">
-            <a href="/services-aux-citoyens" class="sidebar-category-link">
+          <li class="sidebar-category-item {{ not active_category_tid ? 'active' }}">
+            <a href="/services-aux-citoyens{{ app.request.query.get('title') ? '?title=' ~ app.request.query.get('title') : '' }}" class="sidebar-category-link">
+              <span class="cat-icon"><i class="fas fa-th-large"></i></span>
               <span class="cat-label">Toutes les catégories</span>
               <span class="cat-arrow"><i class="fas fa-chevron-right"></i></span>
             </a>
           </li>
+          
+          {% for parent in services_categories_tree %}
+            {% set has_active_child = false %}
+            {% for child in parent.children %}
+              {% if child.tid == active_category_tid %}
+                {% set has_active_child = true %}
+              {% endif %}
+            {% endfor %}
+            
+            <li class="sidebar-parent-item {{ parent.tid == active_category_tid or has_active_child ? 'expanded' }}">
+              {% if parent.children is not empty %}
+                <div class="sidebar-parent-header {{ parent.tid == active_category_tid or has_active_child ? 'active' }}">
+                  <span class="cat-label">{{ parent.name }}</span>
+                  <span class="cat-toggle-icon"><i class="fas {{ parent.tid == active_category_tid or has_active_child ? 'fa-chevron-down' : 'fa-chevron-right' }}"></i></span>
+                </div>
+                <ul class="sidebar-child-list" style="{{ parent.tid == active_category_tid or has_active_child ? 'display: block;' : 'display: none;' }}">
+                  {% for child in parent.children %}
+                    <li class="sidebar-child-item {{ child.tid == active_category_tid ? 'active' }}">
+                      <a href="/services-aux-citoyens/{{ child.tid }}{{ app.request.query.get('title') ? '?title=' ~ app.request.query.get('title') : '' }}" class="sidebar-child-link">
+                        {{ child.name }}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <a href="/services-aux-citoyens/{{ parent.tid }}{{ app.request.query.get('title') ? '?title=' ~ app.request.query.get('title') : '' }}" class="sidebar-parent-link-direct {{ parent.tid == active_category_tid ? 'active' }}">
+                  <span class="cat-label">{{ parent.name }}</span>
+                  <span class="cat-arrow"><i class="fas fa-chevron-right"></i></span>
+                </a>
+              {% endif %}
+            </li>
+          {% endfor %}
         </ul>
-        
-        {# ================================================================
-           Vue : block_categories | Display : block_categories
-           Affiche les termes du vocabulaire service_au_citoyen
-           ================================================================ #}
-        {{ drupal_view('block_categories', 'block_categories') }}
 
         <!-- Bloc aide -->
         <div class="sidebar-help-box">
@@ -182,3 +209,29 @@
         {{page.popup}}
     </div>
 {% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var headers = document.querySelectorAll('.sidebar-parent-header');
+  headers.forEach(function(header) {
+    header.addEventListener('click', function() {
+      var parentLi = this.parentElement;
+      var childList = parentLi.querySelector('.sidebar-child-list');
+      if (childList) {
+        var isOpen = childList.style.display === 'block';
+        childList.style.display = isOpen ? 'none' : 'block';
+        parentLi.classList.toggle('expanded', !isOpen);
+        var icon = this.querySelector('.cat-toggle-icon i');
+        if (icon) {
+          if (isOpen) {
+            icon.className = 'fas fa-chevron-right';
+          } else {
+            icon.className = 'fas fa-chevron-down';
+          }
+        }
+      }
+    });
+  });
+});
+</script>
+
