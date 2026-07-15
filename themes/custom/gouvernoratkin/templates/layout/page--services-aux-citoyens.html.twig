@@ -139,9 +139,10 @@
         </ul>
         
         {# ================================================================
-           block_1 = nom système du display Block (sidebar catégories)
+           Vue : block_categories | Display : block_1
+           Affiche les termes du vocabulaire service_au_citoyen
            ================================================================ #}
-        {{ drupal_view('services_citoyens', 'block_1') }}
+        {{ drupal_view('block_categories', 'block_1') }}
 
         <!-- Bloc aide -->
         <div class="sidebar-help-box">
