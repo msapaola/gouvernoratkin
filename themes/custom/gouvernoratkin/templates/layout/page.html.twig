@@ -202,13 +202,17 @@
     {% endif %} 
 <!-- Blog Area End -->
 <!-- Gallery Area Start -->
-     {% if page.gallery %}
+     {% if is_front %}
       <section class="container my-4 gallery-section">
        <div class="default-section-title default-section-title-middle">      
-        <h3>Galerie photo du Gouvernorat</h3>
+        <h3 class="section-title">Galerie photo du Gouvernorat</h3>
         <p>Découvrez les activités officielles et les événements importants organisés par le Gouvernorat à travers cette galerie photo interactive.</p>
         </div>
-        {{ page.gallery }}
+        
+        <div class="gallery-container">
+            <!-- Remplacez 'nom_machine_de_la_vue' et 'block_1' par les vrais IDs de votre vue -->
+            {{ drupal_view('nom_machine_de_la_vue', 'block_1') }}
+        </div>
    </section>
     {% endif %} 
 <!-- Gallery Area End -->
