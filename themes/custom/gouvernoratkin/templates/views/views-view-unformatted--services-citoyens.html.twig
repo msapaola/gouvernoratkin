@@ -1,0 +1,31 @@
+{#
+/**
+ * @file
+ * Template : Affichage des services aux citoyens (liste non formatée).
+ * Chaque ligne affiche le titre (lien), le résumé et la catégorie.
+ */
+#}
+{% if title %}
+  <h3>{{ title }}</h3>
+{% endif %}
+
+<div class="services-results-list">
+  {% if rows %}
+    {% for row in rows %}
+      <div{{ row.attributes.addClass('services-result-item') }}>
+        {{- row.content -}}
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="services-no-results">
+      <div class="no-results-icon">
+        <i class="fas fa-search"></i>
+      </div>
+      <h4>Aucun service trouvé</h4>
+      <p>Essayez de modifier votre recherche ou sélectionnez une autre catégorie.</p>
+      <a href="/services-aux-citoyens" class="btn-reset-search">
+        <i class="fas fa-arrow-left me-2"></i>Voir tous les services
+      </a>
+    </div>
+  {% endif %}
+</div>
