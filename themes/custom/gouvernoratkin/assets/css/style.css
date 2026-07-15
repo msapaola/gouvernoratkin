@@ -3907,3 +3907,78 @@ blockquote p {
     box-shadow: 0 0 0 0 rgba(0, 170, 85, 0);
   }
 }
+
+/* ==========================================================================
+   Galerie (Home Page)
+   ========================================================================== */
+.gallery-section {
+    padding: 2rem 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.gallery-section .section-title {
+    color: var(--mainColor);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+    font-family: var(--fontFamily-heading);
+    font-weight: 700;
+}
+
+.gallery-section .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: var(--mainColor);
+}
+
+.gallery-section .gallery-container {
+    background-color: #e6f0fa;
+    border-radius: 8px;
+    padding-top: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.gallery-section .item img {
+    border-radius: 6px;
+    box-shadow: var(--boxShadow, 0 3px 8px rgba(0,0,0,0.15));
+    transition: var(--transition, transform 0.3s ease);
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+}
+
+.gallery-section .item p {
+    font-size: 15px;
+    font-style: italic;
+    font-family: var(--fontFamily-body);
+    color: var(--paragraphColor, #555555);
+}
+
+.gallery-section .item img:hover {
+    transform: translateY(-5px);
+}
+
+.gallery-section .owl-nav button {
+    width: 45px;
+    height: 45px;
+    background-color: var(--mainColor) !important;
+    color: var(--whiteColor, #ffffff) !important;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-section .owl-nav button:hover {
+    background-color: var(--darkBlue) !important;
+}
