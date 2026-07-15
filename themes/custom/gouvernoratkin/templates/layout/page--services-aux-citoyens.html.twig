@@ -118,23 +118,13 @@
     <div class="col-lg-4 col-md-12">
       <div class="services-sidebar">
         
-        <!-- Titre Catégories -->
-        <div class="sidebar-header">
-          <h3 class="sidebar-title">
-            <i class="fas fa-list-ul me-2"></i>Catégories
-          </h3>
-        </div>
+        <!-- En-tête principal "Services aux citoyens" (toujours déplié, clique pour tout afficher) -->
+        <a href="/services-aux-citoyens{{ app.request.query.get('title') ? '?title=' ~ app.request.query.get('title') : '' }}" class="sidebar-main-header-link {{ not active_category_tid ? 'active' }}">
+          <i class="fas fa-hands-helping me-2"></i>Services aux citoyens
+        </a>
 
-        <!-- Liste des catégories injectée hiérarchiquement depuis gouvernoratkin.theme -->
+        <!-- Liste des catégories parents (1er niveau) -->
         <ul class="sidebar-categories-list">
-          <li class="sidebar-category-item {{ not active_category_tid ? 'active' }}">
-            <a href="/services-aux-citoyens{{ app.request.query.get('title') ? '?title=' ~ app.request.query.get('title') : '' }}" class="sidebar-category-link">
-              <span class="cat-icon"><i class="fas fa-th-large"></i></span>
-              <span class="cat-label">Toutes les catégories</span>
-              <span class="cat-arrow"><i class="fas fa-chevron-right"></i></span>
-            </a>
-          </li>
-          
           {% for parent in services_categories_tree %}
             {% set has_active_child = false %}
             {% for child in parent.children %}
