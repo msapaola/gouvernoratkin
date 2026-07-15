@@ -1,0 +1,41 @@
+{#
+/**
+ * @file
+ * Template : Affichage d'un article de type "service_au_citoyen" en mode teaser.
+ * Utilisé dans la liste de la page Services aux citoyens.
+ *
+ * Variables disponibles :
+ * - label : Titre du noeud
+ * - url   : Lien vers l'article complet
+ * - content : Tous les champs du noeud
+ * - node  : L'entité noeud
+ */
+#}
+<article class="service-teaser-item">
+  
+  {# Icône / badge catégorie si disponible #}
+  {% if content.field_categorie is not empty %}
+    <div class="service-teaser-category">
+      <i class="fas fa-tag me-1"></i>
+      {{ content.field_categorie }}
+    </div>
+  {% endif %}
+
+  {# Titre = lien vers l'article complet #}
+  <h3 class="service-teaser-title">
+    <a href="{{ url }}" title="{{ label }}">{{ label }}</a>
+  </h3>
+
+  {# Résumé / corps tronqué #}
+  {% if content.body is not empty %}
+    <p class="service-teaser-summary">
+      {{ content.body[0]['#text']|striptags|slice(0, 220) }}{% if content.body[0]['#text']|striptags|length > 220 %}…{% endif %}
+    </p>
+  {% endif %}
+
+  {# Lien "En savoir plus" #}
+  <a href="{{ url }}" class="service-teaser-readmore" aria-label="Lire la suite : {{ label }}">
+    En savoir plus <i class="fas fa-arrow-right ms-1"></i>
+  </a>
+
+</article>

@@ -4418,3 +4418,83 @@ blockquote p {
         justify-content: center;
     }
 }
+
+/* ==========================================================================
+   Teaser article : Service au Citoyen
+   ========================================================================== */
+.service-teaser-item {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #e9ecef;
+    transition: padding-left 0.2s ease;
+}
+
+.service-teaser-item:last-child {
+    border-bottom: none;
+}
+
+.service-teaser-item:hover {
+    padding-left: 0.5rem;
+}
+
+/* Badge catégorie */
+.service-teaser-category {
+    display: inline-flex;
+    align-items: center;
+    background: #edf4ff;
+    color: var(--mainColor);
+    font-family: var(--fontFamily-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    margin-bottom: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Titre du service */
+.service-teaser-title {
+    font-family: var(--fontFamily-heading);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.service-teaser-title a {
+    color: var(--mainColor);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.service-teaser-title a:hover {
+    color: var(--secondaryColor);
+    text-decoration: underline;
+}
+
+/* Résumé */
+.service-teaser-summary {
+    font-family: var(--fontFamily-body);
+    color: var(--paragraphColor);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+}
+
+/* Lien "En savoir plus" */
+.service-teaser-readmore {
+    display: inline-flex;
+    align-items: center;
+    color: var(--secondaryColor);
+    font-family: var(--fontFamily-heading);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease, gap 0.2s ease;
+    gap: 0.3rem;
+}
+
+.service-teaser-readmore:hover {
+    color: var(--mainColor);
+    gap: 0.6rem;
+}
