@@ -4685,3 +4685,8 @@ blockquote p {
 .services-list-container .views-exposed-form {
     display: none;
 }
+/* Cacher le titre de la page en doublon si présent dans le rendu standard */
+.services-list-container h1.page-title,
+.services-list-container .page-title {
+    display: none;
+}

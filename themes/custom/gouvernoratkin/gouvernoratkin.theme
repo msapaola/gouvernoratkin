@@ -26,20 +26,31 @@ function gouvernoratkin_preprocess_page(&$variables) {
   $current_path = \Drupal::service('path.current')->getPath();
   $alias = \Drupal::service('path_alias.manager')->getAliasByPath($current_path);
   
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  if ($route_name === 'entity.taxonomy_term.canonical') {
+    $term = \Drupal::routeMatch()->getParameter('taxonomy_term');
+    if ($term && $term->bundle() === 'service_au_citoyen') {
+      $url = \Drupal\Core\Url::fromUserInput('/services-aux-citoyens/' . $term->id());
+      $response = new \Symfony\Component\HttpFoundation\RedirectResponse($url->toString());
+      $response->send();
+      exit;
+    }
+  }
+
   if ($alias == '/services-aux-citoyens' || strpos($alias, '/services-aux-citoyens/') === 0) {
-    // Charger la taxonomie service_au_citoyen sous forme d'arbre
+    // Charger la taxonomie service_au_citoyen sous forme d'arbre sans entités complètes pour avoir ->parents
     $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
-    $terms = $term_storage->loadTree('service_au_citoyen', 0, NULL, TRUE);
+    $terms = $term_storage->loadTree('service_au_citoyen', 0, NULL, FALSE);
     
     $tree = [];
     $terms_by_id = [];
     
     // Indexer tous les termes
     foreach ($terms as $term) {
-      $tid = $term->id();
+      $tid = $term->tid;
       $terms_by_id[$tid] = [
         'tid' => $tid,
-        'name' => $term->label(),
+        'name' => $term->name,
         'children' => [],
         'parents' => [],
       ];

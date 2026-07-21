@@ -106,11 +106,7 @@
         <h2 class="services-list-title">Tous les services</h2>
       </div>
       <div class="services-list-container">
-      {# ================================================================
-         On passe active_category_tid en argument à la vue pour activer
-         le filtrage contextuel par catégorie.
-         ================================================================ #}
-        {{ drupal_view('services_citoyens', 'page_1', active_category_tid) }}
+        {{ page.content }}
       </div>
     </div>
 
