@@ -4807,7 +4807,22 @@ blockquote p {
     .breadcrumb,
     .mobile-actions,
     .copyright,
-    .d-print-none {
+    .d-print-none,
+    .tabs,
+    ul.tabs,
+    nav.tabs,
+    .tabs--primary,
+    .tabs--secondary,
+    #block-gouvernoratkin-local-tasks,
+    .block-local-tasks-block,
+    .local-tasks,
+    #toolbar-administration,
+    #toolbar-bar,
+    .toolbar,
+    .contextual,
+    .contextual-links,
+    #gin-sidebar-wrapper,
+    .gin-secondary-toolbar {
         display: none !important;
     }
 
