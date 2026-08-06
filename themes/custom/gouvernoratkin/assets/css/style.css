@@ -4786,6 +4786,114 @@ blockquote p {
 .services-list-container .views-exposed-form {
     display: none;
 }
+
+/* ==========================================================================
+   Impression : Seul le titre et le corps de l'article sont imprimés
+   ========================================================================== */
+@media print {
+    /* Masquer tous les éléments d'interface, navigation, bannières et sidebars */
+    header,
+    footer,
+    .footer,
+    .navbar,
+    .services-page-header,
+    .services-sidebar,
+    .service-detail-toolbar,
+    .service-detail-notice,
+    .service-detail-contact-box,
+    .service-detail-footer,
+    .go-top,
+    .popup,
+    .breadcrumb,
+    .mobile-actions,
+    .copyright,
+    .d-print-none {
+        display: none !important;
+    }
+
+    /* Reset global de la page d'impression */
+    html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-family: Arial, Helvetica, sans-serif !important;
+        font-size: 11pt !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    .container, .services-page-body {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .row {
+        margin: 0 !important;
+    }
+
+    .col-lg-8, .col-md-12 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        padding: 0 !important;
+    }
+
+    .service-detail-card {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+    }
+
+    /* En-tête de document imprimé */
+    .print-only-header {
+        display: block !important;
+        margin-bottom: 25px !important;
+    }
+
+    .print-header-top {
+        font-size: 10pt !important;
+        color: #333333 !important;
+        border-bottom: 2px solid #000000 !important;
+        padding-bottom: 8px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .print-service-title {
+        font-size: 20pt !important;
+        font-weight: bold !important;
+        color: #000000 !important;
+        margin-bottom: 20px !important;
+        line-height: 1.3 !important;
+    }
+
+    /* Contenu du corps de l'article imprimé */
+    .service-detail-content, 
+    .service-body-text {
+        font-size: 11pt !important;
+        line-height: 1.6 !important;
+        color: #000000 !important;
+    }
+
+    .service-body-text h1,
+    .service-body-text h2,
+    .service-body-text h3,
+    .service-body-text h4 {
+        color: #000000 !important;
+        font-size: 14pt !important;
+        margin-top: 18px !important;
+        margin-bottom: 8px !important;
+        page-break-after: avoid !important;
+    }
+
+    .service-body-text p,
+    .service-body-text li {
+        color: #000000 !important;
+    }
+}
 /* Cacher le titre de la page en doublon si présent dans le rendu standard */
 .services-list-container h1.page-title,
 .services-list-container .page-title {

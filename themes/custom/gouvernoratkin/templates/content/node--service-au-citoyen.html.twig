@@ -98,6 +98,15 @@
           </div>
         </div>
 
+        {# En-tête d'impression (visible UNIQUEMENT à l'impression) #}
+        <div class="print-only-header d-none d-print-block">
+          <div class="print-header-top pb-2 mb-3 border-bottom d-flex justify-content-between">
+            <strong>Gouvernorat de Kinshasa — Services aux citoyens</strong>
+            <span>Doc-Ref: {{ node.id }}</span>
+          </div>
+          <h1 class="print-service-title fw-bold mb-4">{{ label }}</h1>
+        </div>
+
         {# Contenu principal (Texte administratif du service / Body) #}
         <div class="service-detail-content">
           {% if content.body|render|trim is not empty %}
