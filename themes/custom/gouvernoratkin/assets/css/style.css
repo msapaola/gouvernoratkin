@@ -4601,6 +4601,13 @@ blockquote p {
     box-shadow: 0 8px 20px rgba(13, 59, 102, 0.15);
 }
 
+.service-detail-contact-box p {
+    color: #ffffff !important;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    opacity: 1 !important;
+}
+
 /* ==========================================================================
    Sidebar : styles sur la liste HTML générée par la vue block_categories
    ========================================================================== */
