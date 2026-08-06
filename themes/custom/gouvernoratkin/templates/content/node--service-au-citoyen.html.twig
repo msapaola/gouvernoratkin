@@ -38,14 +38,10 @@
     </nav>
 
     {# Badge Catégorie #}
-    {% if service_category_name or content.field_categorie is not empty %}
+    {% if service_category_name or node.field_categorie.entity.label is not empty %}
       <div class="service-detail-category-badge">
         <i class="fas fa-folder-open me-2"></i>
-        {% if service_category_name %}
-          {{ service_category_name }}
-        {% else %}
-          {{ content.field_categorie }}
-        {% endif %}
+        {{ service_category_name ?: node.field_categorie.entity.label }}
       </div>
     {% endif %}
 
@@ -102,18 +98,25 @@
           </div>
         </div>
 
-        {# Contenu principal (Body & Autres Champs) #}
+        {# Contenu principal (Texte administratif du service / Body) #}
         <div class="service-detail-content">
-          {% if content.body is not empty %}
+          {% if content.body|render|trim is not empty %}
             <div class="service-body-text mb-4">
               {{ content.body }}
             </div>
+          {% elseif node.body.value is not empty %}
+            <div class="service-body-text mb-4 fs-6 text-dark lh-lg">
+              {{ node.body.value|raw }}
+            </div>
+          {% elseif node.body.processed is not empty %}
+            <div class="service-body-text mb-4 fs-6 text-dark lh-lg">
+              {{ node.body.processed|raw }}
+            </div>
+          {% else %}
+            <div class="alert alert-info border-0 shadow-sm rounded-3">
+              <i class="fas fa-info-circle me-2"></i>Consultez nos guichets communaux pour obtenir les informations complémentaires concernant cette démarche.
+            </div>
           {% endif %}
-
-          {# Rendu des autres champs du noeud sans ré-afficher la catégorie ou le body #}
-          <div class="service-extra-fields mt-4">
-            {{ content|without('field_categorie', 'body') }}
-          </div>
         </div>
 
         {# Bloc Contact / Où effectuer la démarche #}
