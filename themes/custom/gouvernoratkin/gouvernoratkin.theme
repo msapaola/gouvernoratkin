@@ -20,6 +20,47 @@ function gouvernoratkin_theme_suggestions_page_alter(array &$suggestions, array 
 }
 
 /**
+ * Helper to build the taxonomy tree for service_au_citoyen vocabulary.
+ */
+function _gouvernoratkin_get_services_categories_tree() {
+  $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+  $terms = $term_storage->loadTree('service_au_citoyen', 0, NULL, FALSE);
+  
+  $tree = [];
+  $terms_by_id = [];
+  
+  foreach ($terms as $term) {
+    $tid = $term->tid;
+    $terms_by_id[$tid] = [
+      'tid' => $tid,
+      'name' => $term->name,
+      'children' => [],
+      'parents' => [],
+    ];
+    
+    foreach ($term->parents as $parent) {
+      if ($parent != '0') {
+        $terms_by_id[$tid]['parents'][] = (int) $parent;
+      }
+    }
+  }
+  
+  foreach ($terms_by_id as $tid => &$term_data) {
+    if (empty($term_data['parents'])) {
+      $tree[$tid] = &$term_data;
+    } else {
+      foreach ($term_data['parents'] as $parent_id) {
+        if (isset($terms_by_id[$parent_id])) {
+          $terms_by_id[$parent_id]['children'][$tid] = &$term_data;
+        }
+      }
+    }
+  }
+  
+  return $tree;
+}
+
+/**
  * Implements hook_preprocess_page().
  */
 function gouvernoratkin_preprocess_page(&$variables) {
@@ -38,54 +79,37 @@ function gouvernoratkin_preprocess_page(&$variables) {
   }
 
   if ($alias == '/services-aux-citoyens' || strpos($alias, '/services-aux-citoyens/') === 0) {
-    // Charger la taxonomie service_au_citoyen sous forme d'arbre sans entités complètes pour avoir ->parents
-    $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
-    $terms = $term_storage->loadTree('service_au_citoyen', 0, NULL, FALSE);
+    $variables['services_categories_tree'] = _gouvernoratkin_get_services_categories_tree();
     
-    $tree = [];
-    $terms_by_id = [];
-    
-    // Indexer tous les termes
-    foreach ($terms as $term) {
-      $tid = $term->tid;
-      $terms_by_id[$tid] = [
-        'tid' => $tid,
-        'name' => $term->name,
-        'children' => [],
-        'parents' => [],
-      ];
-      
-      // Stocker les parents s'il y en a
-      foreach ($term->parents as $parent) {
-        if ($parent != '0') {
-          $terms_by_id[$tid]['parents'][] = (int) $parent;
-        }
-      }
-    }
-    
-    // Construire la structure parent/enfant
-    foreach ($terms_by_id as $tid => &$term_data) {
-      if (empty($term_data['parents'])) {
-        // C'est un terme de premier niveau
-        $tree[$tid] = &$term_data;
-      } else {
-        // C'est un sous-terme, on l'associe à ses parents
-        foreach ($term_data['parents'] as $parent_id) {
-          if (isset($terms_by_id[$parent_id])) {
-            $terms_by_id[$parent_id]['children'][$tid] = &$term_data;
-          }
-        }
-      }
-    }
-    
-    $variables['services_categories_tree'] = $tree;
-    
-    // Récupérer le TID depuis le chemin d'URL (ex: /services-aux-citoyens/12)
     $active_tid = null;
     $parts = explode('/', ltrim($alias, '/'));
     if (isset($parts[1]) && is_numeric($parts[1])) {
       $active_tid = (int) $parts[1];
     }
     $variables['active_category_tid'] = $active_tid;
+  }
+}
+
+/**
+ * Implements hook_preprocess_node().
+ */
+function gouvernoratkin_preprocess_node(&$variables) {
+  $node = $variables['node'] ?? NULL;
+  if ($node && is_object($node) && method_exists($node, 'bundle') && $node->bundle() === 'service_au_citoyen') {
+    $variables['services_categories_tree'] = _gouvernoratkin_get_services_categories_tree();
+    
+    $active_tid = null;
+    $category_name = null;
+    
+    if ($node->hasField('field_categorie') && !$node->get('field_categorie')->isEmpty()) {
+      $term = $node->get('field_categorie')->entity;
+      if ($term) {
+        $active_tid = (int) $term->id();
+        $category_name = $term->label();
+      }
+    }
+    
+    $variables['active_category_tid'] = $active_tid;
+    $variables['service_category_name'] = $category_name;
   }
 }

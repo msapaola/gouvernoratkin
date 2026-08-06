@@ -1,0 +1,230 @@
+{#
+/**
+ * @file
+ * Template : Page d'un service au citoyen (mode affichage complet / node detail).
+ * Utilisé pour afficher un terme / service de 3ème degré du catalogue services aux citoyens.
+ *
+ * Variables disponibles :
+ * - label : Titre du service
+ * - url   : Lien du service
+ * - content : Ensemble des champs (body, field_categorie, etc.)
+ * - node  : L'entité noeud service_au_citoyen
+ * - services_categories_tree : Arbre complet des catégories de services
+ * - active_category_tid : TID de la catégorie associée
+ * - service_category_name : Nom de la catégorie associée
+ */
+#}
+
+<!-- ===== BANNIÈRE SERVICE (EN-TÊTE DE PAGE) ===== -->
+<div class="services-page-header service-detail-header">
+  <div class="container">
+    
+    {# Fil d'Ariane / Breadcrumb #}
+    <nav aria-label="breadcrumb" class="services-breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/"><i class="fas fa-home me-1"></i>Accueil</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="/services-aux-citoyens">Services aux citoyens</a>
+        </li>
+        {% if service_category_name and active_category_tid %}
+          <li class="breadcrumb-item">
+            <a href="/services-aux-citoyens/{{ active_category_tid }}">{{ service_category_name }}</a>
+          </li>
+        {% endif %}
+        <li class="breadcrumb-item active" aria-current="page">{{ label }}</li>
+      </ol>
+    </nav>
+
+    {# Badge Catégorie #}
+    {% if service_category_name or content.field_categorie is not empty %}
+      <div class="service-detail-category-badge">
+        <i class="fas fa-folder-open me-2"></i>
+        {% if service_category_name %}
+          {{ service_category_name }}
+        {% else %}
+          {{ content.field_categorie }}
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {# Titre Principal du Service #}
+    <h1 class="services-page-title service-detail-title">
+      <i class="fas fa-file-alt me-3 text-warning"></i>{{ label }}
+    </h1>
+
+    {# Metadonnées (Date de mise à jour, etc.) #}
+    <div class="service-detail-meta">
+      <span class="meta-item">
+        <i class="far fa-clock me-1"></i>
+        Mise à jour : {{ node.getChangedTime|date('d/m/Y') }}
+      </span>
+      <span class="meta-item ms-3">
+        <i class="fas fa-building me-1"></i>
+        Gouvernorat de Kinshasa
+      </span>
+    </div>
+
+  </div>
+</div>
+<!-- ===== FIN BANNIÈRE ===== -->
+
+<!-- ===== CORPS DU SERVICE (2 COLONNES) ===== -->
+<div class="container services-page-body pt-4 pb-5">
+  <div class="row g-4">
+    
+    <!-- COLONNE GAUCHE : DÉTAIL DU SERVICE (col-lg-8) -->
+    <div class="col-lg-8 col-md-12">
+      <div class="service-detail-card shadow-sm p-4 p-md-5 bg-white rounded-3">
+        
+        {# Barre d'outils / Actions rapides #}
+        <div class="service-detail-toolbar d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom">
+          <a href="/services-aux-citoyens{{ active_category_tid ? '/' ~ active_category_tid : '' }}" class="btn-back-to-list text-decoration-none">
+            <i class="fas fa-arrow-left me-2"></i>Retour à la liste des services
+          </a>
+          <div class="service-actions-buttons">
+            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill me-2" onclick="window.print();" title="Imprimer cette fiche">
+              <i class="fas fa-print me-1"></i>Imprimer
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" onclick="navigator.clipboard.writeText(window.location.href); alert('Lien copié dans le presse-papier !');" title="Partager">
+              <i class="fas fa-share-alt me-1"></i>Partager
+            </button>
+          </div>
+        </div>
+
+        {# Information box d'introduction #}
+        <div class="service-detail-notice mb-4 p-3 bg-light rounded-3 border-start border-4 border-primary d-flex align-items-start">
+          <i class="fas fa-info-circle text-primary fs-4 me-3 mt-1"></i>
+          <div>
+            <h6 class="mb-1 fw-bold text-dark">Démarche administrative officielle</h6>
+            <p class="mb-0 text-muted small">Consultez les informations relatives aux conditions, modalités et pièces justificatives nécessaires pour effectuer cette démarche auprès des services de la Ville-Province de Kinshasa.</p>
+          </div>
+        </div>
+
+        {# Contenu principal (Body & Autres Champs) #}
+        <div class="service-detail-content">
+          {% if content.body is not empty %}
+            <div class="service-body-text mb-4">
+              {{ content.body }}
+            </div>
+          {% endif %}
+
+          {# Rendu des autres champs du noeud sans ré-afficher la catégorie ou le body #}
+          <div class="service-extra-fields mt-4">
+            {{ content|without('field_categorie', 'body') }}
+          </div>
+        </div>
+
+        {# Bloc Contact / Où effectuer la démarche #}
+        <div class="service-detail-contact-box mt-5 p-4 rounded-3 text-white" style="background: linear-gradient(135deg, #0d3b66 0%, #001f3f 100%);">
+          <div class="row align-items-center">
+            <div class="col-md-8 mb-3 mb-md-0">
+              <h5 class="fw-bold mb-2"><i class="fas fa-university me-2 text-warning"></i>Où effectuer cette démarche ?</h5>
+              <p class="mb-0 opacity-75 small">Rendez-vous dans votre Maison Citoyenne de commune ou au Guichet Unique de l'Hôtel de Ville de Kinshasa muni de vos pièces justificatives.</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+              <a href="/contact" class="btn btn-warning text-dark fw-bold rounded-pill px-3 py-2">
+                <i class="fas fa-map-marker-alt me-2"></i>Nos guichets
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {# Pied de carte avec retour #}
+        <div class="service-detail-footer mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
+          <a href="/services-aux-citoyens" class="btn-reset-search">
+            <i class="fas fa-th-list me-2"></i>Tous les services aux citoyens
+          </a>
+          <span class="text-muted small">RDC - Gouvernorat de Kinshasa</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- COLONNE DROITE : SIDEBAR CATÉGORIES ET AIDE (col-lg-4) -->
+    <div class="col-lg-4 col-md-12">
+      <div class="services-sidebar">
+        
+        <!-- En-tête principal "Services aux citoyens" -->
+        <a href="/services-aux-citoyens" class="sidebar-main-header-link">
+          <i class="fas fa-hands-helping me-2"></i>Services aux citoyens
+        </a>
+
+        <!-- Liste des catégories parents (1er niveau) et enfants (2ème / 3ème niveau) -->
+        <ul class="sidebar-categories-list">
+          {% for root in services_categories_tree %}
+            {% for category in root.children %}
+              {% set has_active_child = false %}
+              {% for grandchild in category.children %}
+                {% if grandchild.tid == active_category_tid %}
+                  {% set has_active_child = true %}
+                {% endif %}
+              {% endfor %}
+              
+              <li class="sidebar-parent-item {{ category.tid == active_category_tid or has_active_child ? 'expanded' }}">
+                {% if category.children is not empty %}
+                  <div class="sidebar-parent-header {{ category.tid == active_category_tid or has_active_child ? 'active' }}">
+                    <span class="cat-label">{{ category.name }}</span>
+                    <span class="cat-toggle-icon"><i class="fas {{ category.tid == active_category_tid or has_active_child ? 'fa-chevron-down' : 'fa-chevron-right' }}"></i></span>
+                  </div>
+                  <ul class="sidebar-child-list" style="{{ category.tid == active_category_tid or has_active_child ? 'display: block;' : 'display: none;' }}">
+                    {% for grandchild in category.children %}
+                      <li class="sidebar-child-item {{ grandchild.tid == active_category_tid ? 'active' }}">
+                        <a href="/services-aux-citoyens/{{ grandchild.tid }}" class="sidebar-child-link">
+                          {{ grandchild.name }}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <a href="/services-aux-citoyens/{{ category.tid }}" class="sidebar-parent-link-direct {{ category.tid == active_category_tid ? 'active' }}">
+                    <span class="cat-label">{{ category.name }}</span>
+                    <span class="cat-arrow"><i class="fas fa-chevron-right"></i></span>
+                  </a>
+                {% endif %}
+              </li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+
+        <!-- Bloc aide -->
+        <div class="sidebar-help-box">
+          <div class="sidebar-help-icon">
+            <i class="fas fa-headset"></i>
+          </div>
+          <div class="sidebar-help-content">
+            <h5>Besoin d'aide ?</h5>
+            <p>Nos conseillers sont à votre disposition pour vous orienter dans l'accomplissement de vos démarches.</p>
+            <a href="/contact" class="sidebar-help-btn">
+              <i class="fas fa-envelope me-2"></i>Nous contacter
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var headers = document.querySelectorAll('.sidebar-parent-header');
+  headers.forEach(function(header) {
+    header.addEventListener('click', function() {
+      var parentLi = this.parentElement;
+      var childList = parentLi.querySelector('.sidebar-child-list');
+      if (childList) {
+        var isOpen = childList.style.display === 'block';
+        childList.style.display = isOpen ? 'none' : 'block';
+        parentLi.classList.toggle('expanded', !isOpen);
+        var icon = this.querySelector('.cat-toggle-icon i');
+        if (icon) {
+          icon.className = isOpen ? 'fas fa-chevron-right' : 'fas fa-chevron-down';
+        }
+      }
+    });
+  });
+});
+</script>

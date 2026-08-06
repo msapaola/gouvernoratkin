@@ -4508,6 +4508,100 @@ blockquote p {
 }
 
 /* ==========================================================================
+   Page de détail d'un Service au Citoyen (Node 3ème Degré)
+   ========================================================================== */
+.service-detail-header {
+    padding-bottom: 2.5rem;
+}
+
+.service-detail-category-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(8px);
+    color: var(--whiteColor);
+    font-family: var(--fontFamily-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.35rem 1rem;
+    border-radius: 50px;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    letter-spacing: 0.5px;
+}
+
+.service-detail-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+}
+
+.service-detail-meta {
+    font-family: var(--fontFamily-body);
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.service-detail-card {
+    border: 1px solid #eef2f6;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+.service-detail-toolbar {
+    border-bottom: 1px solid #edf2f7;
+}
+
+.btn-back-to-list {
+    font-family: var(--fontFamily-heading);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--mainColor);
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-back-to-list:hover {
+    color: var(--secondaryColor);
+    transform: translateX(-3px);
+}
+
+.service-detail-notice {
+    background-color: #f0f7ff !important;
+    border-color: var(--mainColor) !important;
+}
+
+.service-detail-content {
+    font-family: var(--fontFamily-body);
+    color: #334155;
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+.service-body-text h2, 
+.service-body-text h3, 
+.service-body-text h4 {
+    font-family: var(--fontFamily-heading);
+    color: var(--mainColor);
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+}
+
+.service-body-text ul, 
+.service-body-text ol {
+    padding-left: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.service-body-text li {
+    margin-bottom: 0.5rem;
+}
+
+.service-detail-contact-box {
+    box-shadow: 0 8px 20px rgba(13, 59, 102, 0.15);
+}
+
+/* ==========================================================================
    Sidebar : styles sur la liste HTML générée par la vue block_categories
    ========================================================================== */
 
