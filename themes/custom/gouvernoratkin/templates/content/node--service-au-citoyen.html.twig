@@ -83,7 +83,7 @@
             <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" onclick="window.print();" title="Imprimer cette fiche">
               <i class="fas fa-print me-1"></i>Imprimer
             </button>
-            <button type="button" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill" onclick="window.print();" title="Télécharger la fiche au format PDF">
+            <button type="button" class="btn btn-sm btn-warning text-dark fw-bold rounded-pill" onclick="downloadServicePDF();" title="Télécharger la fiche au format PDF">
               <i class="fas fa-file-pdf me-1"></i>Télécharger PDF
             </button>
             <button type="button" class="btn btn-sm btn-outline-primary rounded-pill" onclick="navigator.clipboard.writeText(window.location.href); alert('Lien copié dans le presse-papier !');" title="Partager">
@@ -223,6 +223,7 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   var headers = document.querySelectorAll('.sidebar-parent-header');
@@ -242,4 +243,51 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+function downloadServicePDF() {
+  var titleElement = document.querySelector('.services-page-title') || document.querySelector('.print-service-title');
+  var rawTitle = titleElement ? titleElement.innerText.trim() : '{{ label|e('js') }}';
+  var contentElement = document.querySelector('.service-detail-content');
+  var contentHtml = contentElement ? contentElement.innerHTML : '';
+
+  var container = document.createElement('div');
+  container.style.padding = '25px';
+  container.style.fontFamily = 'Arial, sans-serif';
+  container.style.color = '#111111';
+  container.style.backgroundColor = '#ffffff';
+
+  container.innerHTML = `
+    <div style="border-bottom: 2px solid #0d3b66; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h3 style="color: #0d3b66; margin: 0; font-size: 16px; font-weight: bold;">Gouvernorat de Kinshasa</h3>
+        <p style="color: #555555; margin: 3px 0 0 0; font-size: 12px;">Services aux citoyens — Document Officiel</p>
+      </div>
+      <div style="text-align: right; font-size: 11px; color: #777777;">
+        Réf: {{ node.id }}<br>
+        Date: ${new Date().toLocaleDateString('fr-FR')}
+      </div>
+    </div>
+    <h1 style="font-size: 20px; color: #0d3b66; margin-top: 10px; margin-bottom: 20px; font-weight: bold; line-height: 1.3;">
+      ${rawTitle}
+    </h1>
+    <div style="font-size: 12px; line-height: 1.6; color: #222222;">
+      ${contentHtml}
+    </div>
+    <div style="margin-top: 40px; border-top: 1px solid #dddddd; padding-top: 12px; font-size: 10px; color: #777777; text-align: center;">
+      République Démocratique du Congo — Ville-Province de Kinshasa — Fiche d'information officielle
+    </div>
+  `;
+
+  var cleanFileName = rawTitle.toLowerCase().replace(/[^a-z0-9]/g, '_').replace(/_+/g, '_').substring(0, 40) + '_fiche.pdf';
+
+  var opt = {
+    margin: [12, 12, 12, 12],
+    filename: cleanFileName,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(container).save();
+}
 </script>
