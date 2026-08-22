@@ -1,28 +1,4 @@
-/* Imports des polices nécessaires */
-@import url("https://fonts.googleapis.com/css2?family=Great+Vibes:wght@400;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,500;0,700;1,500&display=swap");
-
-/* Définition de Cooper Hewitt */
-@font-face {
-  font-family: 'Cooper Hewitt';
-  src: url('https://cdnjs.cloudflare.com/ajax/libs/cooper-hewitt/1.0.0/fonts/CooperHewitt-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Cooper Hewitt';
-  src: url('https://cdnjs.cloudflare.com/ajax/libs/cooper-hewitt/1.0.0/fonts/CooperHewitt-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Cooper Hewitt';
-  src: url('https://cdnjs.cloudflare.com/ajax/libs/cooper-hewitt/1.0.0/fonts/CooperHewitt-MediumItalic.woff2') format('woff2');
-  font-weight: 500;
-  font-style: italic;
-}
+/* Les polices du thème sont déclarées dans fonts.css (chargée avant cette feuille). */
 
 /* Variables globales */
 :root {
