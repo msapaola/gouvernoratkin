@@ -1,3 +1,4 @@
 *.zip
 *.tar.gz
 *.sql
+sites/default/files/config_new/smtp.settings.yml
