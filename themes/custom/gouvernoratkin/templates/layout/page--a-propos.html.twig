@@ -1,0 +1,394 @@
+{#
+/**
+ * @file
+ * Page « À propos » du site du Gouvernorat de Kinshasa.
+ *
+ * Comme la page d'accueil, cette page est entièrement décrite ici, section
+ * par section. Elle remplace le contenu saisi dans l'éditeur (le bloc rendu
+ * par la vue about_us), dont le balisage et les styles vivaient hors du
+ * thème et échappaient donc à la charte.
+ *
+ * L'entête et le pied de page sont partagés avec page.html.twig via des
+ * partiels : la navigation n'est décrite qu'à un seul endroit.
+ *
+ * Pour changer une image, une seule ligne à modifier : le tableau « visuels »
+ * ci-dessous. Les chemins sont relatifs à la racine du site.
+ */
+#}
+{{ attach_library('gouvernoratkin/apropos') }}
+
+{% set img = '/themes/custom/gouvernoratkin/assets/images/' %}
+{% set visuels = {
+  bandeau:     img ~ 'apropos-hero.webp',
+  institution: img ~ 'apropos-institution.webp',
+  initiatives: img ~ 'apropos-initiatives.webp'
+} %}
+
+{# Le fil d'Ariane générique du partiel est neutralisé : cette page pose le
+   sien sur le bandeau, où il reste lisible et à sa place. #}
+{% include "@gouvernoratkin/layout/partials/site-header.html.twig" with { sans_fil_ariane: true } %}
+
+<main id="main-content" role="main">
+
+  <div class="container page-messages">{{ drupal_messages() }}</div>
+
+  {# ================= BANDEAU ================= #}
+  <section class="ap-bandeau" aria-labelledby="ap-titre">
+    <img class="ap-bandeau__image" src="{{ visuels.bandeau }}" alt="" width="1200" height="480" fetchpriority="high" decoding="async">
+    <div class="ap-bandeau__voile" aria-hidden="true"></div>
+
+    <div class="container">
+      <div class="ap-bandeau__contenu">
+        <nav aria-label="{{ 'Fil d’Ariane'|t }}">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">À propos</li>
+          </ol>
+        </nav>
+
+        <p class="surtitre surtitre--clair">Le Gouvernorat</p>
+        <h1 class="ap-bandeau__titre" id="ap-titre">À propos de la Ville-Province de Kinshasa</h1>
+        <p class="ap-bandeau__accroche">
+          Institution dédiée à la gestion et au développement de la capitale de la
+          République Démocratique du Congo, le Gouvernorat coordonne les services
+          publics de la Ville-Province et conduit les politiques de développement
+          urbain au service des Kinoises et des Kinois.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {# ================= SOMMAIRE ANCRÉ ================= #}
+  <nav class="ap-sommaire" aria-label="{{ 'Sommaire de la page'|t }}">
+    <div class="container">
+      <ul class="ap-sommaire__liste">
+        <li><a class="ap-sommaire__lien" href="#qui-sommes-nous">Qui sommes-nous&nbsp;?</a></li>
+        <li><a class="ap-sommaire__lien" href="#piliers">Nos piliers</a></li>
+        <li><a class="ap-sommaire__lien" href="#histoire">Notre histoire</a></li>
+        <li><a class="ap-sommaire__lien" href="#organisation">Organisation</a></li>
+        <li><a class="ap-sommaire__lien" href="#economie-culture">Économie et culture</a></li>
+        <li><a class="ap-sommaire__lien" href="#hotel-de-ville">Hôtel de Ville</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  {# ================= QUI SOMMES-NOUS ================= #}
+  <section class="ap-section ap-presentation" id="qui-sommes-nous" aria-labelledby="qui-titre">
+    <div class="container">
+      <div class="ap-section__entete">
+        <p class="surtitre">Notre rôle</p>
+        <h2 class="ap-section__titre" id="qui-titre">Qui sommes-nous&nbsp;?</h2>
+        <p class="ap-section__chapo">
+          Nous œuvrons chaque jour pour améliorer la qualité de vie des Kinoises et
+          des Kinois, en transformant Kinshasa en une métropole moderne, dynamique
+          et accueillante, tout en préservant son riche patrimoine culturel et
+          historique.
+        </p>
+      </div>
+
+      <div class="ap-presentation__grille">
+        <div class="ap-presentation__texte">
+          <p>
+            En tant qu'autorité administrative de la Ville-Province, le Gouvernorat
+            de Kinshasa coordonne l'ensemble des services publics et met en œuvre
+            les politiques de développement urbain. Notre action s'articule autour
+            de cinq axes prioritaires&nbsp;:
+          </p>
+
+          <ul class="ap-axes">
+            <li>Développement des infrastructures urbaines</li>
+            <li>Amélioration des services sociaux de base</li>
+            <li>Gestion durable de l'environnement</li>
+            <li>Promotion de l'entreprenariat local</li>
+            <li>Renforcement de la gouvernance participative</li>
+          </ul>
+
+          <p>
+            Nous travaillons en étroite collaboration avec les différentes parties
+            prenantes — les communes, la société civile, le secteur privé et les
+            partenaires internationaux — afin d'assurer un développement harmonieux
+            et inclusif de notre capitale.
+          </p>
+
+          <a href="/executif-provincial" class="lien-suite">
+            Découvrir l'exécutif provincial <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        </div>
+
+        <figure class="ap-visuel">
+          <img src="{{ visuels.institution }}" alt="Séance de travail dans la salle du conseil de l'Hôtel de Ville de Kinshasa" width="900" height="600" loading="lazy" decoding="async">
+          <figcaption>Séance de travail à l'Hôtel de Ville, siège du Gouvernorat</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  {# ================= REPÈRES CHIFFRÉS ================= #}
+  <section class="ap-reperes" aria-labelledby="reperes-titre">
+    <div class="container">
+      <p class="surtitre surtitre--clair">Kinshasa en bref</p>
+      <h2 class="ap-reperes__titre" id="reperes-titre">Quelques repères</h2>
+
+      <dl class="ap-reperes__liste">
+        <div class="ap-reperes__item">
+          <dt class="ap-reperes__valeur">9 965 km²</dt>
+          <dd class="ap-reperes__libelle">de superficie, dont plus de 90&nbsp;% de zones rurales et forestières</dd>
+        </div>
+        <div class="ap-reperes__item">
+          <dt class="ap-reperes__valeur">17 M</dt>
+          <dd class="ap-reperes__libelle">d'habitants en 2024, première agglomération francophone au monde</dd>
+        </div>
+        <div class="ap-reperes__item">
+          <dt class="ap-reperes__valeur">24</dt>
+          <dd class="ap-reperes__libelle">communes réparties en 4 districts administratifs</dd>
+        </div>
+        <div class="ap-reperes__item">
+          <dt class="ap-reperes__valeur">Français</dt>
+          <dd class="ap-reperes__libelle">langue officielle, aux côtés du lingala parlé au quotidien</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  {# ================= PILIERS ================= #}
+  <section class="ap-section ap-section--clair" id="piliers" aria-labelledby="piliers-titre">
+    <div class="container">
+      <div class="ap-section__entete ap-section__entete--centre">
+        <p class="surtitre">Ce qui nous guide</p>
+        <h2 class="ap-section__titre" id="piliers-titre">Nos piliers fondamentaux</h2>
+      </div>
+
+      <ul class="ap-piliers">
+        <li class="ap-pilier">
+          <span class="ap-pilier__icone" aria-hidden="true"><i class="fas fa-bullseye"></i></span>
+          <h3 class="ap-pilier__titre">Notre mission</h3>
+          <p>
+            Servir la population kinoise avec intégrité et efficacité, en assurant
+            une gouvernance transparente et participative pour le développement
+            durable et équilibré de la capitale.
+          </p>
+          <p>
+            Nous nous engageons à faciliter l'accès aux services essentiels et à
+            créer un environnement propice à l'épanouissement de tous les citoyens.
+          </p>
+        </li>
+
+        <li class="ap-pilier">
+          <span class="ap-pilier__icone" aria-hidden="true"><i class="fas fa-eye"></i></span>
+          <h3 class="ap-pilier__titre">Notre vision</h3>
+          <p>
+            Faire de Kinshasa une métropole moderne, inclusive et résiliente,
+            reconnue comme un pôle de développement économique, culturel et
+            technologique majeur en Afrique centrale.
+          </p>
+          <p>
+            Nous aspirons à une ville où il fait bon vivre, dotée d'infrastructures
+            de qualité et d'opportunités pour tous.
+          </p>
+        </li>
+
+        <li class="ap-pilier">
+          <span class="ap-pilier__icone" aria-hidden="true"><i class="fas fa-hand-holding-heart"></i></span>
+          <h3 class="ap-pilier__titre">Nos valeurs</h3>
+          <ul class="ap-pilier__valeurs">
+            <li><strong>Transparence</strong> — nous agissons avec intégrité et ouverture dans toutes nos décisions.</li>
+            <li><strong>Innovation</strong> — nous encourageons les solutions créatives face aux défis urbains.</li>
+            <li><strong>Proximité</strong> — nous restons à l'écoute des besoins de la population.</li>
+            <li><strong>Excellence</strong> — nous visons constamment l'amélioration de nos services.</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  {# ================= HISTOIRE ================= #}
+  <section class="ap-section" id="histoire" aria-labelledby="histoire-titre">
+    <div class="container">
+      <div class="ap-section__entete ap-section__entete--centre">
+        <p class="surtitre">Depuis 1881</p>
+        <h2 class="ap-section__titre" id="histoire-titre">Notre évolution historique</h2>
+        <p class="ap-section__chapo">
+          De poste commercial à métropole de dix-sept millions d'habitants, Kinshasa
+          a connu une évolution marquée par des étapes qui ont façonné la capitale
+          et son administration.
+        </p>
+      </div>
+
+      {# Chronologie : une liste ordonnée, pour que l'ordre des étapes soit porté
+         par le balisage et non par la seule mise en page. #}
+      <ol class="ap-chrono">
+        <li class="ap-chrono__etape">
+          <span class="ap-chrono__date">1881</span>
+          <h3 class="ap-chrono__titre">Fondation de Léopoldville</h3>
+          <p>Fondée par Henry Morton Stanley, la ville est d'abord un poste commercial et administratif sous le nom de Léopoldville.</p>
+        </li>
+        <li class="ap-chrono__etape">
+          <span class="ap-chrono__date">1923</span>
+          <h3 class="ap-chrono__titre">Capitale du Congo belge</h3>
+          <p>Léopoldville devient la capitale administrative du Congo belge, ce qui stimule son développement urbain.</p>
+        </li>
+        <li class="ap-chrono__etape">
+          <span class="ap-chrono__date">1960</span>
+          <h3 class="ap-chrono__titre">Indépendance de la RDC</h3>
+          <p>La ville devient la capitale de la République Démocratique du Congo indépendante.</p>
+        </li>
+        <li class="ap-chrono__etape">
+          <span class="ap-chrono__date">1966</span>
+          <h3 class="ap-chrono__titre">Renommage en Kinshasa</h3>
+          <p>La ville est rebaptisée Kinshasa, affirmant ainsi l'identité nationale.</p>
+        </li>
+        <li class="ap-chrono__etape">
+          <span class="ap-chrono__date">2006</span>
+          <h3 class="ap-chrono__titre">Décentralisation</h3>
+          <p>La mise en œuvre de la politique de décentralisation renforce l'autonomie administrative et financière du Gouvernorat.</p>
+        </li>
+        <li class="ap-chrono__etape">
+          <span class="ap-chrono__date">2022</span>
+          <h3 class="ap-chrono__titre">Transformation numérique</h3>
+          <p>Lancement du programme de digitalisation des services administratifs, pour améliorer l'efficacité et la transparence de la gouvernance locale.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  {# ================= ORGANISATION ADMINISTRATIVE ================= #}
+  <section class="ap-section ap-section--clair" id="organisation" aria-labelledby="organisation-titre">
+    <div class="container">
+      <div class="ap-section__entete ap-section__entete--centre">
+        <p class="surtitre">Territoire</p>
+        <h2 class="ap-section__titre" id="organisation-titre">Organisation administrative</h2>
+        <p class="ap-section__chapo">
+          Kinshasa est une ville-province unique, organisée en 24 communes
+          regroupées en 4 districts.
+        </p>
+      </div>
+
+      <ul class="ap-districts">
+        <li class="ap-district">
+          <h3 class="ap-district__titre">District de la Lukunga</h3>
+          <span class="ap-district__compte">7 communes</span>
+          <ul class="ap-district__communes">
+            <li>Barumbu</li><li>Gombe</li><li>Kinshasa</li><li>Kintambo</li>
+            <li>Lingwala</li><li>Mont Ngafula</li><li>Ngaliema</li>
+          </ul>
+        </li>
+        <li class="ap-district">
+          <h3 class="ap-district__titre">District de la Funa</h3>
+          <span class="ap-district__compte">7 communes</span>
+          <ul class="ap-district__communes">
+            <li>Bandalungwa</li><li>Bumbu</li><li>Kalamu</li><li>Kasa-Vubu</li>
+            <li>Makala</li><li>Ngiri-Ngiri</li><li>Selembao</li>
+          </ul>
+        </li>
+        <li class="ap-district">
+          <h3 class="ap-district__titre">District du Mont-Amba</h3>
+          <span class="ap-district__compte">5 communes</span>
+          <ul class="ap-district__communes">
+            <li>Kisenso</li><li>Lemba</li><li>Limete</li><li>Matete</li><li>Ngaba</li>
+          </ul>
+        </li>
+        <li class="ap-district">
+          <h3 class="ap-district__titre">District de la Tshangu</h3>
+          <span class="ap-district__compte">5 communes</span>
+          <ul class="ap-district__communes">
+            <li>Kimbanseke</li><li>Maluku</li><li>Masina</li><li>Ndjili</li><li>Nsele</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  {# ================= ÉCONOMIE ET CULTURE ================= #}
+  <section class="ap-section" id="economie-culture" aria-labelledby="economie-titre">
+    <div class="container">
+      <div class="ap-section__entete ap-section__entete--centre">
+        <p class="surtitre">Rayonnement</p>
+        <h2 class="ap-section__titre" id="economie-titre">Économie et culture</h2>
+      </div>
+
+      <ul class="ap-cartes">
+        <li class="ap-carte">
+          <h3 class="ap-carte__titre"><i class="fas fa-chart-line" aria-hidden="true"></i> Économie</h3>
+          <p>
+            Kinshasa est le cœur économique de la RDC, avec des secteurs prospères
+            comme le commerce, l'industrie légère (textile, agroalimentaire) et les
+            services (banques, télécommunications). Le quartier de la Gombe,
+            véritable centre d'affaires, abrite de nombreuses entreprises et
+            institutions financières, faisant de la ville un pôle économique
+            incontournable.
+          </p>
+        </li>
+        <li class="ap-carte">
+          <h3 class="ap-carte__titre"><i class="fas fa-music" aria-hidden="true"></i> Culture</h3>
+          <p>
+            Kinshasa est un carrefour culturel majeur en Afrique, berceau de la
+            rumba congolaise et foyer de créativité. Avec des institutions
+            prestigieuses comme l'Université de Kinshasa et le Stade des Martyrs,
+            la ville rayonne par sa vitalité artistique et son riche patrimoine.
+          </p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  {# ================= HÔTEL DE VILLE ================= #}
+  <section class="ap-section ap-section--clair ap-hotel" id="hotel-de-ville" aria-labelledby="hotel-titre">
+    <div class="container">
+      <div class="ap-section__entete">
+        <p class="surtitre">Le siège de l'institution</p>
+        <h2 class="ap-section__titre" id="hotel-titre">Le rôle de l'Hôtel de Ville</h2>
+        <p class="ap-section__chapo">
+          L'Hôtel de Ville de Kinshasa, siège du Gouvernorat, est au cœur de la
+          gestion et du développement de la Ville-Province.
+        </p>
+      </div>
+
+      <div class="ap-hotel__grille">
+        <div class="ap-hotel__colonnes">
+          <div>
+            <h3 class="ap-hotel__titre"><i class="fas fa-balance-scale" aria-hidden="true"></i> Responsabilités</h3>
+            <ul class="ap-liste-cochee">
+              <li>Gestion des finances publiques de la Ville-Province</li>
+              <li>Planification et aménagement urbains</li>
+              <li>Coordination des 24 communes</li>
+              <li>Services techniques&nbsp;: voirie, assainissement, transports</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 class="ap-hotel__titre"><i class="fas fa-seedling" aria-hidden="true"></i> Initiatives récentes</h3>
+            <ul class="ap-liste-cochee">
+              <li>Programme «&nbsp;Kinshasa ezo bonga&nbsp;» pour une ville moderne, salubre et sécurisée</li>
+              <li>Mesures d'amélioration de l'assainissement et de la mobilité</li>
+              <li>Régulation du secteur publicitaire et harmonisation de l'aménagement urbain</li>
+            </ul>
+          </div>
+        </div>
+
+        <figure class="ap-visuel">
+          <img src="{{ visuels.initiatives }}" alt="Agents d'assainissement devant un camion aux couleurs du programme Kinshasa ezo bonga" width="900" height="600" loading="lazy" decoding="async">
+          <figcaption>Le programme «&nbsp;Kinshasa ezo bonga&nbsp;» pour une ville moderne, salubre et sécurisée</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  {# ================= APPEL FINAL ================= #}
+  <section class="ap-appel" aria-labelledby="appel-titre">
+    <div class="container">
+      <h2 class="ap-appel__titre" id="appel-titre">Découvrez nos projets et initiatives</h2>
+      <p class="ap-appel__texte">
+        Vous souhaitez en savoir plus sur nos réalisations, nos projets en cours et
+        nos perspectives d'avenir&nbsp;? Parcourez les rubriques dédiées aux actions
+        du Gouvernorat de Kinshasa.
+      </p>
+      <div class="ap-appel__actions">
+        <a href="/evenements" class="bouton bouton--clair">Explorer nos projets</a>
+        <a href="/contact" class="bouton bouton--fantome">Nous contacter</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+{% include "@gouvernoratkin/layout/partials/site-footer.html.twig" %}

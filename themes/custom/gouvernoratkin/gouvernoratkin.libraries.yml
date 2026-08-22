@@ -56,9 +56,26 @@ drupal.nav-tabs:
     - core/drupal.toolbar
     - core/backbone
 
+# Briques partagees par les pages entierement decrites dans le theme
+# (surtitres, boutons, entetes de section). Chargee en dependance, jamais seule.
+composants:
+  css:
+    theme:
+        assets/css/composants.css: {}
+
 # Styles propres a la page d'accueil, attachee depuis page--front.html.twig.
 # Isolee de global-styling : elle n'est chargee que sur la page qui s'en sert.
 accueil:
   css:
     theme:
         assets/css/accueil.css: {}
+  dependencies:
+    - gouvernoratkin/composants
+
+# Styles propres a la page « A propos », attachee depuis page--a-propos.html.twig.
+apropos:
+  css:
+    theme:
+        assets/css/apropos.css: {}
+  dependencies:
+    - gouvernoratkin/composants

@@ -1,0 +1,705 @@
+/**
+ * Page « À propos » — Gouvernorat de Kinshasa
+ *
+ * Chargée uniquement par page--a-propos.html.twig, via la bibliothèque
+ * gouvernoratkin/apropos, qui dépend de gouvernoratkin/composants pour les
+ * briques communes (surtitres, boutons, liens « suite »).
+ *
+ * Aucune couleur n'est écrite en dur : tout vient des variables de la charte
+ * déclarées dans style.css. Modifier la charte suffit donc à faire évoluer
+ * cette page avec le reste du site.
+ */
+
+/* ==========================================================================
+   Bandeau
+   ========================================================================== */
+
+.ap-bandeau {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 46vh;
+  padding: 3rem 0 2.75rem;
+  overflow: hidden;
+  background-color: var(--mainColor);
+}
+
+.ap-bandeau__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+}
+
+/* Voile dégradé : il assombrit assez le bas de la photo pour que le texte
+   blanc y garde un contraste supérieur à 7:1, quelle que soit la découpe. */
+.ap-bandeau__voile {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(9, 36, 46, 0.35) 0%,
+    rgba(16, 66, 147, 0.72) 55%,
+    rgba(9, 36, 46, 0.92) 100%
+  );
+}
+
+.ap-bandeau__contenu {
+  position: relative;
+  max-width: 62ch;
+  color: var(--whiteColor);
+}
+
+.ap-bandeau__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.12;
+  color: var(--whiteColor);
+  margin: 0 0 1rem;
+  text-wrap: balance;
+}
+
+.ap-bandeau__accroche {
+  font-size: clamp(1rem, 1.6vw, 1.12rem);
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0;
+}
+
+/* Fil d'Ariane posé sur la photo : il reprend le balisage de Drupal mais
+   inverse les couleurs pour rester lisible sur fond sombre. */
+.ap-bandeau .breadcrumb {
+  background: none;
+  padding: 0;
+  margin: 0 0 1rem;
+  font-size: 0.88rem;
+}
+
+.ap-bandeau .breadcrumb a,
+.ap-bandeau .breadcrumb li {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+}
+
+.ap-bandeau .breadcrumb a:hover,
+.ap-bandeau .breadcrumb a:focus {
+  color: var(--highlightColor);
+  text-decoration: underline;
+}
+
+.ap-bandeau .breadcrumb-item + .breadcrumb-item::before {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ==========================================================================
+   Sommaire ancré
+   ========================================================================== */
+
+.ap-sommaire {
+  background-color: var(--whiteColor);
+  border-bottom: 1px solid #e2e8f2;
+  box-shadow: 0 2px 10px rgba(16, 66, 147, 0.06);
+}
+
+.ap-sommaire__liste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0.9rem 0;
+}
+
+.ap-sommaire__lien {
+  font-family: var(--fontFamily-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--mainColor);
+  text-decoration: none;
+  padding: 0.35rem 0;
+  border-bottom: 2px solid transparent;
+  display: inline-block;
+}
+
+.ap-sommaire__lien:hover,
+.ap-sommaire__lien:focus-visible {
+  color: var(--mainColorDark);
+  border-bottom-color: var(--accentColor);
+}
+
+/* Les ancres ne doivent pas passer sous la barre de sommaire. */
+.ap-section {
+  scroll-margin-top: 5rem;
+  padding: 4.5rem 0;
+}
+
+.ap-section--clair {
+  background-color: #f6f8fc;
+}
+
+.ap-section__entete {
+  max-width: 70ch;
+  margin: 0 0 2.5rem;
+}
+
+.ap-section__entete--centre {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.ap-section__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--mainColor);
+  margin: 0 0 0.9rem;
+  text-wrap: balance;
+}
+
+.ap-section__chapo {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--paragraphColor);
+  margin: 0;
+}
+
+/* ==========================================================================
+   Présentation : texte + visuel
+   ========================================================================== */
+
+.ap-presentation__grille {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 3rem;
+  align-items: center;
+}
+
+.ap-presentation__texte p {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--paragraphColor);
+  margin: 0 0 1.1rem;
+}
+
+/* Les axes prioritaires : une liste, pas des puces décoratives. Le chevron
+   est purement visuel et reste hors du flux de lecture des lecteurs d'écran. */
+.ap-axes {
+  list-style: none;
+  margin: 0 0 1.4rem;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.ap-axes li {
+  position: relative;
+  padding-left: 1.9rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--blackColor);
+}
+
+.ap-axes li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 2px;
+  background-color: var(--secondaryColor);
+}
+
+.ap-visuel {
+  margin: 0;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 16px 38px rgba(9, 36, 46, 0.16);
+}
+
+.ap-visuel img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.ap-visuel figcaption {
+  background-color: var(--deepTeal);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  padding: 0.85rem 1.1rem;
+}
+
+/* ==========================================================================
+   Repères chiffrés
+   ========================================================================== */
+
+.ap-reperes {
+  background-color: var(--deepTeal);
+  color: var(--whiteColor);
+  padding: 3.5rem 0;
+}
+
+.ap-reperes__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  font-weight: 700;
+  color: var(--whiteColor);
+  margin: 0 0 2.25rem;
+}
+
+.ap-reperes__liste {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 2rem;
+  margin: 0;
+}
+
+.ap-reperes__item {
+  border-left: 3px solid var(--highlightColor);
+  padding-left: 1.1rem;
+}
+
+.ap-reperes__valeur {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.7rem, 3.4vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0 0 0.35rem;
+}
+
+.ap-reperes__libelle {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.82);
+  margin: 0;
+}
+
+/* ==========================================================================
+   Piliers : mission, vision, valeurs
+   ========================================================================== */
+
+.ap-piliers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 1.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ap-pilier {
+  background-color: var(--whiteColor);
+  border-radius: 12px;
+  border-top: 4px solid var(--secondaryColor);
+  padding: 2rem 1.75rem;
+  box-shadow: 0 10px 26px rgba(9, 36, 46, 0.07);
+}
+
+.ap-pilier:nth-child(2) {
+  border-top-color: var(--accentColor);
+}
+
+.ap-pilier:nth-child(3) {
+  border-top-color: var(--green);
+}
+
+.ap-pilier__icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.9rem;
+  height: 2.9rem;
+  border-radius: 50%;
+  background-color: #e7edf7;
+  background-color: color-mix(in srgb, var(--mainColor) 10%, var(--whiteColor));
+  color: var(--mainColor);
+  font-size: 1.15rem;
+  margin-bottom: 1rem;
+}
+
+.ap-pilier__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--mainColor);
+  margin: 0 0 0.75rem;
+}
+
+.ap-pilier p {
+  font-size: 0.98rem;
+  line-height: 1.75;
+  color: var(--paragraphColor);
+  margin: 0 0 0.8rem;
+}
+
+.ap-pilier p:last-child {
+  margin-bottom: 0;
+}
+
+.ap-pilier__valeurs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.ap-pilier__valeurs strong {
+  color: var(--blackColor);
+}
+
+/* ==========================================================================
+   Chronologie
+   ========================================================================== */
+
+.ap-chrono {
+  position: relative;
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 1.75rem;
+  counter-reset: none;
+}
+
+/* Le trait vertical est décoratif : il ne porte aucune information que la
+   liste ordonnée ne donne déjà. */
+.ap-chrono::before {
+  content: '';
+  position: absolute;
+  left: 0.4rem;
+  top: 0.6rem;
+  bottom: 0.6rem;
+  width: 2px;
+  background: linear-gradient(180deg, var(--secondaryColor), var(--mainColor));
+}
+
+.ap-chrono__etape {
+  position: relative;
+  padding: 0 0 2.25rem 0;
+}
+
+.ap-chrono__etape:last-child {
+  padding-bottom: 0;
+}
+
+.ap-chrono__etape::before {
+  content: '';
+  position: absolute;
+  left: -1.75rem;
+  top: 0.45rem;
+  transform: translateX(0.1rem);
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background-color: var(--whiteColor);
+  border: 3px solid var(--mainColor);
+}
+
+.ap-chrono__date {
+  display: inline-block;
+  font-family: var(--fontFamily-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--whiteColor);
+  background-color: var(--mainColor);
+  border-radius: 4px;
+  padding: 0.2rem 0.7rem;
+  margin-bottom: 0.6rem;
+}
+
+.ap-chrono__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--blackColor);
+  margin: 0 0 0.4rem;
+}
+
+.ap-chrono__etape p {
+  font-size: 0.98rem;
+  line-height: 1.75;
+  color: var(--paragraphColor);
+  margin: 0;
+  max-width: 62ch;
+}
+
+@media (min-width: 768px) {
+  .ap-chrono {
+    padding-left: 0;
+  }
+
+  .ap-chrono::before {
+    left: 50%;
+    transform: translateX(-1px);
+  }
+
+  .ap-chrono__etape {
+    width: 50%;
+    padding-right: 2.75rem;
+    text-align: right;
+  }
+
+  .ap-chrono__etape::before {
+    left: auto;
+    right: -0.4rem;
+    transform: none;
+  }
+
+  .ap-chrono__etape:nth-child(even) {
+    margin-left: 50%;
+    padding-right: 0;
+    padding-left: 2.75rem;
+    text-align: left;
+  }
+
+  .ap-chrono__etape:nth-child(even)::before {
+    right: auto;
+    left: -0.4rem;
+  }
+
+  .ap-chrono__etape:nth-child(even) p {
+    margin-right: 0;
+  }
+
+  .ap-chrono__etape p {
+    margin-left: auto;
+  }
+}
+
+/* ==========================================================================
+   Districts et communes
+   ========================================================================== */
+
+.ap-districts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ap-district {
+  background-color: var(--whiteColor);
+  border-radius: 12px;
+  padding: 1.6rem 1.5rem;
+  box-shadow: 0 10px 26px rgba(9, 36, 46, 0.07);
+  border-left: 4px solid var(--mainColor);
+}
+
+.ap-district:nth-child(2) { border-left-color: var(--secondaryColor); }
+.ap-district:nth-child(3) { border-left-color: var(--orange); }
+.ap-district:nth-child(4) { border-left-color: var(--green); }
+
+.ap-district__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--mainColor);
+  margin: 0 0 0.25rem;
+}
+
+.ap-district__compte {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--paragraphColor);
+  margin-bottom: 0.9rem;
+}
+
+.ap-district__communes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.ap-district__communes li {
+  font-size: 0.88rem;
+  line-height: 1.3;
+  color: var(--blackColor);
+  background-color: #eef2f9;
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+}
+
+/* ==========================================================================
+   Économie et culture
+   ========================================================================== */
+
+.ap-cartes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ap-carte {
+  background-color: var(--whiteColor);
+  border-radius: 12px;
+  padding: 2rem 1.85rem;
+  box-shadow: 0 10px 26px rgba(9, 36, 46, 0.07);
+}
+
+.ap-carte__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--mainColor);
+  margin: 0 0 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.ap-carte__titre i {
+  color: var(--secondaryColor);
+  font-size: 1.05rem;
+}
+
+.ap-carte p {
+  font-size: 0.98rem;
+  line-height: 1.8;
+  color: var(--paragraphColor);
+  margin: 0;
+}
+
+/* ==========================================================================
+   Hôtel de Ville : missions et initiatives
+   ========================================================================== */
+
+.ap-hotel__grille {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: 3rem;
+  align-items: start;
+}
+
+.ap-hotel__colonnes {
+  display: grid;
+  gap: 2.25rem;
+}
+
+.ap-hotel__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--mainColor);
+  margin: 0 0 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.ap-hotel__titre i {
+  color: var(--secondaryColor);
+  font-size: 1rem;
+}
+
+.ap-liste-cochee {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.ap-liste-cochee li {
+  position: relative;
+  padding-left: 1.75rem;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--paragraphColor);
+}
+
+.ap-liste-cochee li::before {
+  content: '\f00c';
+  font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free', 'FontAwesome';
+  font-weight: 900;
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  font-size: 0.8rem;
+  color: var(--green);
+}
+
+/* ==========================================================================
+   Appel final
+   ========================================================================== */
+
+.ap-appel {
+  background-color: var(--mainColor);
+  color: var(--whiteColor);
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.ap-appel__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--whiteColor);
+  margin: 0 0 1rem;
+  text-wrap: balance;
+}
+
+.ap-appel__texte {
+  max-width: 68ch;
+  margin: 0 auto 2rem;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.ap-appel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   Adaptations
+   ========================================================================== */
+
+@media (max-width: 991.98px) {
+  .ap-presentation__grille,
+  .ap-hotel__grille {
+    grid-template-columns: 1fr;
+    gap: 2.25rem;
+  }
+
+  .ap-section {
+    padding: 3.25rem 0;
+  }
+
+  .ap-bandeau {
+    min-height: 0;
+    padding: 2.5rem 0 2.25rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .ap-sommaire__liste {
+    gap: 0.25rem 1.1rem;
+  }
+
+  .ap-pilier,
+  .ap-carte {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .ap-appel__actions .bouton {
+    width: 100%;
+  }
+}

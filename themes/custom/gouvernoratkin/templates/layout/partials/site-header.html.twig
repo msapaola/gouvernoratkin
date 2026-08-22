@@ -65,8 +65,11 @@
   ajoute une bande vide au-dessus de l'article. Les fiches de service ont par
   ailleurs leur propre fil d'Ariane dans node--service-au-citoyen.html.twig,
   qui porte la rubrique et la categorie : le fil generique faisait doublon.
+  Les pages qui posent elles-memes leur fil d'Ariane dans un bandeau — la page
+  « A propos », par exemple — passent sans_fil_ariane a l'inclusion pour eviter
+  le doublon.
 #}
-{% if not is_front and node is not defined %}
+{% if not is_front and node is not defined and sans_fil_ariane is not defined %}
   <div class="system-area">
     <div class="container">
       {{ drupal_breadcrumb() }}
