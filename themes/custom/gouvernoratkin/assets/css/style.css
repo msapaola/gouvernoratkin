@@ -4013,6 +4013,80 @@ blockquote p {
 }
 
 /* ==========================================================================
+   Menu : deploiement des sous-menus sous 992 px
+   ==========================================================================
+   Au-dessus de 992 px les sous-menus s'ouvrent au survol (bloc suivant). En
+   dessous, il n'y a ni survol ni gestionnaire de clic : toucher une rubrique a
+   sous-menu naviguait directement. Un bouton chevron, distinct du lien, confie
+   l'ouverture a Bootstrap tout en laissant la page de la rubrique atteignable. */
+
+.menu-deployer {
+  display: none;
+}
+
+@media (max-width: 991.98px) {
+  .navbar-nav .nav-item.dropdown {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .navbar-nav .nav-item.dropdown > .nav-link {
+    flex: 1;
+  }
+
+  /* Le chevron de Bootstrap sur le lien ferait doublon avec le bouton. */
+  .navbar-nav .nav-item.dropdown > .nav-link.dropdown-toggle::after {
+    display: none;
+  }
+
+  .menu-deployer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--mainColor);
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+
+  .menu-deployer i {
+    transition: transform 0.25s ease;
+  }
+
+  .menu-deployer[aria-expanded="true"] i {
+    transform: rotate(180deg);
+  }
+
+  /* Le sous-menu occupe toute la largeur, sous le couple lien + bouton. */
+  .navbar-nav .nav-item.dropdown > .dropdown-menu {
+    flex: 1 0 100%;
+    border: 0;
+    border-left: 3px solid var(--highlightColor);
+    border-radius: 0;
+    box-shadow: none;
+    margin: 0 0 0.5rem;
+    padding-left: 0.75rem;
+    background-color: transparent;
+  }
+
+  .navbar-nav .dropdown-item {
+    padding: 0.6rem 0.75rem;
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-deployer i {
+    transition: none;
+  }
+}
+
+/* ==========================================================================
    Menu: Multi-level & Hover (Desktop)
    ========================================================================== */
 @media (min-width: 992px) {

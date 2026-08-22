@@ -62,7 +62,26 @@ We call a macro which calls itself to render the full tree.
   %}
   <li{{ item.attributes.addClass(list_item_classes) }}>
     {% if item.below %}
-      {{ link(item.title, item.url, { 'class': link_class, 'title': ('Expand menu' | t) ~ ' ' ~ item.title }) }}
+      {{ link(item.title, item.url, { 'class': link_class }) }}
+      {#
+        Bouton d'ouverture du sous-menu, affiché sous 992 px seulement.
+
+        Au-dessus de cette largeur, les sous-menus s'ouvrent au survol (règle
+        CSS dans style.css) et ce bouton est masqué. En dessous, il n'y a ni
+        survol ni gestionnaire de clic : toucher une rubrique à sous-menu
+        naviguait directement, sans jamais laisser voir ses enfants.
+
+        Le bouton est distinct du lien afin que la page de la rubrique reste
+        atteignable : on touche le libellé pour y aller, le chevron pour
+        dérouler. C'est data-bs-toggle qui confie l'ouverture à Bootstrap.
+      #}
+      <button type="button"
+              class="menu-deployer d-lg-none"
+              data-bs-toggle="dropdown"
+              aria-expanded="false">
+        <span class="visually-hidden">{{ 'Afficher le sous-menu de'|t }} {{ item.title }}</span>
+        <i class="fas fa-chevron-down" aria-hidden="true"></i>
+      </button>
       {{ menus.build_menu(item.below, attributes, menu_level + 1) }}
     {% else %}
       {{ link(item.title, item.url, { 'class': link_class }) }}
