@@ -5001,3 +5001,53 @@ blockquote p {
   font-weight: 600;
   border-bottom-color: var(--mainColor);
 }
+
+/* ==========================================================================
+   Bannière de titre de page
+   ========================================================================== */
+
+.page-banner {
+  background-color: var(--mainColor);
+  color: var(--whiteColor);
+  padding: 42px 0 46px;
+  margin-bottom: 36px;
+}
+
+.page-banner__title {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--whiteColor);
+  margin: 0;
+  text-wrap: balance;
+}
+
+@media (max-width: 767.98px) {
+  .page-banner {
+    padding: 28px 0 30px;
+    margin-bottom: 24px;
+  }
+}
+
+/* Neutralise la règle injectée « title_page », qui peint le titre en vert
+   #088832 sur sept chemins via #block-gouvernoratkin-page-title h1, avec une
+   marge négative et une animation au survol sur un élément non cliquable.
+
+   Cette règle a une spécificité de (1,0,1) et est chargée après le thème : un
+   sélecteur de classe seul ne peut pas la contredire. Le sélecteur ci-dessous
+   monte à (1,1,1) sans recourir à !important.
+
+   À supprimer une fois la règle « title_page » désactivée dans
+   /admin/config/development/asset-injector/css. */
+
+#block-gouvernoratkin-page-title h1.page-banner__title,
+#block-gouvernoratkin-page-title h1.page-banner__title:hover {
+  background-color: transparent;
+  color: var(--whiteColor);
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  transform: none;
+  text-align: left;
+}

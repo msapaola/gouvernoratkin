@@ -1,19 +1,30 @@
 {#
 /**
  * @file
- * Theme override for page titles.
+ * Bannière de titre de page — composant unique du thème.
  *
- * Available variables:
- * - title_attributes: HTML attributes for the page title element.
- * - title_prefix: Additional output populated by modules, intended to be
- *   displayed in front of the main title tag that appears in the template.
- * - title: The page title, for use in the actual content.
- * - title_suffix: Additional output populated by modules, intended to be
- *   displayed after the main title tag that appears in the template.
+ * Le site présentait jusqu'ici cinq traitements de titre concurrents :
+ * un bandeau vert appliqué par la règle Asset Injector « title_page » sur sept
+ * chemins, une bannière à image réservée aux termes de taxonomie, un dégradé
+ * pour les services aux citoyens, un titre brut ailleurs, et aucun titre du
+ * tout sur les pages où le bloc est masqué.
+ *
+ * Ce gabarit les remplace par une bannière unique, en bleu institutionnel de
+ * la charte, ciblée par une classe et non par l'identifiant d'instance du bloc.
+ *
+ * Variables disponibles :
+ * - title_attributes: attributs HTML du titre de page.
+ * - title_prefix: contenu ajouté par les modules avant le titre.
+ * - title: le titre de la page.
+ * - title_suffix: contenu ajouté par les modules après le titre.
  */
 #}
 {{ title_prefix }}
 {% if title|render|striptags|trim %}
-<h1{{title_attributes}}>{{ title }}</h1>
+  <div class="page-banner">
+    <div class="container">
+      <h1{{ title_attributes.addClass('page-banner__title') }}>{{ title }}</h1>
+    </div>
+  </div>
 {% endif %}
 {{ title_suffix }}
