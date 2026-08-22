@@ -1,0 +1,21 @@
+uuid: 8d9ad645-fa2e-47f9-ae96-d6c4d4500650
+langcode: fr
+status: true
+dependencies: {  }
+name: carte_teaser
+label: 'Carte teaser (600x420, WebP)'
+effects:
+  7dcd2a86-3534-408f-aaad-1db3765e8018:
+    uuid: 7dcd2a86-3534-408f-aaad-1db3765e8018
+    id: image_convert
+    weight: 1
+    data:
+      extension: webp
+  eaeb7321-9a9f-499e-ab2f-2a7c6b39fa44:
+    uuid: eaeb7321-9a9f-499e-ab2f-2a7c6b39fa44
+    id: image_scale_and_crop
+    weight: 2
+    data:
+      width: 600
+      height: 420
+      anchor: center-center

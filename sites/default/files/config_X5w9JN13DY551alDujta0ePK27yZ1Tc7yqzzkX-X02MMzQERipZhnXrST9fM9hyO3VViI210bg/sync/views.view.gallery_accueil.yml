@@ -5,7 +5,7 @@ dependencies:
   config:
     - field.storage.node.field_gallery_date
     - field.storage.node.field_photos_gallery
-    - image.style.image_article_teaser
+    - image.style.carte_teaser
     - node.type.gallery
   module:
     - datetime
@@ -144,7 +144,7 @@ display:
           type: media_thumbnail
           settings:
             image_link: ''
-            image_style: image_article_teaser
+            image_style: carte_teaser
             image_loading:
               attribute: lazy
           group_column: target_id

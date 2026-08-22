@@ -124,7 +124,7 @@
           
           <div class="highlights-carousel">
             <div class="highlight-item">
-              <h5 class="highlight-title"><i class="fas fa-heartbeat me-2"></i>Kinshasa, au cœur du changement</h5>
+              <h2 class="highlight-title"><i class="fas fa-heartbeat me-2"></i>Kinshasa, au cœur du changement</h2>
               <p class="highlight-text">Centre culturel et économique rayonnant sur toute l'Afrique centrale.</p>
             </div>
           </div>
@@ -167,6 +167,11 @@
   <!-- Section des caractéristiques -->
   <section class="features-section" id="features">
     <div class="container">
+      {# Titre de section masque visuellement : les quatre cartes ci-dessous
+         sont des h3 et avaient besoin d'un h2 parent pour que le plan de la
+         page soit correct pour les lecteurs d'ecran et les moteurs de
+         recherche. Aucun changement visuel. #}
+      <h2 class="visually-hidden">{{ 'Acceder aux rubriques du site'|t }}</h2>
       <div class="row">
         <div class="col-md-3 col-sm-6">
           <div class="feature-card blue">
@@ -226,7 +231,7 @@
         <section class="blog ptb-50 bg-f9fbfe">
             <div class="container">
                 <div class="default-section-title default-section-title-middle">
-                    <h3>Dernières Nouvelles de Kinshasa</h3>
+                    <h2>Dernières Nouvelles de Kinshasa</h2>
                     <p>Restez informé sur la vie de notre ville</p>
                 </div>
                 {{ page.last_news }}
@@ -238,7 +243,7 @@
      {% if is_front %}
       <section class="container my-4 gallery-section">
        <div class="default-section-title default-section-title-middle">      
-        <h3 class="section-title">Galerie photo du Gouvernorat</h3>
+        <h2 class="section-title">Galerie photo du Gouvernorat</h2>
         <p>Découvrez les activités officielles et les événements importants organisés par le Gouvernorat à travers cette galerie photo interactive.</p>
         </div>
         
@@ -281,7 +286,7 @@
 {% if page.events %}
         <section class="container pt-100">
             <div class="default-section-title default-section-title-middle">
-             <h3>Événements à venir</h3>
+             <h2>Événements à venir</h2>
               <p>Kinshasa Action : Ne Manquez Rien !</p>
              </div>
                 {{ page.events }}

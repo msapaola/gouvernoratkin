@@ -5,7 +5,7 @@ dependencies:
   config:
     - field.storage.node.field_categorie
     - field.storage.node.field_image_media
-    - image.style.image_article_teaser
+    - image.style.carte_teaser
     - node.type.article
   module:
     - media
@@ -283,7 +283,7 @@ display:
           type: media_thumbnail
           settings:
             image_link: content
-            image_style: image_article_teaser
+            image_style: carte_teaser
             image_loading:
               attribute: lazy
           group_column: target_id
