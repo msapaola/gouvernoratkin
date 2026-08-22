@@ -55,3 +55,10 @@ drupal.nav-tabs:
     - core/collapse
     - core/drupal.toolbar
     - core/backbone
+
+# Styles propres a la page d'accueil, attachee depuis page--front.html.twig.
+# Isolee de global-styling : elle n'est chargee que sur la page qui s'en sert.
+accueil:
+  css:
+    theme:
+        assets/css/accueil.css: {}

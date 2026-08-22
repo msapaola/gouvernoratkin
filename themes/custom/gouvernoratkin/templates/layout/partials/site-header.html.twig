@@ -1,0 +1,86 @@
+{#
+/**
+ * @file
+ * Entête du site : navigation principale, zone système, menu secondaire.
+ *
+ * Partagé par page.html.twig et page--front.html.twig afin que la barre de
+ * navigation ne soit décrite qu'à un seul endroit.
+ */
+#}
+<!-- Navigation area start -->
+    <header>
+    <nav class="navbar navbar-expand-lg">
+      <div class="container">
+        {% if page.logo %}
+          {{page.logo}}
+        {% endif %}
+        
+        <!-- Boutons à droite sur mobile (recherche et contact) -->
+        <div class="d-flex d-lg-none mobile-actions">
+          <button type="button" class="popup-button" aria-label="{{ 'Rechercher'|t }}"><i class="fas fa-search" aria-hidden="true"></i></button>
+          <a href="/contact" class="btn-contact-mobile" aria-label="{{ 'Nous contacter'|t }}">
+            <i class="fas fa-envelope" aria-hidden="true"></i>
+          </a>
+        </div>
+        
+        <!-- Bouton hamburger -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ 'Ouvrir le menu'|t }}">
+          <i class="fas fa-bars" aria-hidden="true"></i>
+        </button>
+        
+        <!-- Menu principal -->
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          {% if page.menu %}
+            {{page.menu}}
+          {% endif %}
+          
+          <!-- Boutons à droite sur desktop (recherche et contact) -->
+          <div class="d-none d-lg-flex align-items-center">
+            <button type="button" class="popup-button" aria-label="{{ 'Rechercher'|t }}"><i class="fas fa-search" aria-hidden="true"></i></button>
+            <a href="/contact" class="btn btn-contact">Contact</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+ <!-- Navigation area end --> 
+
+<!-- Zone systeme start -->
+{#
+  Fil d'Ariane.
+
+  Le theme ne place aucun bloc de fil d'Ariane : il n'en figurait aucun parmi
+  ses 26 blocs configures, alors que les quatre autres themes du site en ont
+  un. Le rendu passe donc par Twig Tweak, ce qui le versionne avec le theme.
+
+  Les messages d'etat et les onglets locaux, eux, sont rendus par des blocs
+  places en region et ne doivent pas etre rendus ici : le bloc
+  gouvernoratkin_onglets (local_tasks_block) est place en region content, et un
+  bloc de messages a ete ajoute cote configuration. Les rendre une seconde fois
+  depuis ce gabarit produisait un affichage en double.
+
+  Il n'est pas rendu sur les pages de contenu. Sur un noeud, le fil d'Ariane
+  de Drupal se reduit a « Accueil », ce qui n'apprend rien au visiteur et
+  ajoute une bande vide au-dessus de l'article. Les fiches de service ont par
+  ailleurs leur propre fil d'Ariane dans node--service-au-citoyen.html.twig,
+  qui porte la rubrique et la categorie : le fil generique faisait doublon.
+#}
+{% if not is_front and node is not defined %}
+  <div class="system-area">
+    <div class="container">
+      {{ drupal_breadcrumb() }}
+    </div>
+  </div>
+{% endif %}
+<!-- Zone systeme end -->
+  
+ 
+  {% if page.top_menu %}
+  
+      <div class="container">
+          {{page.top_menu}}
+      </div>
+  
+   {% endif %}
+   

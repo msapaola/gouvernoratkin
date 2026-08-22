@@ -1,0 +1,756 @@
+/**
+ * Page d'accueil — Gouvernorat de Kinshasa
+ *
+ * Chargée uniquement par page--front.html.twig, via la bibliothèque
+ * gouvernoratkin/accueil. Toutes les couleurs et les polices viennent des
+ * variables de la charte définies dans style.css.
+ *
+ * Les classes des vues injectées — .blog-card pour les actualités, la galerie
+ * pour les photos — restent stylées par style.css : cette feuille ne décrit
+ * que les sections propres à l'accueil.
+ */
+
+/* ==========================================================================
+   Éléments communs
+   ========================================================================== */
+
+.surtitre {
+  font-family: var(--fontFamily-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--secondaryColor);
+  margin: 0 0 0.4rem;
+}
+
+.surtitre--clair {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.bouton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--fontFamily-body);
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.2;
+  padding: 0.95rem 1.7rem;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  text-decoration: none;
+  transition: background-color var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.bouton--principal {
+  background-color: var(--accentColor);
+  color: var(--whiteColor);
+}
+
+.bouton--principal:hover,
+.bouton--principal:focus {
+  background-color: var(--darkRed);
+  color: var(--whiteColor);
+}
+
+/* Bouton secondaire sur fond sombre : le contour blanc garantit le contraste,
+   là où le cyan de la charte ne tient que 3,4:1. */
+.bouton--fantome {
+  background-color: transparent;
+  border-color: rgba(255, 255, 255, 0.7);
+  color: var(--whiteColor);
+}
+
+.bouton--fantome:hover,
+.bouton--fantome:focus {
+  background-color: var(--whiteColor);
+  border-color: var(--whiteColor);
+  color: var(--mainColor);
+}
+
+.bouton--clair {
+  background-color: var(--whiteColor);
+  color: var(--mainColor);
+}
+
+.bouton--clair:hover,
+.bouton--clair:focus {
+  background-color: var(--highlightColor);
+  color: var(--mainColor);
+}
+
+.lien-suite {
+  font-family: var(--fontFamily-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--mainColor);
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 2px;
+}
+
+.lien-suite:hover,
+.lien-suite:focus {
+  color: var(--mainColorDark);
+  border-bottom-color: var(--highlightColor);
+}
+
+.lien-suite i {
+  font-size: 0.8em;
+  margin-left: 0.35rem;
+}
+
+/* Les messages n'occupent de la place que lorsqu'il y en a. */
+.accueil-messages:not(:has(.messages)) {
+  display: none;
+}
+
+.accueil-messages {
+  padding-top: 1.5rem;
+}
+
+/* ==========================================================================
+   Bandeau d'accueil
+   ========================================================================== */
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: min(78vh, 640px);
+  padding: 5rem 0 4rem;
+  overflow: hidden;
+  background-color: var(--deepTeal);
+}
+
+/* L'image est une balise <img> et non un fond CSS : le navigateur la découvre
+   dans le HTML et peut la charger en priorité, ce qui améliore le délai
+   d'affichage du plus grand élément de la page. */
+.hero__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.hero__voile {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(9, 36, 46, 0.92) 0%,
+    rgba(16, 66, 147, 0.82) 55%,
+    rgba(16, 66, 147, 0.55) 100%
+  );
+}
+
+.hero__contenu {
+  position: relative;
+  z-index: 2;
+  max-width: 780px;
+}
+
+/* L'écriture calligraphique de la charte retrouve son rôle : un ornement, en
+   surtitre, et non le titre de niveau 1. */
+.hero__surtitre {
+  font-family: var(--fontFamily-accent);
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  line-height: 1;
+  color: var(--highlightColor);
+  margin: 0 0 0.2rem;
+}
+
+.hero__titre {
+  font-family: var(--fontFamily-heading);
+  font-weight: 700;
+  font-size: clamp(2.8rem, 8vw, 5.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--whiteColor);
+  margin: 0 0 1.2rem;
+  text-wrap: balance;
+}
+
+.hero__accroche {
+  font-family: var(--fontFamily-body);
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.92);
+  max-width: 60ch;
+  margin: 0 0 2rem;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-bottom: 2.5rem;
+}
+
+.hero__reseaux {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.hero__reseaux-libelle {
+  font-family: var(--fontFamily-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.reseaux {
+  display: flex;
+  gap: 0.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.reseaux__lien {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.14);
+  color: var(--whiteColor);
+  font-size: 1rem;
+  text-decoration: none;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.reseaux__lien:hover,
+.reseaux__lien:focus {
+  background-color: var(--highlightColor);
+  color: var(--mainColor);
+}
+
+/* ==========================================================================
+   Accès rapide
+   ========================================================================== */
+
+.acces {
+  position: relative;
+  z-index: 3;
+  margin-top: -3.5rem;
+  padding-bottom: 4rem;
+}
+
+.acces__liste {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.acces__carte {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.6rem 1.5rem 1.7rem;
+  background-color: var(--whiteColor);
+  border-radius: 10px;
+  border-bottom: 4px solid var(--acces-couleur, var(--mainColor));
+  box-shadow: var(--boxShadow);
+  text-decoration: none;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.acces__carte:hover,
+.acces__carte:focus {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 28px rgba(15, 23, 32, 0.14);
+}
+
+.acces__carte--bleu   { --acces-couleur: var(--mainColor); }
+.acces__carte--rouge  { --acces-couleur: var(--accentColor); }
+.acces__carte--vert   { --acces-couleur: var(--darkGreen); }
+.acces__carte--jaune  { --acces-couleur: var(--orange); }
+
+.acces__icone {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  font-size: 1.15rem;
+  background-color: var(--acces-couleur);
+  color: var(--whiteColor);
+}
+
+/* Le jaune de la charte ne porte pas de texte blanc : sur cette carte,
+   l'icône passe en texte foncé. */
+.acces__carte--jaune .acces__icone {
+  background-color: var(--highlightColor);
+  color: var(--blackColor);
+}
+
+.acces__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--mainColor);
+  margin-bottom: 0.45rem;
+}
+
+.acces__texte {
+  font-family: var(--fontFamily-body);
+  font-size: 0.94rem;
+  line-height: 1.6;
+  color: var(--paragraphColor);
+}
+
+/* ==========================================================================
+   Mot du gouverneur
+   ========================================================================== */
+
+.gouverneur {
+  background-color: var(--mainColor);
+  color: var(--whiteColor);
+  padding: 4.5rem 0;
+}
+
+.gouverneur__grille {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 3rem;
+  align-items: center;
+}
+
+.gouverneur__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.9rem, 3.4vw, 2.6rem);
+  font-weight: 700;
+  color: var(--whiteColor);
+  margin: 0 0 0.25rem;
+}
+
+.gouverneur__fonction {
+  font-family: var(--fontFamily-body);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0 0 1.75rem;
+}
+
+.gouverneur__citation {
+  position: relative;
+  margin: 0 0 2rem;
+  padding-left: 1.5rem;
+  border-left: 4px solid var(--highlightColor);
+}
+
+.gouverneur__citation p {
+  font-family: var(--fontFamily-body);
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.92);
+  max-width: 62ch;
+  margin: 0 0 1rem;
+}
+
+.gouverneur__citation p:last-child {
+  margin-bottom: 0;
+}
+
+.gouverneur__portrait {
+  margin: 0;
+}
+
+.gouverneur__portrait img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+/* ==========================================================================
+   Blocs de contenu (actualités, galerie)
+   ========================================================================== */
+
+.bloc {
+  padding: 4.5rem 0;
+}
+
+.bloc--clair {
+  background-color: #f6f8fc;
+}
+
+.bloc__entete {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #dde3ec;
+}
+
+.bloc__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--mainColor);
+  margin: 0;
+  text-wrap: balance;
+}
+
+/* ==========================================================================
+   Chiffres clés
+   ========================================================================== */
+
+.chiffres {
+  background-color: var(--deepTeal);
+  color: var(--whiteColor);
+  padding: 4rem 0;
+}
+
+.chiffres__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--whiteColor);
+  margin: 0 0 2.5rem;
+}
+
+.chiffres__liste {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 2rem;
+  margin: 0 0 1.75rem;
+}
+
+.chiffres__item {
+  border-left: 3px solid var(--highlightColor);
+  padding-left: 1.1rem;
+}
+
+.chiffres__valeur {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.9rem, 4vw, 2.7rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--whiteColor);
+  font-variant-numeric: tabular-nums;
+}
+
+.chiffres__libelle {
+  font-family: var(--fontFamily-body);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0.35rem 0 0;
+}
+
+.chiffres__source {
+  font-family: var(--fontFamily-body);
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+/* ==========================================================================
+   Appel aux services
+   ========================================================================== */
+
+.appel {
+  /* Aplat de la charte plutot qu'une photographie : la page compte deja six
+     visuels, et cette section gagne a etre un point d'arret visuel. */
+  background: linear-gradient(100deg, var(--deepTeal) 0%, var(--mainColorDark) 70%);
+  padding: 4.5rem 0;
+}
+
+.appel__contenu {
+  max-width: 640px;
+}
+
+.appel__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+  font-weight: 700;
+  color: var(--whiteColor);
+  margin: 0 0 0.9rem;
+}
+
+.appel__texte {
+  font-family: var(--fontFamily-body);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 1.9rem;
+}
+
+.appel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+}
+
+/* ==========================================================================
+   Adaptations aux petits écrans
+   ========================================================================== */
+
+@media (max-width: 991.98px) {
+  .gouverneur__grille {
+    grid-template-columns: 1fr;
+    gap: 2.25rem;
+  }
+
+  .gouverneur__portrait {
+    order: -1;
+    max-width: 380px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hero {
+    min-height: 0;
+    padding: 3.5rem 0 3rem;
+  }
+
+  .acces {
+    margin-top: -2rem;
+    padding-bottom: 3rem;
+  }
+
+  .bloc,
+  .chiffres,
+  .appel,
+  .gouverneur {
+    padding: 3rem 0;
+  }
+
+  .hero__actions .bouton,
+  .appel__actions .bouton {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acces__carte:hover,
+  .acces__carte:focus {
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   À propos de Kinshasa
+   ========================================================================== */
+
+.apropos {
+  padding: 4.5rem 0;
+}
+
+.apropos__grille {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 3rem;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.apropos__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700;
+  color: var(--mainColor);
+  margin: 0 0 1.1rem;
+  text-wrap: balance;
+}
+
+.apropos__texte p {
+  font-family: var(--fontFamily-body);
+  font-size: 1.02rem;
+  line-height: 1.8;
+  color: var(--paragraphColor);
+  max-width: 62ch;
+  margin: 0 0 1.1rem;
+}
+
+.apropos__texte strong {
+  color: var(--mainColor);
+  font-weight: 600;
+}
+
+.apropos__texte .bouton {
+  margin-top: 0.6rem;
+}
+
+.apropos__visuel {
+  margin: 0;
+}
+
+.apropos__visuel img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: var(--boxShadow);
+}
+
+.apropos__visuel figcaption {
+  font-family: var(--fontFamily-body);
+  font-size: 0.88rem;
+  color: var(--paragraphColor);
+  margin-top: 0.7rem;
+  text-align: center;
+}
+
+.piliers {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.piliers__item {
+  background-color: #f6f8fc;
+  border-radius: 10px;
+  border-top: 4px solid var(--secondaryColor);
+  padding: 1.6rem 1.5rem;
+}
+
+.piliers__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--mainColor);
+  margin: 0 0 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.piliers__titre i {
+  color: var(--secondaryColor);
+  font-size: 0.95em;
+}
+
+.piliers__item p {
+  font-family: var(--fontFamily-body);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--paragraphColor);
+  margin: 0;
+}
+
+/* ==========================================================================
+   Cartes thématiques
+   ========================================================================== */
+
+.bloc__entete--centre {
+  justify-content: center;
+  text-align: center;
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 2rem;
+}
+
+.themes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* La carte entière est un lien : cliquer l'image fonctionne, ce qui n'était
+   pas le cas des cartes précédentes où seul le titre était cliquable. */
+.themes__carte {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--whiteColor);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--boxShadow);
+  text-decoration: none;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.themes__carte:hover,
+.themes__carte:focus {
+  transform: translateY(-6px);
+  box-shadow: 0 14px 30px rgba(15, 23, 32, 0.15);
+}
+
+.themes__carte img {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+}
+
+.themes__corps {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.4rem 1.4rem 1.5rem;
+}
+
+.themes__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--mainColor);
+  margin-bottom: 0.5rem;
+}
+
+.themes__texte {
+  font-family: var(--fontFamily-body);
+  font-size: 0.94rem;
+  line-height: 1.65;
+  color: var(--paragraphColor);
+  flex: 1;
+  margin-bottom: 1rem;
+}
+
+.themes__suite {
+  font-family: var(--fontFamily-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--accentColor);
+}
+
+.themes__suite i {
+  font-size: 0.8em;
+  margin-left: 0.3rem;
+}
+
+@media (max-width: 991.98px) {
+  .apropos__grille {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .apropos {
+    padding: 3rem 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .themes__carte:hover,
+  .themes__carte:focus {
+    transform: none;
+  }
+}

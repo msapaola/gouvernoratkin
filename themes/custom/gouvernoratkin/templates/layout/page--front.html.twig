@@ -1,0 +1,327 @@
+{#
+/**
+ * @file
+ * Page d'accueil du site du Gouvernorat de Kinshasa.
+ *
+ * Cette page est entièrement décrite ici, section par section. Les actualités
+ * et la galerie sont injectées depuis leurs vues avec Twig Tweak, de sorte que
+ * la rédaction publie normalement et que la mise en page reste sous contrôle
+ * du thème.
+ *
+ * L'entête et le pied de page sont partagés avec page.html.twig via des
+ * partiels, afin que la navigation ne soit décrite qu'à un seul endroit.
+ *
+ * Pour changer une image, une seule ligne à modifier : le tableau « visuels »
+ * ci-dessous. Les chemins sont relatifs à la racine du site.
+ */
+#}
+{{ attach_library('gouvernoratkin/accueil') }}
+
+{# Visuels de la page. Tous sont des WebP recadres aux dimensions reellement
+   affichees, generes depuis les photographies du theme.
+   Pour en remplacer un, deposer le nouveau fichier dans assets/images/ et
+   changer la ligne correspondante — rien d'autre a modifier. #}
+{% set img = '/themes/custom/gouvernoratkin/assets/images/' %}
+{% set visuels = {
+  hero:       img ~ 'accueil-hero.webp',
+  gouverneur: img ~ 'accueil-gouverneur.webp',
+  apropos:    img ~ 'accueil-apropos.webp',
+  cadre_vie:  img ~ 'accueil-cadre-de-vie.webp',
+  urbain:     img ~ 'accueil-developpement-urbain.webp',
+  ezo_bonga:  img ~ 'accueil-ezo-bonga.webp'
+} %}
+
+{% include "@gouvernoratkin/layout/partials/site-header.html.twig" %}
+
+<main id="main-content" role="main">
+
+  {# Messages d'etat. Sur les autres pages ils viennent du bloc place en region
+     content ; cette page n'affiche pas cette region, le rendu passe donc par
+     Twig Tweak. Ils apparaissent ainsi une fois et une seule. #}
+  <div class="container accueil-messages">{{ drupal_messages() }}</div>
+
+  {# ================= BANDEAU D'ACCUEIL ================= #}
+  <section class="hero" aria-labelledby="hero-titre">
+    <img class="hero__image" src="{{ visuels.hero }}" alt="" width="1600" height="900" fetchpriority="high" decoding="async">
+    <div class="hero__voile" aria-hidden="true"></div>
+
+    <div class="container hero__contenu">
+      <p class="hero__surtitre">Bienvenue à</p>
+      <h1 class="hero__titre" id="hero-titre">Kinshasa</h1>
+      <p class="hero__accroche">
+        Capitale de la République Démocratique du Congo, la Ville-Province se réinvente
+        chaque jour, mêlant tradition et modernité pour construire une ville tournée
+        vers l'avenir.
+      </p>
+
+      <div class="hero__actions">
+        <a href="/services-aux-citoyens" class="bouton bouton--principal">
+          Vos démarches administratives
+        </a>
+        <a href="/actualites" class="bouton bouton--fantome">
+          Actualités du Gouvernorat
+        </a>
+      </div>
+
+      <div class="hero__reseaux">
+        <span class="hero__reseaux-libelle">Nous suivre</span>
+        <ul class="reseaux">
+          <li><a href="https://x.com/gouvernoratk" class="reseaux__lien" aria-label="{{ 'Nous suivre sur X'|t }}" rel="noopener"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
+          <li><a href="https://www.facebook.com/GouvKinshasa" class="reseaux__lien" aria-label="{{ 'Nous suivre sur Facebook'|t }}" rel="noopener"><i class="fab fa-facebook-f" aria-hidden="true"></i></a></li>
+          <li><a href="https://www.instagram.com/gouvernoratk" class="reseaux__lien" aria-label="{{ 'Nous suivre sur Instagram'|t }}" rel="noopener"><i class="fab fa-instagram" aria-hidden="true"></i></a></li>
+          <li><a href="https://youtube.com/@gouvernoratdekinshasa" class="reseaux__lien" aria-label="{{ 'Nous suivre sur YouTube'|t }}" rel="noopener"><i class="fab fa-youtube" aria-hidden="true"></i></a></li>
+          <li><a href="https://www.tiktok.com/@gouvernoratk" class="reseaux__lien" aria-label="{{ 'Nous suivre sur TikTok'|t }}" rel="noopener"><i class="fab fa-tiktok" aria-hidden="true"></i></a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {# ================= ACCÈS RAPIDE ================= #}
+  <section class="acces" aria-labelledby="acces-titre">
+    <div class="container">
+      <h2 class="visually-hidden" id="acces-titre">Accéder aux rubriques du site</h2>
+      <ul class="acces__liste">
+        <li class="acces__item">
+          <a href="/services-aux-citoyens" class="acces__carte acces__carte--bleu">
+            <span class="acces__icone" aria-hidden="true"><i class="fas fa-hands-helping"></i></span>
+            <span class="acces__titre">Services aux citoyens</span>
+            <span class="acces__texte">Démarches, pièces à fournir et lieux de dépôt, expliqués pas à pas.</span>
+          </a>
+        </li>
+        <li class="acces__item">
+          <a href="/actualites" class="acces__carte acces__carte--rouge">
+            <span class="acces__icone" aria-hidden="true"><i class="fas fa-newspaper"></i></span>
+            <span class="acces__titre">Actualités</span>
+            <span class="acces__texte">Communiqués, décisions et annonces officielles du Gouvernorat.</span>
+          </a>
+        </li>
+        <li class="acces__item">
+          <a href="/executif-provincial" class="acces__carte acces__carte--vert">
+            <span class="acces__icone" aria-hidden="true"><i class="fas fa-landmark"></i></span>
+            <span class="acces__titre">Gouvernance</span>
+            <span class="acces__texte">L'exécutif provincial, le cabinet du gouverneur et les structures de la ville.</span>
+          </a>
+        </li>
+        <li class="acces__item">
+          <a href="/culture-et-patrimoine" class="acces__carte acces__carte--jaune">
+            <span class="acces__icone" aria-hidden="true"><i class="fas fa-monument"></i></span>
+            <span class="acces__titre">Culture et patrimoine</span>
+            <span class="acces__texte">L'histoire, les lieux et la vie culturelle de la capitale.</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  {# ================= MOT DU GOUVERNEUR ================= #}
+  <section class="gouverneur" aria-labelledby="gouverneur-titre">
+    <div class="container gouverneur__grille">
+      <div class="gouverneur__texte">
+        <p class="surtitre surtitre--clair">Le mot du gouverneur</p>
+        <h2 class="gouverneur__titre" id="gouverneur-titre">Daniel Bumba</h2>
+        <p class="gouverneur__fonction">Gouverneur de la Ville-Province de Kinshasa</p>
+
+        <blockquote class="gouverneur__citation">
+          <p>
+            Chers Kinois, chères Kinoises, nous sommes à l'aube d'une nouvelle ère
+            pour Kinshasa. Nous nous engageons dans un voyage vers l'amélioration
+            de notre ville bien-aimée.
+          </p>
+          <p>
+            Chaque projet, chaque effort est un pas vers cette transformation :
+            faire de Kinshasa une ville qui s'améliore continuellement, pour nous
+            et pour les générations futures.
+          </p>
+        </blockquote>
+
+        <a href="/cabinet-du-gouverneur" class="bouton bouton--clair">
+          Lire le message complet
+        </a>
+      </div>
+
+      <figure class="gouverneur__portrait">
+        <img src="{{ visuels.gouverneur }}" alt="Daniel Bumba, gouverneur de la Ville-Province de Kinshasa" width="800" height="600" loading="lazy" decoding="async">
+      </figure>
+    </div>
+  </section>
+
+  {# ================= ACTUALITÉS (vue injectée) ================= #}
+  <section class="bloc bloc--clair" aria-labelledby="actu-titre">
+    <div class="container">
+      <div class="bloc__entete">
+        <div>
+          <p class="surtitre">Vie de la ville</p>
+          <h2 class="bloc__titre" id="actu-titre">Dernières nouvelles de Kinshasa</h2>
+        </div>
+        <a href="/actualites" class="lien-suite">
+          Toutes les actualités <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <div class="bloc__contenu">
+        {{ drupal_view('last_news', 'block_1') }}
+      </div>
+    </div>
+  </section>
+
+
+  {# ================= À PROPOS DE KINSHASA ================= #}
+  <section class="apropos" aria-labelledby="apropos-titre">
+    <div class="container">
+      <div class="apropos__grille">
+        <div class="apropos__texte">
+          <p class="surtitre">À propos</p>
+          <h2 class="apropos__titre" id="apropos-titre">Une capitale au service de ses habitants</h2>
+          <p>
+            Située sur la rive sud du majestueux fleuve Congo, Kinshasa est une
+            métropole vibrante de plus de dix-sept millions d'habitants, à la fois
+            capitale politique, cœur économique et pôle culturel de la République
+            Démocratique du Congo.
+          </p>
+          <p>
+            Le Gouvernorat conduit la gestion et le développement de la Ville-Province
+            avec une ambition simple : <strong>améliorer la qualité de vie des Kinoises
+            et des Kinois</strong>, en transformant la ville en un pôle économique,
+            culturel et technologique de premier plan en Afrique centrale.
+          </p>
+          <a href="/a-propos" class="bouton bouton--principal">En savoir plus</a>
+        </div>
+
+        <figure class="apropos__visuel">
+          <img src="{{ visuels.apropos }}" alt="Vue aérienne de Kinshasa au coucher du soleil" width="900" height="675" loading="lazy" decoding="async">
+          <figcaption>Kinshasa, métropole de plus de dix-sept millions d'habitants</figcaption>
+        </figure>
+      </div>
+
+      <ul class="piliers">
+        <li class="piliers__item">
+          <h3 class="piliers__titre"><i class="fas fa-bullseye" aria-hidden="true"></i> Notre mission</h3>
+          <p>Assurer une gouvernance transparente et participative pour un développement durable et équilibré de Kinshasa, tout en servant la population avec intégrité et efficacité.</p>
+        </li>
+        <li class="piliers__item">
+          <h3 class="piliers__titre"><i class="fas fa-eye" aria-hidden="true"></i> Notre vision</h3>
+          <p>Faire de Kinshasa une métropole moderne, inclusive et résiliente, reconnue comme un pôle de développement économique, culturel et technologique africain.</p>
+        </li>
+        <li class="piliers__item">
+          <h3 class="piliers__titre"><i class="fas fa-hand-holding-heart" aria-hidden="true"></i> Nos valeurs</h3>
+          <p>Transparence, innovation, proximité, excellence et responsabilité guident chacune des actions menées pour le bien-être des citoyens et le rayonnement de la ville.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  {# ================= CHIFFRES CLÉS ================= #}
+  <section class="chiffres" aria-labelledby="chiffres-titre">
+    <div class="container">
+      <p class="surtitre surtitre--clair">Kinshasa en bref</p>
+      <h2 class="chiffres__titre" id="chiffres-titre">Quelques repères</h2>
+
+      <dl class="chiffres__liste">
+        <div class="chiffres__item">
+          <dt class="chiffres__valeur">17,7 M</dt>
+          <dd class="chiffres__libelle">habitants dans l'aire urbaine</dd>
+        </div>
+        <div class="chiffres__item">
+          <dt class="chiffres__valeur">9 965 km²</dt>
+          <dd class="chiffres__libelle">de superficie, 24 communes</dd>
+        </div>
+        <div class="chiffres__item">
+          <dt class="chiffres__valeur">90 %</dt>
+          <dd class="chiffres__libelle">de taux de scolarisation primaire</dd>
+        </div>
+        <div class="chiffres__item">
+          <dt class="chiffres__valeur">60 %</dt>
+          <dd class="chiffres__libelle">de la population a moins de 25 ans</dd>
+        </div>
+      </dl>
+
+      {# Un chiffre sans source est un chiffre contestable : la ligne ci-dessous
+         est à compléter avec la référence et l'année réelles avant mise en ligne. #}
+      <p class="chiffres__source">Source : à compléter — institut et année de référence.</p>
+    </div>
+  </section>
+
+  {# ================= GALERIE (vue injectée) ================= #}
+  <section class="bloc" aria-labelledby="galerie-titre">
+    <div class="container">
+      <div class="bloc__entete">
+        <div>
+          <p class="surtitre">En images</p>
+          <h2 class="bloc__titre" id="galerie-titre">Galerie photo du Gouvernorat</h2>
+        </div>
+        <a href="/all-gallery" class="lien-suite">
+          Toute la galerie <i class="fas fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <div class="bloc__contenu">
+        {{ drupal_view('gallery_accueil', 'block_1') }}
+      </div>
+    </div>
+  </section>
+
+  {# ================= KINSHASA À VOTRE SERVICE ================= #}
+  <section class="bloc bloc--clair" aria-labelledby="themes-titre">
+    <div class="container">
+      <div class="bloc__entete bloc__entete--centre">
+        <div>
+          <p class="surtitre">Kinshasa à votre service</p>
+          <h2 class="bloc__titre" id="themes-titre">Explorer la ville</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <ul class="themes">
+        <li class="themes__item">
+          <a href="/a-propos" class="themes__carte">
+            <img src="{{ visuels.cadre_vie }}" alt="" width="900" height="600" loading="lazy" decoding="async">
+            <span class="themes__corps">
+              <span class="themes__titre">Cadre de vie</span>
+              <span class="themes__texte">Une culture vibrante et une vie quotidienne rythmée par une grande ville africaine en plein développement.</span>
+              <span class="themes__suite">Découvrir <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+            </span>
+          </a>
+        </li>
+        <li class="themes__item">
+          <a href="/structuresville" class="themes__carte">
+            <img src="{{ visuels.urbain }}" alt="" width="900" height="600" loading="lazy" decoding="async">
+            <span class="themes__corps">
+              <span class="themes__titre">Développement urbain</span>
+              <span class="themes__texte">Des initiatives structurantes visant à moderniser la ville et à améliorer la qualité de vie de ses habitants.</span>
+              <span class="themes__suite">Découvrir <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+            </span>
+          </a>
+        </li>
+        <li class="themes__item">
+          <a href="/actualites" class="themes__carte">
+            <img src="{{ visuels.ezo_bonga }}" alt="" width="900" height="600" loading="lazy" decoding="async">
+            <span class="themes__corps">
+              <span class="themes__titre">Kinshasa Ezo Bonga</span>
+              <span class="themes__texte">La campagne pour une ville moderne, salubre et sécurisée : assainissement, voirie et cadre de vie.</span>
+              <span class="themes__suite">Découvrir <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  {# ================= APPEL AUX DÉMARCHES ================= #}
+  <section class="appel" aria-labelledby="appel-titre">
+    <div class="container appel__contenu">
+      <h2 class="appel__titre" id="appel-titre">Une démarche à effectuer ?</h2>
+      <p class="appel__texte">
+        Conditions, pièces justificatives et lieux de dépôt : retrouvez l'ensemble
+        des démarches proposées par les services de la Ville-Province.
+      </p>
+      <div class="appel__actions">
+        <a href="/services-aux-citoyens" class="bouton bouton--principal">Voir les démarches</a>
+        <a href="/contact" class="bouton bouton--fantome">Nous contacter</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+{% include "@gouvernoratkin/layout/partials/site-footer.html.twig" %}

@@ -1,0 +1,42 @@
+{#
+/**
+ * @file
+ * Pied de page du site, fenêtre de recherche et bouton de retour en haut.
+ *
+ * Partagé par page.html.twig et page--front.html.twig.
+ */
+#}
+<!-- Footer area start -->
+{% if page.footer %}
+        <section class="footer">
+            <div class="container">
+                <div class="footer-content ptb-100">
+                   <div class="row">
+                     {{ page.footer }}
+                   </div>
+                </div>
+                <div class="copyright">
+                    {# Le lien de credit pointait vers href="" avec target="_blank" : il rechargeait
+                       la page courante dans un nouvel onglet. Remis en texte simple faute
+                       d'URL ; y remettre un lien des que l'adresse de l'APDNK est connue. #}
+                    <p>powered by Agence pour le Développement du Numérique de Kinshasa (APDNK)</p>
+                </div>
+            </div>
+        </section>
+{% endif %}         
+<!-- Footer Area end -->
+
+<!-- popup area start -->
+{% if page.popup %}
+        <div class="popup">
+          {{ page.popup }}
+        </div>
+{% endif %}          
+<!-- popup area end -->
+        
+<!--=== Start Go Top Button ===-->
+<button type="button" class="go-top" aria-label="{{ 'Revenir en haut de page'|t }}">
+   <i class="fas fa-chevron-up" aria-hidden="true"></i>
+</button>
+<!--=== End Go Top Button ===-->
+
