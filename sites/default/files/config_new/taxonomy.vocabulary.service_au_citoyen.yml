@@ -1,9 +1,0 @@
-uuid: 3effc757-650b-4331-b35d-790c5a65f4d5
-langcode: fr
-status: true
-dependencies: {  }
-name: 'Service au citoyen'
-vid: service_au_citoyen
-description: null
-weight: 0
-new_revision: false

@@ -53,3 +53,15 @@ node_modules/
 # boite contact@gouv.kinshasa.cd en clair, dans un depot public.
 sites/default/files/config_new/smtp.settings.yml
 sites/*/files/config_*/sync/smtp.settings.yml
+
+# --- Residus de decompression macOS ---
+# Une archive creee sous macOS a ete decompressee dans le depot : 35 157
+# fichiers __MACOSX, soit 168 Mo de metadonnees sans aucun contenu.
+__MACOSX/
+._*
+.AppleDouble
+
+# --- Reglages du site : contiennent les identifiants de base de donnees ---
+# settings.php porte le nom de la base, l'utilisateur, le mot de passe et le
+# hash_salt. Il ne doit jamais entrer dans un depot, a plus forte raison public.
+sites/*/settings.php
