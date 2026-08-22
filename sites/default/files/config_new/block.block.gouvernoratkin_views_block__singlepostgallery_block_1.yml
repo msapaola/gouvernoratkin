@@ -1,0 +1,25 @@
+uuid: 6deb9169-5302-4b57-b993-8622d4294eb5
+langcode: fr
+status: true
+dependencies:
+  config:
+    - views.view.singlepostgallery
+  module:
+    - views
+  theme:
+    - gouvernoratkin
+id: gouvernoratkin_views_block__singlepostgallery_block_1
+theme: gouvernoratkin
+region: singlepostgallery
+weight: 0
+provider: null
+plugin: 'views_block:singlepostgallery-block_1'
+settings:
+  id: 'views_block:singlepostgallery-block_1'
+  label: ''
+  label_display: '0'
+  provider: views
+  context_mapping: {  }
+  views_label: ''
+  items_per_page: none
+visibility: {  }

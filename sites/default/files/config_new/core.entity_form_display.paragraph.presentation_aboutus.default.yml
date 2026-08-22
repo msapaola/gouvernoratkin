@@ -1,0 +1,79 @@
+uuid: 0b8b61a8-60d6-448b-bd4c-98c2ed2a0045
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.presentation_aboutus.field_section_administrative
+    - field.field.paragraph.presentation_aboutus.field_section_cta
+    - field.field.paragraph.presentation_aboutus.field_section_economie_et_cultur
+    - field.field.paragraph.presentation_aboutus.field_section_historique
+    - field.field.paragraph.presentation_aboutus.field_section_hotel_de_ville
+    - field.field.paragraph.presentation_aboutus.field_section_pilliers
+    - field.field.paragraph.presentation_aboutus.field_section_presentation
+    - paragraphs.paragraphs_type.presentation_aboutus
+  module:
+    - text
+id: paragraph.presentation_aboutus.default
+targetEntityType: paragraph
+bundle: presentation_aboutus
+mode: default
+content:
+  field_section_administrative:
+    type: text_textarea
+    weight: 3
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_section_cta:
+    type: text_textarea
+    weight: 6
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_section_economie_et_cultur:
+    type: text_textarea
+    weight: 4
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_section_historique:
+    type: text_textarea
+    weight: 2
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_section_hotel_de_ville:
+    type: text_textarea
+    weight: 5
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_section_pilliers:
+    type: text_textarea
+    weight: 1
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_section_presentation:
+    type: text_textarea
+    weight: 0
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

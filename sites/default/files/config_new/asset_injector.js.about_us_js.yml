@@ -1,0 +1,33 @@
+uuid: 69d688a0-710e-4dd3-9f99-6cb3b437cbdf
+langcode: fr
+status: true
+dependencies: {  }
+id: about_us_js
+label: 'About us JS'
+code: |-
+  document.addEventListener('DOMContentLoaded', function() {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const element = entry.target;
+              const delay = element.getAttribute('data-delay') || '0';
+              element.style.transitionDelay = `${delay}ms`;
+              element.classList.add('visible');
+              observer.unobserve(element); // Arrête de surveiller après l'animation
+            }
+          });
+        }, {
+          threshold: 0.1 // Déclenche quand 10% de l'élément est visible
+        });
+
+        const elementsToAnimate = document.querySelectorAll('[class*="animate-"]');
+        elementsToAnimate.forEach(el => observer.observe(el));
+      });
+noscript: ''
+noscriptRegion: {  }
+jquery: false
+header: false
+preprocess: true
+conditions: {  }
+contexts: {  }
+conditions_require_all: true

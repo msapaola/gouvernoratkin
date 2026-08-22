@@ -1,0 +1,20 @@
+uuid: 06c10235-16d2-4c9a-98a9-069df1cdac24
+langcode: fr
+status: true
+dependencies:
+  module:
+    - media
+    - paragraphs
+id: paragraph.field_photos_para
+field_name: field_photos_para
+entity_type: paragraph
+type: entity_reference
+settings:
+  target_type: media
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

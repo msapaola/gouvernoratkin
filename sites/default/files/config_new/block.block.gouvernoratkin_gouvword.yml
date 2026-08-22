@@ -1,0 +1,30 @@
+uuid: 2303cadd-ff2d-4992-92fa-03f8b3c62386
+langcode: fr
+status: true
+dependencies:
+  content:
+    - 'block_content:basic:2c5f4f1b-af99-453f-b5d3-84439f777820'
+  module:
+    - block_content
+    - system
+  theme:
+    - gouvernoratkin
+id: gouvernoratkin_gouvword
+theme: gouvernoratkin
+region: gouv_word
+weight: 0
+provider: null
+plugin: 'block_content:2c5f4f1b-af99-453f-b5d3-84439f777820'
+settings:
+  id: 'block_content:2c5f4f1b-af99-453f-b5d3-84439f777820'
+  label: 'Gouv Word'
+  label_display: '0'
+  provider: block_content
+  status: true
+  info: ''
+  view_mode: full
+visibility:
+  request_path:
+    id: request_path
+    negate: false
+    pages: '<front>'

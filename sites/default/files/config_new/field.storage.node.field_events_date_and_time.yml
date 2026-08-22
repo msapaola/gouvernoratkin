@@ -1,0 +1,20 @@
+uuid: 67eeb4c9-daf1-4df0-9b00-67573a490892
+langcode: fr
+status: true
+dependencies:
+  module:
+    - datetime
+    - node
+id: node.field_events_date_and_time
+field_name: field_events_date_and_time
+entity_type: node
+type: datetime
+settings:
+  datetime_type: datetime
+module: datetime
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,26 @@
+uuid: d17165af-3e84-4087-9f37-58b0876590b8
+langcode: fr
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - gouvernoratkin
+_core:
+  default_config_hash: 6aOgWsNTXjqrDm98TXSAjP6qd2nCijD1xw45MrnbK-Y
+id: gouvernoratkin_page_title
+theme: gouvernoratkin
+region: content
+weight: -3
+provider: null
+plugin: page_title_block
+settings:
+  id: page_title_block
+  label: 'Titre de la page'
+  label_display: '0'
+  provider: core
+visibility:
+  request_path:
+    id: request_path
+    negate: true
+    pages: "<front>\r\n/node/*\r\n/all-gallery\r\n/a-propos\r\n/contact\r\n/user/login"

@@ -1,0 +1,29 @@
+uuid: 1b653c85-2392-4b95-8196-dc4a96798460
+langcode: fr
+status: true
+dependencies:
+  config:
+    - views.view.sidebar_category
+  module:
+    - system
+    - views
+  theme:
+    - gouvernoratkin
+id: gouvernoratkin_views_block__sidebar_category_block_1
+theme: gouvernoratkin
+region: singlepost_sidebar
+weight: -7
+provider: null
+plugin: 'views_block:sidebar_category-block_1'
+settings:
+  id: 'views_block:sidebar_category-block_1'
+  label: ''
+  label_display: '0'
+  provider: views
+  views_label: ''
+  items_per_page: none
+visibility:
+  request_path:
+    id: request_path
+    negate: false
+    pages: '/article/*'

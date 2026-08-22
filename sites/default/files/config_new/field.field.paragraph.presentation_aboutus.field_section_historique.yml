@@ -1,0 +1,24 @@
+uuid: ae03a160-f751-436b-aafc-af62087416c2
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_section_historique
+    - filter.format.full_html
+    - paragraphs.paragraphs_type.presentation_aboutus
+  module:
+    - text
+id: paragraph.presentation_aboutus.field_section_historique
+field_name: field_section_historique
+entity_type: paragraph
+bundle: presentation_aboutus
+label: 'section historique'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - full_html
+field_type: text_long

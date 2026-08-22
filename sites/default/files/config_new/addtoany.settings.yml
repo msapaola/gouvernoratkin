@@ -1,0 +1,23 @@
+_core:
+  default_config_hash: fMTQlRT4MXb9WtflmxsvPI0VnKTQNjOnlx9oCWO3vYo
+langcode: fr
+buttons_size: 32
+additional_html: "       <ul>\r\n            <li><span>Partager:</span></li>\r\n            <li><a class=\"a2a_button_facebook\"><i class=\"fab fa-facebook-f\"></i></a></li>\r\n            <li><a class=\"a2a_button_whatsapp\"><i class=\"fab fa-whatsapp\"></i></a></li>\r\n            <li><a class=\"a2a_button_linkedin\"><i class=\"fab fa-linkedin-in\"></i></a></li>\r\n            <li><a class=\"a2a_button_twitter\"><i class=\"fab fa-twitter\"></i></a></li>\r\n            <li><a class=\"a2a_button_telegram\"><i class=\"fab fa-telegram\"></i></a></li>\r\n            <li><a class=\"a2a_button_copy_link\"><i class=\"fas fa-link\"></i></a></li>\r\n        </ul>"
+additional_css: ''
+additional_js: ''
+universal_button: none
+custom_universal_button: ''
+universal_button_placement: before
+entities:
+  media: 1
+  node: 1
+  comment: 1
+  block_content: 0
+  contact_message: 0
+  file: 0
+  menu_link_content: 0
+  path_alias: 0
+  shortcut: 0
+  taxonomy_term: 0
+  user: 0
+  paragraph: 0

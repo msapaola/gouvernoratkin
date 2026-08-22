@@ -1,0 +1,18 @@
+uuid: f65d8b9e-c01b-4c34-ab5a-7a98e9a54118
+langcode: fr
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main
+    parent: 'main:'
+name: 'Page a propos'
+type: page_a_propos
+description: null
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

@@ -1,0 +1,10 @@
+uuid: 426d146a-a6a5-441a-979a-d3c4626fce62
+langcode: fr
+status: true
+dependencies: {  }
+id: photos_gallery
+label: 'photos gallery para'
+icon_uuid: null
+icon_default: null
+description: ''
+behavior_plugins: {  }

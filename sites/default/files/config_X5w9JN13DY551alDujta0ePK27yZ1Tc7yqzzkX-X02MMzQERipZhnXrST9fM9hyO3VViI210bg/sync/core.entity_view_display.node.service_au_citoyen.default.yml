@@ -1,0 +1,41 @@
+uuid: 384021b8-bb92-4e22-b1c6-cc10fe784495
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.node.service_au_citoyen.body
+    - field.field.node.service_au_citoyen.field_image_media
+    - field.field.node.service_au_citoyen.field_service_au_citoyen
+    - node.type.service_au_citoyen
+  module:
+    - user
+id: node.service_au_citoyen.default
+targetEntityType: node
+bundle: service_au_citoyen
+mode: default
+content:
+  field_image_media:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  field_service_au_citoyen:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 102
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  addtoany: true
+  body: true
+  langcode: true

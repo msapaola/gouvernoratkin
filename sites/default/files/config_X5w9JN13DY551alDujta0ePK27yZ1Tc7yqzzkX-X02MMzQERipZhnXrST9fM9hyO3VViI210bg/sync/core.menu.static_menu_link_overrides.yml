@@ -1,0 +1,39 @@
+_core:
+  default_config_hash: CXhei_vpaZk-3f_Mj2cH0YmpK-ZpKHoSzVA3yZrDq0g
+definitions:
+  contact__site_page:
+    menu_name: footer
+    parent: ''
+    weight: 0
+    expanded: false
+    enabled: true
+  standard__front_page:
+    weight: -50
+    menu_name: main
+    parent: ''
+    enabled: true
+    expanded: false
+  'taxonomy_menu__menu_link:taxonomy_menu__menu_link__menu_categories_service_au_citoyen__17':
+    weight: -49
+    menu_name: main
+    parent: ''
+    expanded: true
+    enabled: true
+  'taxonomy_menu__menu_link:taxonomy_menu__menu_link__menu_categories_service_au_citoyen__19':
+    expanded: true
+    parent: 'taxonomy_menu.menu_link:taxonomy_menu.menu_link.menu_categories_service_au_citoyen.17'
+    weight: 0
+    menu_name: main
+    enabled: true
+  'taxonomy_menu__menu_link:taxonomy_menu__menu_link__menu_categories_service_au_citoyen__25':
+    expanded: true
+    parent: 'taxonomy_menu.menu_link:taxonomy_menu.menu_link.menu_categories_service_au_citoyen.17'
+    weight: 0
+    menu_name: main
+    enabled: true
+  'taxonomy_menu__menu_link:taxonomy_menu__menu_link__menu_categories_service_au_citoyen__22':
+    expanded: true
+    parent: 'taxonomy_menu.menu_link:taxonomy_menu.menu_link.menu_categories_service_au_citoyen.17'
+    weight: 0
+    menu_name: main
+    enabled: true

@@ -1,0 +1,21 @@
+uuid: 66bfc33b-9fb6-4e69-ae17-e717bca4533a
+langcode: fr
+status: true
+dependencies: {  }
+name: webp_image
+label: 'Style gallery home page (800x600)'
+effects:
+  a285edb4-f016-4d6f-a467-afbc4313a0a5:
+    uuid: a285edb4-f016-4d6f-a467-afbc4313a0a5
+    id: image_convert
+    weight: 1
+    data:
+      extension: webp
+  43187da9-9176-47b1-91cd-5b9ef9ce18ef:
+    uuid: 43187da9-9176-47b1-91cd-5b9ef9ce18ef
+    id: image_scale_and_crop
+    weight: 2
+    data:
+      width: 800
+      height: 600
+      anchor: center-center

@@ -1,0 +1,30 @@
+uuid: 24cf0dfc-05e8-4568-ae97-1ed7353c6014
+langcode: fr
+status: true
+dependencies:
+  content:
+    - 'block_content:basic:3829f040-6d0d-4d5a-9cae-c9b7b262703a'
+  module:
+    - block_content
+    - system
+  theme:
+    - gouvernoratkin
+id: gouvernoratkin_welcome
+theme: gouvernoratkin
+region: welcome
+weight: 0
+provider: null
+plugin: 'block_content:3829f040-6d0d-4d5a-9cae-c9b7b262703a'
+settings:
+  id: 'block_content:3829f040-6d0d-4d5a-9cae-c9b7b262703a'
+  label: Welcome
+  label_display: '0'
+  provider: block_content
+  status: true
+  info: ''
+  view_mode: full
+visibility:
+  request_path:
+    id: request_path
+    negate: false
+    pages: '<front>'

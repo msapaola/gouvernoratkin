@@ -1,0 +1,18 @@
+uuid: 65d7fa71-fdc3-485c-a873-16eebb08a00c
+langcode: fr
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main
+    parent: 'main:'
+name: 'Service au citoyen'
+type: service_au_citoyen
+description: null
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

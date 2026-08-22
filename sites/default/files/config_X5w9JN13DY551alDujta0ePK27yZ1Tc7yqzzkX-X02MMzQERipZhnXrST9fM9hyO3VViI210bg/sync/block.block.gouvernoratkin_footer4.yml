@@ -1,0 +1,25 @@
+uuid: 1640d325-5e12-4a22-8e22-92cfee9a4901
+langcode: fr
+status: true
+dependencies:
+  content:
+    - 'block_content:basic:901f3b62-43de-4bf5-a8b9-5d787ac579e0'
+  module:
+    - block_content
+  theme:
+    - gouvernoratkin
+id: gouvernoratkin_footer4
+theme: gouvernoratkin
+region: footer
+weight: 0
+provider: null
+plugin: 'block_content:901f3b62-43de-4bf5-a8b9-5d787ac579e0'
+settings:
+  id: 'block_content:901f3b62-43de-4bf5-a8b9-5d787ac579e0'
+  label: 'Footer 4'
+  label_display: '0'
+  provider: block_content
+  status: true
+  info: ''
+  view_mode: full
+visibility: {  }

@@ -1,0 +1,26 @@
+uuid: f1c5ed0c-e91d-444d-abe5-0248f11e2060
+langcode: fr
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - gouvernoratkin
+id: gouvernoratkin_onglets_2
+theme: gouvernoratkin
+region: top_menu
+weight: 0
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: Onglets
+  label_display: '0'
+  provider: core
+  primary: true
+  secondary: true
+visibility:
+  request_path:
+    id: request_path
+    negate: false
+    pages: '/node/*'

@@ -1,0 +1,27 @@
+uuid: c5cbb48c-de5d-4a13-9af2-056227a23596
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.full
+    - field.field.node.article.body
+    - field.field.node.article.field_categorie
+    - field.field.node.article.field_image_media
+    - field.field.node.article.field_tags
+    - node.type.article
+  module:
+    - user
+_core:
+  default_config_hash: br6izr-iGEu--JvNbCJNtOBpRnxpFLXfoV5y61U9Nqc
+id: node.article.full
+targetEntityType: node
+bundle: article
+mode: full
+content: {  }
+hidden:
+  body: true
+  field_categorie: true
+  field_image_media: true
+  field_tags: true
+  langcode: true
+  links: true

@@ -1,0 +1,34 @@
+uuid: fd296e7b-aefe-4e1f-8491-da528fb93ff5
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_champs_a_propos
+    - node.type.page_a_propos
+    - paragraphs.paragraphs_type.presentation_aboutus
+  module:
+    - entity_reference_revisions
+id: node.page_a_propos.field_champs_a_propos
+field_name: field_champs_a_propos
+entity_type: node
+bundle: page_a_propos
+label: 'Champs a propos'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      presentation_aboutus: presentation_aboutus
+    negate: 0
+    target_bundles_drag_drop:
+      photos_gallery:
+        weight: 3
+        enabled: false
+      presentation_aboutus:
+        weight: 4
+        enabled: true
+field_type: entity_reference_revisions

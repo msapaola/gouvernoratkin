@@ -716,8 +716,8 @@ $settings['file_chmod_file'] = 0644;
 $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
 
 $settings['trusted_host_patterns'] = [
-    '^darkorchid-rail-176211\.hostingersite\.com$', 
-    '^.+\.darkorchid-rail-176211\.hostingersite\.com$',
+    '^test\.kinshasa\.cd$', 
+    '^.+\.test\.kinshasa\.cd$',
 ];
     
 /**
@@ -883,9 +883,9 @@ $settings['migrate_node_migrate_type_classic'] = FALSE;
 #   include $app_root . '/' . $site_path . '/settings.local.php';
 # }
 $databases['default']['default'] = array (
-  'database' => 'u546312304_YAoJO',
-  'username' => 'u546312304_x7fUR',
-  'password' => 'TjHRzrU6LP',
+  'database' => 'u460716455_kinshasa',
+  'username' => 'u460716455_kinshasa',
+  'password' => 'u460716455_Kinshasa',
   'prefix' => 'cu68_',
   'host' => '127.0.0.1',
   'port' => '3306',

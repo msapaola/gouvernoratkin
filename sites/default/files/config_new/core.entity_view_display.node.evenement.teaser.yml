@@ -1,0 +1,37 @@
+uuid: d97128ea-5b74-4d91-932a-caa680d97661
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.evenement.body
+    - field.field.node.evenement.field_events_date_and_time
+    - field.field.node.evenement.field_events_location
+    - field.field.node.evenement.field_image_media
+    - node.type.evenement
+  module:
+    - text
+    - user
+id: node.evenement.teaser
+targetEntityType: node
+bundle: evenement
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  field_events_date_and_time: true
+  field_events_location: true
+  field_image_media: true
+  langcode: true

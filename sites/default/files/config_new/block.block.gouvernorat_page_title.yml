@@ -1,0 +1,20 @@
+uuid: 7c0209f0-46b4-4be6-a09f-ef558e832e79
+langcode: fr
+status: true
+dependencies:
+  theme:
+    - gouvernorat
+_core:
+  default_config_hash: LjyHxWxk-AhIZ7KC02GSiK_LTcbRr9xDl5HHUl_SDe4
+id: gouvernorat_page_title
+theme: gouvernorat
+region: header
+weight: -2
+provider: null
+plugin: page_title_block
+settings:
+  id: page_title_block
+  label: 'Titre de la page'
+  label_display: '0'
+  provider: core
+visibility: {  }

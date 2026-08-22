@@ -1,0 +1,19 @@
+uuid: 60e588cf-a120-4b25-8178-99ccc76e000f
+langcode: fr
+status: true
+dependencies:
+  module:
+    - paragraphs
+    - text
+id: paragraph.field_section_historique
+field_name: field_section_historique
+entity_type: paragraph
+type: text_long
+settings: {  }
+module: text
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

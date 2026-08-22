@@ -41,7 +41,7 @@ final class UpdateDBCommands extends DrushCommands
      */
 
     /**
-     * Apply any database updates required (as with running update.php).
+     * Apply any pending database updates. Automatically enables maintenance mode during the update.
      */
     #[CLI\Command(name: self::UPDATEDB, aliases: ['updb'])]
     #[CLI\Option(name: 'cache-clear', description: 'Clear caches upon completion.')]
@@ -558,12 +558,12 @@ final class UpdateDBCommands extends DrushCommands
                 $return = false;
             }
             foreach ($requirements as $requirement) {
-                if (isset($requirement['severity']) && $requirement['severity'] != REQUIREMENT_OK) {
+                if (isset($requirement['severity']) && drush_drupal_requirement_severity_int($requirement['severity']) !== REQUIREMENT_OK) {
                     $message = isset($requirement['description']) ? DrupalUtil::drushRender($requirement['description']) : '';
                     if (isset($requirement['value']) && $requirement['value']) {
                         $message .= ' (Currently using ' . $requirement['title'] . ' ' . DrupalUtil::drushRender($requirement['value']) . ')';
                     }
-                    $log_level = $requirement['severity'] === REQUIREMENT_ERROR ? LogLevel::ERROR : LogLevel::WARNING;
+                    $log_level = drush_drupal_requirement_severity_int($requirement['severity']) === REQUIREMENT_ERROR ? LogLevel::ERROR : LogLevel::WARNING;
                     $this->logger()->log($log_level, $message);
                 }
             }

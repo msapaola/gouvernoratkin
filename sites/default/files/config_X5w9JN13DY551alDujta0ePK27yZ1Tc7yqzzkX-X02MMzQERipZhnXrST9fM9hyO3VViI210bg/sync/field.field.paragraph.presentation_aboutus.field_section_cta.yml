@@ -1,0 +1,24 @@
+uuid: b3f677d0-d2a9-4779-853b-85b473115355
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_section_cta
+    - filter.format.full_html
+    - paragraphs.paragraphs_type.presentation_aboutus
+  module:
+    - text
+id: paragraph.presentation_aboutus.field_section_cta
+field_name: field_section_cta
+entity_type: paragraph
+bundle: presentation_aboutus
+label: 'section cta'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - full_html
+field_type: text_long

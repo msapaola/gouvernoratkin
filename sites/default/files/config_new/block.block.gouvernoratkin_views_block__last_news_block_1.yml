@@ -1,0 +1,29 @@
+uuid: 6f11aad8-f83b-4013-bb8c-dbc0e55c22c9
+langcode: fr
+status: true
+dependencies:
+  config:
+    - views.view.last_news
+  module:
+    - system
+    - views
+  theme:
+    - gouvernoratkin
+id: gouvernoratkin_views_block__last_news_block_1
+theme: gouvernoratkin
+region: last_news
+weight: 0
+provider: null
+plugin: 'views_block:last_news-block_1'
+settings:
+  id: 'views_block:last_news-block_1'
+  label: ''
+  label_display: '0'
+  provider: views
+  views_label: ''
+  items_per_page: none
+visibility:
+  request_path:
+    id: request_path
+    negate: false
+    pages: '<front>'

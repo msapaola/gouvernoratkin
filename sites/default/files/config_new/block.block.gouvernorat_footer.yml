@@ -1,0 +1,27 @@
+uuid: e622cbd3-0f9a-40eb-aa80-8b59f0742098
+langcode: fr
+status: true
+dependencies:
+  config:
+    - system.menu.footer
+  module:
+    - system
+  theme:
+    - gouvernorat
+_core:
+  default_config_hash: EVT78AheD2nA4BeLWe-5Q1FMz5FKWwWaWHbWq2lUR0g
+id: gouvernorat_footer
+theme: gouvernorat
+region: footer
+weight: -5
+provider: null
+plugin: 'system_menu_block:footer'
+settings:
+  id: 'system_menu_block:footer'
+  label: 'Footer menu'
+  label_display: '0'
+  provider: system
+  level: 1
+  depth: 0
+  expand_all_items: false
+visibility: {  }

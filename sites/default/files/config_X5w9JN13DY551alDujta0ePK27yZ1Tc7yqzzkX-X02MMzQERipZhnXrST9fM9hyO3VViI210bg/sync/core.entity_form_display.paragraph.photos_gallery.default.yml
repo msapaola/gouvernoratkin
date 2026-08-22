@@ -1,0 +1,24 @@
+uuid: f5b3b395-b320-4620-99e7-da5a7d90fb2a
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.photos_gallery.field_photos_para
+    - paragraphs.paragraphs_type.photos_gallery
+  module:
+    - media_library
+id: paragraph.photos_gallery.default
+targetEntityType: paragraph
+bundle: photos_gallery
+mode: default
+content:
+  field_photos_para:
+    type: media_library_widget
+    weight: 0
+    region: content
+    settings:
+      media_types: {  }
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

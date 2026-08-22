@@ -1,0 +1,29 @@
+uuid: 655058c5-0ec5-4e59-b3a7-a485a623d9fc
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_service_au_citoyen
+    - node.type.service_au_citoyen
+    - taxonomy.vocabulary.service_au_citoyen
+id: node.service_au_citoyen.field_service_au_citoyen
+field_name: field_service_au_citoyen
+entity_type: node
+bundle: service_au_citoyen
+label: 'Service au citoyen'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      service_au_citoyen: service_au_citoyen
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

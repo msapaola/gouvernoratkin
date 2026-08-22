@@ -1,0 +1,29 @@
+uuid: a317983f-6842-417b-a1b5-52d14ab7f3e0
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_image_media
+    - media.type.image
+    - node.type.evenement
+id: node.evenement.field_image_media
+field_name: field_image_media
+entity_type: node
+bundle: evenement
+label: 'Image média'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:media'
+  handler_settings:
+    target_bundles:
+      image: image
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

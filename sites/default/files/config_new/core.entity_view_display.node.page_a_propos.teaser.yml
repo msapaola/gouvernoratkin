@@ -1,0 +1,24 @@
+uuid: daca8c30-1fe2-4c72-a6db-f765d99f328f
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.page_a_propos.field_champs_a_propos
+    - node.type.page_a_propos
+  module:
+    - user
+id: node.page_a_propos.teaser
+targetEntityType: node
+bundle: page_a_propos
+mode: teaser
+content:
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  addtoany: true
+  field_champs_a_propos: true
+  langcode: true

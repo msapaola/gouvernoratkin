@@ -1,0 +1,19 @@
+uuid: 07556f50-a66b-4661-adb4-0f69fe9d6e66
+langcode: fr
+status: true
+dependencies:
+  module:
+    - paragraphs
+    - text
+id: paragraph.field_section_hotel_de_ville
+field_name: field_section_hotel_de_ville
+entity_type: paragraph
+type: text_long
+settings: {  }
+module: text
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

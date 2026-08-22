@@ -1,0 +1,22 @@
+uuid: cbc8c335-a17c-43a7-a8d1-457d9eca95ec
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+id: motif_evenement
+label: 'Motif Événement'
+type: 'canonical_entities:node'
+pattern: 'evenement/[node:title]'
+selection_criteria:
+  f81040bf-3220-44c4-adcc-bcf32de57174:
+    id: 'entity_bundle:node'
+    negate: false
+    uuid: f81040bf-3220-44c4-adcc-bcf32de57174
+    context_mapping:
+      node: node
+    bundles:
+      evenement: evenement
+selection_logic: and
+weight: -5
+relationships: {  }

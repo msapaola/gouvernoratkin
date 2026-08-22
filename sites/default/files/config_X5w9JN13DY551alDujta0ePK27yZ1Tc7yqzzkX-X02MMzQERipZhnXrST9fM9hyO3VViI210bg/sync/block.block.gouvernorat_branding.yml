@@ -1,0 +1,25 @@
+uuid: 1a6dae0a-f731-47c3-97b7-430362b63155
+langcode: fr
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - gouvernorat
+_core:
+  default_config_hash: gsMArLi2tGlcgZAzISpIaEC_Yu39zS90iVdLI4pGLT4
+id: gouvernorat_branding
+theme: gouvernorat
+region: navbar_branding
+weight: -1
+provider: null
+plugin: system_branding_block
+settings:
+  id: system_branding_block
+  label: 'Identité du site'
+  label_display: '0'
+  provider: system
+  use_site_logo: true
+  use_site_name: false
+  use_site_slogan: false
+visibility: {  }

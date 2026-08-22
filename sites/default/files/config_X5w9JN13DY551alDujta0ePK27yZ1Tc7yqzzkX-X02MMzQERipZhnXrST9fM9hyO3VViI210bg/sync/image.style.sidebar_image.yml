@@ -1,0 +1,21 @@
+uuid: aa51cd06-5abf-434e-960f-0525dc4a641b
+langcode: fr
+status: true
+dependencies: {  }
+name: sidebar_image
+label: 'Sidebar image 100x115'
+effects:
+  73c9e960-dc5f-422d-ae59-bf22f2cddbcf:
+    uuid: 73c9e960-dc5f-422d-ae59-bf22f2cddbcf
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 100
+      height: 115
+      anchor: center-center
+  bd27eea4-8c11-4994-ac92-2c1983c0899d:
+    uuid: bd27eea4-8c11-4994-ac92-2c1983c0899d
+    id: image_convert
+    weight: 2
+    data:
+      extension: webp

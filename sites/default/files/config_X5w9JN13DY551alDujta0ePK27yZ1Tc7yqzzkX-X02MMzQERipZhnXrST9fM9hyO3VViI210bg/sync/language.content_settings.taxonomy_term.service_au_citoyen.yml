@@ -1,0 +1,11 @@
+uuid: c42ef056-f539-4abd-b334-7164a24ed6c1
+langcode: fr
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.service_au_citoyen
+id: taxonomy_term.service_au_citoyen
+target_entity_type_id: taxonomy_term
+target_bundle: service_au_citoyen
+default_langcode: site_default
+language_alterable: false
