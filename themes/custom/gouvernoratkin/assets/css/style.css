@@ -4008,21 +4008,38 @@ blockquote p {
    Page Services aux Citoyens
    ========================================================================== */
 
-/* --- Bannière des services aux citoyens ---
-   Variante de .page-banner : le fond, la couleur du texte et le rembourrage
-   viennent du composant commun. Seul le rembourrage bas est augmente, cette
-   banniere portant un sous-titre et une barre de recherche.
+/* --- Entête des services aux citoyens ---
+   Ces deux pages n'ont pas de bandeau colore : le titre, le fil d'Ariane et le
+   badge de categorie s'inscrivent dans le flux de la page, sur fond clair.
+   Le contenu part ainsi plus haut et la lecture d'une demarche administrative
+   n'est pas precedee d'un aplat plein ecran. */
 
-   Le degre precedent allait de --mainColor a --secondaryColor, sur lequel le
-   texte blanc ne tenait que 3,42:1. Le fond uni de .page-banner porte le meme
-   texte a 9,45:1. Le cercle decoratif et la frise en damier sont supprimes :
-   aucune autre banniere du site n'en comporte. */
+.services-header {
+    padding-top: 1.75rem;
+    padding-bottom: 0.5rem;
+}
 
-.page-banner--services {
-    padding-bottom: 3rem;
-    /* Le corps de ces deux pages porte deja son propre rembourrage haut
-       (.services-page-body), la marge du composant commun ferait doublon. */
-    margin-bottom: 0;
+.services-header__title {
+    font-family: var(--fontFamily-heading);
+    font-size: clamp(1.6rem, 3.4vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--mainColor);
+    margin: 0 0 0.75rem;
+    text-wrap: balance;
+}
+
+.services-header__subtitle {
+    font-family: var(--fontFamily-body);
+    color: var(--paragraphColor);
+    font-size: 1.05rem;
+    max-width: 650px;
+    margin-bottom: 2rem;
+    line-height: 1.7;
+}
+
+.services-header--detail .services-header__title {
+    margin-bottom: 1rem;
 }
 
 /* Fil d'Ariane */
@@ -4032,35 +4049,24 @@ blockquote p {
     margin-bottom: 1rem;
 }
 
-.services-breadcrumb .breadcrumb-item,
 .services-breadcrumb .breadcrumb-item a {
-    color: rgba(255,255,255,0.75);
+    color: var(--mainColor);
     font-family: var(--fontFamily-body);
     font-size: 0.9rem;
 }
 
+.services-breadcrumb .breadcrumb-item,
 .services-breadcrumb .breadcrumb-item.active {
-    color: var(--whiteColor);
+    color: var(--paragraphColor);
+    font-family: var(--fontFamily-body);
+    font-size: 0.9rem;
 }
 
 .services-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
-    color: rgba(255,255,255,0.5);
+    color: #8a8a8a;
 }
 
 /* Sous-titre de bannière */
-.page-banner--services .page-banner__title {
-    margin-bottom: 0.75rem;
-}
-
-.page-banner__subtitle {
-    font-family: var(--fontFamily-body);
-    color: rgba(255,255,255,0.85);
-    font-size: 1.05rem;
-    max-width: 650px;
-    margin-bottom: 2rem;
-    line-height: 1.7;
-}
-
 /* --- Barre de recherche --- */
 .services-search-bar {
     max-width: 780px;
@@ -4072,7 +4078,8 @@ blockquote p {
     background: var(--whiteColor);
     border-radius: 50px;
     overflow: hidden;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+    border: 1px solid #d5dbe4;
+    box-shadow: 0 2px 8px rgba(15,23,32,0.06);
     position: relative;
 }
 
@@ -4351,10 +4358,7 @@ blockquote p {
 
 /* --- Responsive --- */
 @media (max-width: 991px) {
-    .page-banner--services {
-        padding-bottom: 2rem;
-    }
-    
+
     .services-sidebar {
         position: static;
         margin-top: 2rem;
@@ -4474,21 +4478,19 @@ blockquote p {
 .service-detail-category-badge {
     display: inline-flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(8px);
-    color: var(--whiteColor);
+    /* Teinte claire derivee du bleu primaire plutot qu'une valeur en dur. */
+    background: #e8edf7;
+    background: color-mix(in srgb, var(--mainColor) 8%, var(--whiteColor));
+    color: var(--mainColor);
     font-family: var(--fontFamily-body);
     font-size: 0.85rem;
     font-weight: 600;
     padding: 0.35rem 1rem;
     border-radius: 50px;
     margin-bottom: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid #ced8ea;
+    border-color: color-mix(in srgb, var(--mainColor) 20%, var(--whiteColor));
     letter-spacing: 0.5px;
-}
-
-.page-banner--detail .page-banner__title {
-    margin-bottom: 1rem;
 }
 
 .service-detail-meta {
@@ -4751,6 +4753,7 @@ blockquote p {
     .footer,
     .navbar,
     .page-banner,
+    .services-header,
     .services-sidebar,
     .service-detail-toolbar,
     .service-detail-notice,
