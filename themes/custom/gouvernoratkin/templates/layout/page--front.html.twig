@@ -25,10 +25,7 @@
 {% set visuels = {
   hero:       img ~ 'accueil-hero.webp',
   gouverneur: img ~ 'accueil-gouverneur.webp',
-  apropos:    img ~ 'accueil-apropos.webp',
-  cadre_vie:  img ~ 'accueil-cadre-de-vie.webp',
-  urbain:     img ~ 'accueil-developpement-urbain.webp',
-  ezo_bonga:  img ~ 'accueil-ezo-bonga.webp'
+  apropos:    img ~ 'accueil-apropos.webp'
 } %}
 
 {% include "@gouvernoratkin/layout/partials/site-header.html.twig" %}
@@ -45,7 +42,8 @@
     <img class="hero__image" src="{{ visuels.hero }}" alt="" width="1600" height="900" fetchpriority="high" decoding="async">
     <div class="hero__voile" aria-hidden="true"></div>
 
-    <div class="container hero__contenu">
+    <div class="container hero__grille">
+     <div class="hero__contenu">
       <p class="hero__surtitre">Bienvenue à</p>
       <h1 class="hero__titre" id="hero-titre">Kinshasa</h1>
       <p class="hero__accroche">
@@ -73,6 +71,14 @@
           <li><a href="https://www.tiktok.com/@gouvernoratk" class="reseaux__lien" aria-label="{{ 'Nous suivre sur TikTok'|t }}" rel="noopener"><i class="fab fa-tiktok" aria-hidden="true"></i></a></li>
         </ul>
       </div>
+     </div>
+
+     {# Mise en avant : l'article portant la catégorie « À la une ».
+        La vue n'affiche qu'un résultat ; si aucun article ne porte cette
+        catégorie, la vue ne rend rien et la colonne disparaît d'elle-même. #}
+     <div class="hero__une">
+       {{ drupal_view('a_la_une', 'block_1') }}
+     </div>
     </div>
   </section>
 
@@ -133,10 +139,6 @@
             et pour les générations futures.
           </p>
         </blockquote>
-
-        <a href="/cabinet-du-gouverneur" class="bouton bouton--clair">
-          Lire le message complet
-        </a>
       </div>
 
       <figure class="gouverneur__portrait">
@@ -266,40 +268,44 @@
       <div class="bloc__entete bloc__entete--centre">
         <div>
           <p class="surtitre">Kinshasa à votre service</p>
-          <h2 class="bloc__titre" id="themes-titre">Explorer la ville</h2>
+          <h2 class="bloc__titre" id="themes-titre">Les démarches les plus demandées</h2>
         </div>
       </div>
     </div>
 
     <div class="container">
+      {# Les trois rubriques les plus consultées des services aux citoyens.
+         Les identifiants correspondent aux termes de la taxonomie
+         service_au_citoyen ; ajouter une rubrique ici, c'est ajouter un
+         élément à cette liste. #}
       <ul class="themes">
         <li class="themes__item">
-          <a href="/a-propos" class="themes__carte">
-            <img src="{{ visuels.cadre_vie }}" alt="" width="900" height="600" loading="lazy" decoding="async">
+          <a href="/services-aux-citoyens/19" class="themes__carte">
+            <span class="themes__icone themes__icone--bleu" aria-hidden="true"><i class="fas fa-users"></i></span>
             <span class="themes__corps">
-              <span class="themes__titre">Cadre de vie</span>
-              <span class="themes__texte">Une culture vibrante et une vie quotidienne rythmée par une grande ville africaine en plein développement.</span>
-              <span class="themes__suite">Découvrir <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+              <span class="themes__titre">Famille, étapes de la vie et vie sociale</span>
+              <span class="themes__texte">Naissance, mariage, décès, état civil : les démarches qui accompagnent la vie des ménages kinois.</span>
+              <span class="themes__suite">Voir les démarches <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
             </span>
           </a>
         </li>
         <li class="themes__item">
-          <a href="/structuresville" class="themes__carte">
-            <img src="{{ visuels.urbain }}" alt="" width="900" height="600" loading="lazy" decoding="async">
+          <a href="/services-aux-citoyens/25" class="themes__carte">
+            <span class="themes__icone themes__icone--rouge" aria-hidden="true"><i class="fas fa-home"></i></span>
             <span class="themes__corps">
-              <span class="themes__titre">Développement urbain</span>
-              <span class="themes__texte">Des initiatives structurantes visant à moderniser la ville et à améliorer la qualité de vie de ses habitants.</span>
-              <span class="themes__suite">Découvrir <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+              <span class="themes__titre">Habitat et logement</span>
+              <span class="themes__texte">Autorisations de bâtir, titres et occupation : les démarches liées au logement et au foncier.</span>
+              <span class="themes__suite">Voir les démarches <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
             </span>
           </a>
         </li>
         <li class="themes__item">
-          <a href="/actualites" class="themes__carte">
-            <img src="{{ visuels.ezo_bonga }}" alt="" width="900" height="600" loading="lazy" decoding="async">
+          <a href="/services-aux-citoyens/22" class="themes__carte">
+            <span class="themes__icone themes__icone--vert" aria-hidden="true"><i class="fas fa-futbol"></i></span>
             <span class="themes__corps">
-              <span class="themes__titre">Kinshasa Ezo Bonga</span>
-              <span class="themes__texte">La campagne pour une ville moderne, salubre et sécurisée : assainissement, voirie et cadre de vie.</span>
-              <span class="themes__suite">Découvrir <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+              <span class="themes__titre">Loisirs et sports</span>
+              <span class="themes__texte">Manifestations, équipements sportifs et vie associative : autorisations et accompagnement.</span>
+              <span class="themes__suite">Voir les démarches <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
             </span>
           </a>
         </li>

@@ -149,10 +149,27 @@
   );
 }
 
-.hero__contenu {
+.hero__grille {
   position: relative;
   z-index: 2;
-  max-width: 780px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 3rem;
+  align-items: center;
+}
+
+/* Quand aucun article ne porte la catégorie « À la une », la vue ne rend rien :
+   la colonne se vide et le contenu reprend toute la largeur. */
+.hero__grille:not(:has(.une__carte)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.hero__grille:not(:has(.une__carte)) .hero__une {
+  display: none;
+}
+
+.hero__contenu {
+  max-width: 60ch;
 }
 
 /* L'écriture calligraphique de la charte retrouve son rôle : un ornement, en
@@ -346,17 +363,24 @@
 }
 
 .gouverneur__citation {
+  /* Le thème applique à toute balise blockquote un fond #f9fafb et un texte
+     centré (style.css). Sur l'aplat bleu de cette section, le texte blanc
+     devenait invisible sur ce fond clair. Les valeurs héritées sont donc
+     explicitement annulées ici. */
   position: relative;
-  margin: 0 0 2rem;
-  padding-left: 1.5rem;
+  margin: 0;
+  padding: 0 0 0 1.5rem;
+  background-color: transparent;
   border-left: 4px solid var(--highlightColor);
 }
 
 .gouverneur__citation p {
   font-family: var(--fontFamily-body);
   font-size: 1.05rem;
+  font-weight: 400;
   line-height: 1.8;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--whiteColor);
+  text-align: left;
   max-width: 62ch;
   margin: 0 0 1rem;
 }
@@ -693,17 +717,27 @@
   box-shadow: 0 14px 30px rgba(15, 23, 32, 0.15);
 }
 
-.themes__carte img {
-  width: 100%;
-  height: 190px;
-  object-fit: cover;
+.themes__icone {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin: 1.6rem 1.4rem 0;
+  border-radius: 12px;
+  font-size: 1.3rem;
+  color: var(--whiteColor);
+  background-color: var(--themes-couleur, var(--mainColor));
 }
+
+.themes__icone--bleu  { --themes-couleur: var(--mainColor); }
+.themes__icone--rouge { --themes-couleur: var(--accentColor); }
+.themes__icone--vert  { --themes-couleur: var(--darkGreen); }
 
 .themes__corps {
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding: 1.4rem 1.4rem 1.5rem;
+  padding: 1.1rem 1.4rem 1.5rem;
 }
 
 .themes__titre {
@@ -751,6 +785,110 @@
 @media (prefers-reduced-motion: reduce) {
   .themes__carte:hover,
   .themes__carte:focus {
+    transform: none;
+  }
+}
+
+/* ==========================================================================
+   Article à la une, dans le bandeau
+   ========================================================================== */
+
+/* La vue « a_la_une » ne rend qu'un résultat. Les enveloppes que Views ajoute
+   autour du résultat sont neutralisées pour que la carte occupe la colonne. */
+.hero__une .view,
+.hero__une .view-content,
+.hero__une .views-row {
+  height: 100%;
+}
+
+.une__carte {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--whiteColor);
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.une__carte:hover,
+.une__carte:focus {
+  transform: translateY(-5px);
+  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.4);
+}
+
+.une__media {
+  display: block;
+  overflow: hidden;
+}
+
+.une__media img {
+  display: block;
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+}
+
+.une__corps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1.25rem 1.4rem 1.5rem;
+}
+
+.une__etiquette {
+  align-self: flex-start;
+  font-family: var(--fontFamily-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--whiteColor);
+  background-color: var(--accentColor);
+  padding: 0.3rem 0.75rem;
+  border-radius: 100px;
+}
+
+.une__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--mainColor);
+  text-wrap: balance;
+}
+
+.une__date {
+  font-family: var(--fontFamily-body);
+  font-size: 0.85rem;
+  color: var(--paragraphColor);
+}
+
+.une__date i {
+  margin-right: 0.35rem;
+  color: var(--secondaryColor);
+}
+
+@media (max-width: 991.98px) {
+  .hero__grille {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.25rem;
+  }
+
+  .hero__une {
+    max-width: 460px;
+  }
+
+  .une__media img {
+    height: 180px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .une__carte:hover,
+  .une__carte:focus {
     transform: none;
   }
 }

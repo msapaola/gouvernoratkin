@@ -365,18 +365,45 @@ p:last-child {
   transition: color 0.3s;
 }
 
-.nav-link:hover {
-  color: var(--secondaryColor) !important;
-}
+/* Le soulignement au survol utilisait ::after, le meme pseudo-element que le
+   chevron des menus deroulants de Bootstrap (.dropdown-toggle::after). Au
+   survol d'un menu a sous-rubriques, le chevron etait remplace par la barre :
+   le lien perdait la largeur du chevron et tous les menus suivants se
+   decalaient.
 
-.nav-link:hover::after {
+   Le soulignement passe donc sur ::before, toujours present mais reduit a
+   zero en largeur, et deploye au survol. Le chevron n'est plus touche, et
+   l'animation ne modifie plus le flux. */
+
+.nav-link::before {
   content: '';
   position: absolute;
   bottom: -5px;
-  left: 0;
-  width: 100%;
+  left: 10px;
+  right: 10px;
   height: 2px;
   background-color: var(--secondaryColor);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.25s ease;
+}
+
+.nav-link:hover,
+.nav-link:focus-visible {
+  color: var(--secondaryColor) !important;
+}
+
+.nav-link:hover::before,
+.nav-link:focus-visible::before,
+.nav-link.active::before,
+.nav-link.show::before {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-link::before {
+    transition: none;
+  }
 }
 
 .dropdown-menu {
