@@ -4983,19 +4983,21 @@ blockquote p {
   color: var(--paragraphColor);
 }
 
-/* --- Onglets locaux (Voir / Modifier), visibles des seuls rédacteurs --- */
+/* --- Onglets locaux (Voir / Modifier), visibles des seuls rédacteurs ---
+   Rendus par le bloc gouvernoratkin_onglets, place en region content : les
+   selecteurs ne sont donc pas restreints a .system-area. */
 
-.system-area .tabs-wrapper {
+.tabs-wrapper {
   margin-bottom: 20px;
 }
 
-.system-area .nav-tabs .nav-link {
+.tabs-wrapper .nav-tabs .nav-link {
   font-family: var(--fontFamily-body);
   font-size: 14px;
   color: var(--mainColor);
 }
 
-.system-area .nav-tabs .nav-link.is-active {
+.tabs-wrapper .nav-tabs .nav-link.is-active {
   font-weight: 600;
   border-bottom-color: var(--mainColor);
 }
