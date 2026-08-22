@@ -4890,3 +4890,97 @@ blockquote p {
 .services-list-container .page-title {
     display: none;
 }
+
+/* ==========================================================================
+   Zone système : messages, fil d'Ariane, onglets locaux
+   ========================================================================== */
+
+.system-area .container > *:first-child {
+  margin-top: 20px;
+}
+
+.system-area .container > *:last-child {
+  margin-bottom: 20px;
+}
+
+/* --- Messages d'état ---
+   Fond très clair, filet coloré à gauche, texte sombre : la couleur porte la
+   sémantique sans reposer sur elle pour la lisibilité. Le texte conserve un
+   contraste supérieur à 12:1 dans les trois cas. */
+
+.messages {
+  font-family: var(--fontFamily-body);
+  font-size: var(--fontSize);
+  color: var(--blackColor);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  border-left: 4px solid var(--mainColor);
+  background-color: #eef2f9;
+  line-height: 1.6;
+}
+
+.messages a {
+  color: var(--mainColor);
+  text-decoration: underline;
+}
+
+.messages__list {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.messages__item + .messages__item {
+  margin-top: 6px;
+}
+
+.messages--status {
+  border-left-color: var(--darkGreen);
+  background-color: #eaf7ef;
+}
+
+.messages--warning {
+  border-left-color: var(--orange);
+  background-color: #fdf3e8;
+}
+
+.messages--error {
+  border-left-color: var(--accentColor);
+  background-color: #fceceb;
+}
+
+/* --- Fil d'Ariane --- */
+
+.system-area .breadcrumb {
+  font-family: var(--fontFamily-body);
+  font-size: 14px;
+  background: transparent;
+  padding: 0;
+  margin-bottom: 16px;
+}
+
+.system-area .breadcrumb-item a {
+  color: var(--mainColor);
+}
+
+.system-area .breadcrumb-item.active,
+.system-area .breadcrumb-item:last-child {
+  color: var(--paragraphColor);
+}
+
+/* --- Onglets locaux (Voir / Modifier), visibles des seuls rédacteurs --- */
+
+.system-area .tabs-wrapper {
+  margin-bottom: 20px;
+}
+
+.system-area .nav-tabs .nav-link {
+  font-family: var(--fontFamily-body);
+  font-size: 14px;
+  color: var(--mainColor);
+}
+
+.system-area .nav-tabs .nav-link.is-active {
+  font-weight: 600;
+  border-bottom-color: var(--mainColor);
+}

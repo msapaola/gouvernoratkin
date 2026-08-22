@@ -57,6 +57,35 @@
   </header>
 
  <!-- Navigation area end --> 
+
+<!-- Zone systeme start -->
+{#
+  Messages d'etat, fil d'Ariane et onglets locaux.
+
+  Le theme ne place aucun bloc pour ces elements : ni messages, ni fil
+  d'Ariane, ni onglets locaux, ni aide ne figuraient parmi ses 26 blocs
+  configures. Consequence, les confirmations et les erreurs de Drupal
+  n'apparaissaient jamais sur le site public — un visiteur qui envoyait le
+  formulaire de contact ne recevait aucun accuse de reception, et n'etait pas
+  informe de ses erreurs de saisie.
+
+  Le rendu passe par Twig Tweak plutot que par des blocs places en region :
+  le resultat est versionne avec le theme, sans etape de configuration
+  manuelle a rejouer sur chaque environnement.
+
+  Le fil d'Ariane est provisoirement place ici ; il rejoindra la banniere de
+  titre lors de l'unification des entetes de page.
+#}
+<div class="system-area">
+  <div class="container">
+    {% if not is_front %}
+      {{ drupal_breadcrumb() }}
+    {% endif %}
+    {{ drupal_messages() }}
+    {{ drupal_block('local_tasks_block', wrapper=false) }}
+  </div>
+</div>
+<!-- Zone systeme end -->
   
  
   {% if page.top_menu %}
