@@ -1,0 +1,20 @@
+uuid: f620c409-b334-449b-a230-aecf36931156
+langcode: fr
+status: true
+dependencies:
+  module:
+    - system
+  theme:
+    - gouvernoratkin
+id: gouvernoratkin_messages
+theme: gouvernoratkin
+region: content
+weight: -5
+provider: null
+plugin: system_messages_block
+settings:
+  id: system_messages_block
+  label: 'Messages d''état'
+  label_display: '0'
+  provider: system
+visibility: {  }

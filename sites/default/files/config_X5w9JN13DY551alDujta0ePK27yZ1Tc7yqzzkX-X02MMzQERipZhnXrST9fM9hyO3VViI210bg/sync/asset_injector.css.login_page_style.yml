@@ -17,8 +17,8 @@ code: |-
     padding: 2.5rem;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-    font-family: 'Cooper Hewitt', sans-serif;
+    background-color: var(--whiteColor, #ffffff);
+    font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif);
     position: relative;
   }
 
@@ -26,13 +26,13 @@ code: |-
   .user-login-form::before {
     content: "Connexion";
     display: block;
-    font-family: 'Cooper Hewitt', sans-serif;
+    font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif);
     font-weight: 700;
     font-size: 2rem;
     margin-bottom: 2rem;
-    color: #104293; /* Couleur principale bleu C:100 M:87 J:8 N:1 */
+    color: var(--mainColor, #104293); /* Couleur principale bleu C:100 M:87 J:8 N:1 */
     text-align: center;
-    border-bottom: 2px solid #104293;
+    border-bottom: 2px solid var(--mainColor, #104293);
     padding-bottom: 1rem;
   }
 
@@ -44,9 +44,9 @@ code: |-
 
   /* Style des labels */
   .form-required {
-    font-family: 'Cooper Hewitt', sans-serif;
+    font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif);
     font-weight: 600;
-    color: #104293; /* Couleur principale bleu */
+    color: var(--mainColor, #104293); /* Couleur principale bleu */
     margin-bottom: 0.5rem;
     display: block;
     font-size: 1rem;
@@ -55,7 +55,7 @@ code: |-
   /* Indication de champ obligatoire */
   .form-required:after {
     content: " *";
-    color: #DB3832; /* Rouge secondaire C:8 M:93 J:91 N:1 */
+    color: var(--accentColor, #DB3832); /* Rouge secondaire C:8 M:93 J:91 N:1 */
   }
 
   /* Style des inputs texte et password */
@@ -64,7 +64,7 @@ code: |-
     padding: 0.9rem 1rem;
     border: 2px solid #E5E5E5;
     border-radius: 6px;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--fontFamily-body, 'Poppins', sans-serif);
     font-size: 1rem;
     transition: all 0.3s ease;
     margin-top: 0.25rem;
@@ -72,10 +72,10 @@ code: |-
   }
 
   .form-text:focus {
-    border-color: #0095C9; /* Couleur cyan C:79 M:27 J:6 N:0 */
+    border-color: var(--secondaryColor, #0095C9); /* Couleur cyan C:79 M:27 J:6 N:0 */
     box-shadow: 0 0 0 3px rgba(0, 149, 201, 0.25);
     outline: none;
-    background-color: #fff;
+    background-color: var(--whiteColor, #ffffff);
   }
 
   /* Icônes pour les champs (simulation) */
@@ -109,7 +109,7 @@ code: |-
     padding: 0.9rem 1.5rem;
     border: none;
     border-radius: 6px;
-    font-family: 'Cooper Hewitt', sans-serif;
+    font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif);
     font-weight: 700;
     font-size: 1.1rem;
     cursor: pointer;
@@ -118,14 +118,14 @@ code: |-
   }
 
   .button.js-form-submit {
-    background-color: #104293; /* Couleur principale bleu */
+    background-color: var(--mainColor, #104293); /* Couleur principale bleu */
     color: white;
     letter-spacing: 1px;
     box-shadow: 0 4px 6px rgba(16, 66, 147, 0.2);
   }
 
   .button.js-form-submit:hover {
-    background-color: #17419A; /* Version légèrement plus foncée */
+    background-color: var(--darkBlue, #17418A); /* Version légèrement plus foncée */
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(16, 66, 147, 0.3);
   }
@@ -153,15 +153,15 @@ code: |-
   }
 
   .user-login-form ~ .item-list ul li a {
-    color: #0095C9; /* Couleur cyan C:79 M:27 J:6 N:0 */
+    color: var(--secondaryColor, #0095C9); /* Couleur cyan C:79 M:27 J:6 N:0 */
     text-decoration: none;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--fontFamily-body, 'Poppins', sans-serif);
     font-size: 0.9rem;
     transition: color 0.3s;
   }
 
   .user-login-form ~ .item-list ul li a:hover {
-    color: #104293; /* Couleur principale bleu */
+    color: var(--mainColor, #104293); /* Couleur principale bleu */
     text-decoration: underline;
   }
 
@@ -175,16 +175,10 @@ code: |-
     animation: fadeIn 0.6s ease-out;
   }
 
-  /* Messages d'erreur */
-  .messages--error {
-    background-color: rgba(219, 56, 50, 0.1); /* Rouge secondaire avec transparence */
-    border-left: 4px solid #DB3832; /* Rouge secondaire C:8 M:93 J:91 N:1 */
-    color: #DB3832;
-    padding: 1rem;
-    border-radius: 4px;
-    margin-bottom: 1.5rem;
-    font-family: 'Cooper Hewitt', sans-serif;
-  }
+  /* Les styles des messages d'etat sont desormais portes par le theme
+     (style.css, section « Zone systeme »). Ils y sont uniformes sur tout
+     le site et respectent les seuils de contraste : le fond vert plein
+     avec texte blanc utilise ici ne tenait que 3,09:1. */
 
   /* Responsive design */
   @media (max-width: 768px) {
@@ -203,11 +197,11 @@ code: |-
     right: 0;
     height: 4px;
     background: linear-gradient(to right, 
-      #ED7016 0%, /* Orange C:3 M:69 J:100 N:0 */
-      #65B32E 25%, /* Vert C:45 M:5 J:100 N:0 */
-      #17419A 50%, /* Bleu foncé C:100 M:86 J:15 N:3 */
-      #092A2E 75%, /* Bleu-vert foncé C:90 M:69 J:57 N:66 */
-      #DB3832 100% /* Rouge C:8 M:93 J:91 N:1 */
+      var(--orange, #ED7016) 0%, /* Orange C:3 M:69 J:100 N:0 */
+      var(--green, #65832E) 25%, /* Vert C:45 M:5 J:100 N:0 */
+      var(--darkBlue, #17418A) 50%, /* Bleu foncé C:100 M:86 J:15 N:3 */
+      var(--deepTeal, #09242E) 75%, /* Bleu-vert foncé C:90 M:69 J:57 N:66 */
+      var(--accentColor, #DB3832) 100% /* Rouge C:8 M:93 J:91 N:1 */
     );
     border-radius: 0 0 8px 8px;
   }
@@ -226,7 +220,7 @@ code: |-
     transform: translateX(-50%);
     width: 80px;
     height: 80px;
-    background-color: #104293;
+    background-color: var(--mainColor, #104293);
     border-radius: 50%;
     box-shadow: 0 4px 10px rgba(16, 66, 147, 0.3);
     z-index: 0;

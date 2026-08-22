@@ -9,7 +9,7 @@ label: 'Cabinet du gouverneur'
 code: |-
   /* Présentation section */
   #presentation {
-    background: linear-gradient(to right, #ffffff, #0095C9, #ffffff);
+    background: linear-gradient(to right, var(--whiteColor, #ffffff), var(--secondaryColor, #0095C9), var(--whiteColor, #ffffff));
     padding: 60px 0;
   }
 
@@ -69,22 +69,22 @@ code: |-
   }
 
   .card-title {
-    font-family: 'Cooper Hewitt', sans-serif;
+    font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif);
     font-weight: 500;
-    color: #104293; /* Bleu primaire de la charte */
+    color: var(--mainColor, #104293); /* Bleu primaire de la charte */
   }
 
   .card-subtitle {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--fontFamily-body, 'Poppins', sans-serif);
     font-weight: 500;
     font-style: italic;
-    color: #0095C9; /* Bleu secondaire de la charte */
+    color: var(--secondaryColor, #0095C9); /* Bleu secondaire de la charte */
   }
 
   .card-text {
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--fontFamily-body, 'Poppins', sans-serif);
     font-weight: 500;
-    color: #09242E; /* Gris foncé de la charte */
+    color: var(--deepTeal, #09242E); /* Gris foncé de la charte */
   }
 
    img {
@@ -95,7 +95,7 @@ code: |-
   @media (max-width: 992px) {
     .site-title {
       font-size: 1.5rem;
-      font-family: 'Cooper Hewitt', sans-serif;
+      font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif);
     }
   }
 
@@ -103,7 +103,7 @@ code: |-
     .site-title {
       font-size: 1.2rem;
       text-align: center;
-      font-family: 'Cooper Hewitt', sans-serif;
+      font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif);
     }
 
     .logo-container {

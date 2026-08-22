@@ -8,10 +8,10 @@ id: title_page
 label: 'Title page'
 code: |-
   #block-gouvernoratkin-page-title h1 {
-      font-family: 'Cooper Hewitt', sans-serif; /* Police pour les titres */
+      font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif); /* Police pour les titres */
       font-size: 2.6rem;
-      background-color: #088832; /* Dark Green */
-      color: #ffffff; /* Blanc */
+      background-color: var(--darkGreen, #088832); /* Dark Green */
+      color: var(--whiteColor, #ffffff); /* Blanc */
       padding: 15px 30px;
       margin-top: 30px;
       margin-bottom: -10px;

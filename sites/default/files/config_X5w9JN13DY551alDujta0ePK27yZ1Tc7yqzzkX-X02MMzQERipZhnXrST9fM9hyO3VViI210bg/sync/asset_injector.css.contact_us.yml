@@ -14,8 +14,8 @@ code: |-
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
-    font-family: 'Cooper Hewitt', sans-serif;
+    background-color: var(--whiteColor, #ffffff);
+    font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif);
     position: relative;
     animation: fadeIn 0.6s ease-out;
   }
@@ -24,13 +24,13 @@ code: |-
   .contact-message-feedback-form::before {
     content: "Contactez le Gouvernorat de Kinshasa";
     display: block;
-    font-family: 'Cooper Hewitt', sans-serif;
+    font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif);
     font-weight: 700;
     font-size: 2rem;
     margin-bottom: 1.5rem;
-    color: #104293;
+    color: var(--mainColor, #104293);
     text-align: center;
-    border-bottom: 2px solid #104293;
+    border-bottom: 2px solid var(--mainColor, #104293);
     padding-bottom: 1rem;
   }
 
@@ -43,11 +43,11 @@ code: |-
     right: 0;
     height: 4px;
     background: linear-gradient(to right, 
-      #ED7016 0%,
-      #65B32E 25%,
-      #17419A 50%,
-      #09242E 75%,
-      #DB3832 100%
+      var(--orange, #ED7016) 0%,
+      var(--green, #65832E) 25%,
+      var(--darkBlue, #17418A) 50%,
+      var(--deepTeal, #09242E) 75%,
+      var(--accentColor, #DB3832) 100%
     );
     border-radius: 0 0 8px 8px;
   }
@@ -59,16 +59,16 @@ code: |-
 
   /* Style des labels */
   .form-required {
-    font-family: 'Cooper Hewitt', sans-serif;
+    font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif);
     font-weight: 600;
-    color: #104293;
+    color: var(--mainColor, #104293);
     margin-bottom: 0.5rem;
     display: block;
   }
 
   .form-required:after {
     content: " *";
-    color: #DB3832;
+    color: var(--accentColor, #DB3832);
   }
 
   /* Style des inputs texte et email */
@@ -78,7 +78,7 @@ code: |-
     padding: 0.75rem;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--fontFamily-body, 'Poppins', sans-serif);
     transition: border-color 0.3s, box-shadow 0.3s;
     margin-top: 0.25rem;
   }
@@ -86,7 +86,7 @@ code: |-
   .form-text:focus,
   .form-email:focus,
   .form-textarea:focus {
-    border-color: #0095C9;
+    border-color: var(--secondaryColor, #0095C9);
     box-shadow: 0 0 0 3px rgba(0, 149, 201, 0.25);
     outline: none;
   }
@@ -101,7 +101,7 @@ code: |-
     padding: 0.75rem;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--fontFamily-body, 'Poppins', sans-serif);
     min-height: 150px;
     resize: vertical;
     transition: border-color 0.3s, box-shadow 0.3s;
@@ -111,7 +111,7 @@ code: |-
   .form-text:invalid,
   .form-email:invalid,
   .form-textarea:invalid {
-    border-color: #DB3832;
+    border-color: var(--accentColor, #DB3832);
   }
 
   /* Style des boutons */
@@ -125,7 +125,7 @@ code: |-
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 4px;
-    font-family: 'Cooper Hewitt', sans-serif;
+    font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif);
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s;
@@ -133,23 +133,23 @@ code: |-
   }
 
   .button--primary {
-    background-color: #104293;
-    color: #ffffff;
+    background-color: var(--mainColor, #104293);
+    color: var(--whiteColor, #ffffff);
   }
 
   .button--primary:hover {
-    background-color: #17419A;
+    background-color: var(--darkBlue, #17418A);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(16, 66, 147, 0.3);
   }
 
   .button:not(.button--primary) {
-    background-color: #FFF248;
-    color: #104293;
+    background-color: var(--highlightColor, #FFF248);
+    color: var(--mainColor, #104293);
   }
 
   .button:not(.button--primary):hover {
-    background-color: #FFE71D;
+    background-color: var(--highlightColor, #FFF248);
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(255, 242, 75, 0.3);
   }
@@ -181,25 +181,11 @@ code: |-
     }
   }
 
-  /* Message de confirmation */
-  .messages--status {
-    background-color: #65B32E;
-    color: #ffffff;
-    padding: 1rem;
-    border-radius: 4px;
-    margin-bottom: 1.5rem;
-    font-family: 'Cooper Hewitt', sans-serif;
-  }
+  /* Les styles des messages d'etat sont desormais portes par le theme
+     (style.css, section « Zone systeme »). Ils y sont uniformes sur tout
+     le site et respectent les seuils de contraste : le fond vert plein
+     avec texte blanc utilise ici ne tenait que 3,09:1. */
 
-  /* Message d'erreur */
-  .messages--error {
-    background-color: #DB3832;
-    color: #ffffff;
-    padding: 1rem;
-    border-radius: 4px;
-    margin-bottom: 1.5rem;
-    font-family: 'Cooper Hewitt', sans-serif;
-  }
 media: all
 preprocess: true
 conditions:

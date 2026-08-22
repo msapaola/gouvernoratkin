@@ -16,14 +16,14 @@ code: |-
 
   /* Titre de la section */
   #gouvernorat-gallery-section .gov-section-title {
-      color: #104293; /* Bleu primaire */
+      color: var(--mainColor, #104293); /* Bleu primaire */
       text-align: center;
       margin-bottom: 0.5rem;
       font-size: 2.2rem;
       position: relative;
       padding-bottom: 0.5rem;
       font-weight: 700;
-      font-family: 'Cooper Hewitt', sans-serif; /* Police pour les titres */
+      font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif); /* Police pour les titres */
   }
 
   #gouvernorat-gallery-section .gov-section-title::after {
@@ -34,20 +34,20 @@ code: |-
       transform: translateX(-50%);
       width: 100px;
       height: 4px;
-      background-color: #104293; /* Bleu primaire */
+      background-color: var(--mainColor, #104293); /* Bleu primaire */
   }
 
   /* Date de l'événement */
   #gouvernorat-gallery-section .gov-event-date {
       display: inline-block;
-      background-color: #104293; /* Bleu primaire */
-      color: #ffffff; /* Blanc */
+      background-color: var(--mainColor, #104293); /* Bleu primaire */
+      color: var(--whiteColor, #ffffff); /* Blanc */
       padding: 5px 15px;
       border-radius: 20px;
       font-weight: 600;
       margin: 1rem 0;
       box-shadow: 0 3px 6px rgba(16, 66, 147, 0.3);
-      font-family: 'Poppins', sans-serif; /* Police pour le corps du texte */
+      font-family: var(--fontFamily-body, 'Poppins', sans-serif); /* Police pour le corps du texte */
   }
 
   /* Sous-titre de la galerie */
@@ -57,7 +57,7 @@ code: |-
       margin: 1.5rem 0 1rem;
       font-weight: 600;
       text-align: center;
-      font-family: 'Cooper Hewitt', sans-serif; /* Police pour les titres */
+      font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif); /* Police pour les titres */
   }
 
   /* Conteneur de la galerie */
@@ -92,7 +92,7 @@ code: |-
       height: 300px;
       object-fit: cover;
       cursor: pointer;
-      border: 3px solid #ffffff; /* Blanc */
+      border: 3px solid var(--whiteColor, #ffffff); /* Blanc */
   }
 
   #gouvernorat-gallery-section ul li img:hover {
@@ -103,12 +103,12 @@ code: |-
   /* Info de l'événement */
   #gouvernorat-gallery-section .gov-event-info {
       background-color: #f0f7ff;
-      border-left: 5px solid #104293; /* Bleu primaire */
+      border-left: 5px solid var(--mainColor, #104293); /* Bleu primaire */
       padding: 15px;
       margin-bottom: 1.5rem;
       border-radius: 0 8px 8px 0;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      font-family: 'Poppins', sans-serif; /* Police pour le corps du texte */
+      font-family: var(--fontFamily-body, 'Poppins', sans-serif); /* Police pour le corps du texte */
   }
 
   /* Style pour le modal plein écran */
@@ -153,7 +153,7 @@ code: |-
       position: absolute;
       top: 20px;
       right: 20px;
-      color: #ffffff; /* Blanc */
+      color: var(--whiteColor, #ffffff); /* Blanc */
       font-size: 2rem;
       cursor: pointer;
       background: none;
@@ -165,7 +165,7 @@ code: |-
 
   #gov-fullscreen-modal .gov-fullscreen-close:hover {
       transform: scale(1.1);
-      color: #DB3832; /* Rouge pour le survol */
+      color: var(--accentColor, #DB3832); /* Rouge pour le survol */
   }
 
   #gov-fullscreen-modal .gov-fullscreen-nav {
@@ -179,7 +179,7 @@ code: |-
   #gov-fullscreen-modal .gov-fullscreen-nav button {
       background: none;
       border: none;
-      color: #ffffff; /* Blanc */
+      color: var(--whiteColor, #ffffff); /* Blanc */
       font-size: 3rem;
       opacity: 0.7;
       cursor: pointer;
@@ -190,7 +190,7 @@ code: |-
   #gov-fullscreen-modal .gov-fullscreen-nav button:hover {
       opacity: 1;
       transform: scale(1.1);
-      color: #0095C9; /* Bleu secondaire pour le survol */
+      color: var(--secondaryColor, #0095C9); /* Bleu secondaire pour le survol */
   }
 
   body.gov-modal-open {

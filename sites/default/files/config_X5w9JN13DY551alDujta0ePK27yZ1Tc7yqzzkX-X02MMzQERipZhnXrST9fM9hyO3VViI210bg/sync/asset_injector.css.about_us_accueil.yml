@@ -14,15 +14,15 @@ code: |-
 
   #about-section {
     padding: 80px 0;
-    background: linear-gradient(to bottom, #f8f9fa, #ffffff);
+    background: linear-gradient(to bottom, #f8f9fa, var(--whiteColor, #ffffff));
   }
 
   #about-section .about-title {
     position: relative;
     margin-bottom: 20px;
     padding-bottom: 15px;
-    font-family: 'Cooper Hewitt', sans-serif;
-    color: #104293; /* Bleu primaire de la charte */
+    font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif);
+    color: var(--mainColor, #104293); /* Bleu primaire de la charte */
   }
 
   #about-section .about-title::after {
@@ -33,22 +33,22 @@ code: |-
     transform: translateX(-50%);
     width: 80px;
     height: 4px;
-    background-color: #104293; /* Bleu primaire de la charte */
+    background-color: var(--mainColor, #104293); /* Bleu primaire de la charte */
   }
 
   #about-section .about-subtitle {
-    color: #0095C9; /* Bleu secondaire de la charte */
+    color: var(--secondaryColor, #0095C9); /* Bleu secondaire de la charte */
     font-size: 1.2rem;
     margin-bottom: 30px;
-    font-family: 'Poppins', sans-serif; /* Corps du texte */
+    font-family: var(--fontFamily-body, 'Poppins', sans-serif); /* Corps du texte */
   }
 
   #about-section .about-description {
     line-height: 1.8;
     font-size: 1.1rem;
     margin-bottom: 40px;
-    font-family: 'Poppins', sans-serif; /* Corps du texte */
-    color: #555555; /* Gris pour paragraphes */
+    font-family: var(--fontFamily-body, 'Poppins', sans-serif); /* Corps du texte */
+    color: var(--paragraphColor, #555555); /* Gris pour paragraphes */
   }
 
   #about-section .about-feature-box {
@@ -59,7 +59,7 @@ code: |-
     transition: all 0.3s ease;
     height: 100%;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    background-color: #ffffff; /* Blanc de la charte */
+    background-color: var(--whiteColor, #ffffff); /* Blanc de la charte */
   }
 
   #about-section .about-feature-box:hover {
@@ -75,29 +75,29 @@ code: |-
     height: 80px;
     margin-bottom: 20px;
     border-radius: 50%;
-    background-color: rgba(16, 66, 147, 0.1); /* Ajusté pour utiliser le bleu primaire #104293 */
-    color: #104293; /* Bleu primaire de la charte */
+    background-color: rgba(16, 66, 147, 0.1); /* Ajusté pour utiliser le bleu primaire var(--mainColor, #104293) */
+    color: var(--mainColor, #104293); /* Bleu primaire de la charte */
     font-size: 30px;
   }
 
   #about-section .highlight {
-    background-color: #FFF248; /* Jaune de la charte */
-    color: #1f2428; /* Noir de la charte */
+    background-color: var(--highlightColor, #FFF248); /* Jaune de la charte */
+    color: var(--blackColor, #1f2428); /* Noir de la charte */
     padding: 2px 5px;
     font-weight: 500;
-    font-family: 'Poppins', sans-serif; /* Corps du texte */
+    font-family: var(--fontFamily-body, 'Poppins', sans-serif); /* Corps du texte */
   }
 
   #about-section .about-feature-title {
     font-weight: 600;
     margin-bottom: 15px;
-    color: #104293; /* Bleu primaire de la charte */
-    font-family: 'Cooper Hewitt', sans-serif; /* Titres */
+    color: var(--mainColor, #104293); /* Bleu primaire de la charte */
+    font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif); /* Titres */
   }
 
   #about-section .about-cta-button {
-    background-color: #DB3832; /* Rouge de la charte */
-    color: #ffffff; /* Blanc de la charte */
+    background-color: var(--accentColor, #DB3832); /* Rouge de la charte */
+    color: var(--whiteColor, #ffffff); /* Blanc de la charte */
     border: none;
     padding: 12px 30px;
     border-radius: 50px;
@@ -106,11 +106,11 @@ code: |-
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-top: 20px;
-    font-family: 'Poppins', sans-serif; /* Corps du texte */
+    font-family: var(--fontFamily-body, 'Poppins', sans-serif); /* Corps du texte */
   }
 
   #about-section .about-cta-button:hover {
-    background-color: #872025; /* Rouge foncé de la charte pour le hover */
+    background-color: var(--darkRed, #872025); /* Rouge foncé de la charte pour le hover */
     transform: translateY(-3px);
     box-shadow: 0 5px 15px rgba(219, 56, 50, 0.3);
   }
@@ -132,14 +132,14 @@ code: |-
   }
 
   #about-section .carousel-caption {
-    background-color: rgba(16, 66, 147, 0.7); /* Ajusté pour utiliser le bleu primaire #104293 */
+    background-color: rgba(16, 66, 147, 0.7); /* Ajusté pour utiliser le bleu primaire var(--mainColor, #104293) */
     border-radius: 5px;
     padding: 15px;
   }
 
   #about-section .carousel-caption p {
-    color: #ffffff; /* Blanc de la charte */
-    font-family: 'Poppins', sans-serif; /* Corps du texte */
+    color: var(--whiteColor, #ffffff); /* Blanc de la charte */
+    font-family: var(--fontFamily-body, 'Poppins', sans-serif); /* Corps du texte */
   }
 
   #aboutCarousel {

@@ -10,6 +10,10 @@
   /* Couleurs principales */
   --mainColor: #104293;
   /* Bleu primaire */
+  --mainColorDark: #0A3D7E;
+  /* Bleu primaire assombri — survol des boutons et des commandes.
+     Cette valeur circulait deja dans les feuilles injectees sans avoir jamais
+     ete nommee ; elle rejoint la charte pour cesser d'etre recopiee. */
   --secondaryColor: #0095C9;
   /* Bleu secondaire */
   --accentColor: #DB3832;

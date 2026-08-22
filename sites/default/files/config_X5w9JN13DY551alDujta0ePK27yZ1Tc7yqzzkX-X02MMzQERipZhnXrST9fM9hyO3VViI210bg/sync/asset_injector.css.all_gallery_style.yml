@@ -9,16 +9,16 @@ label: 'All Gallery Style'
 code: |-
   /* Styles de la page-header */
   .page-header {
-    background: linear-gradient(to right, #104293, #0095C9);
-    color: #ffffff;
+    background: linear-gradient(to right, var(--mainColor, #104293), var(--secondaryColor, #0095C9));
+    color: var(--whiteColor, #ffffff);
     padding: 3rem 0;
     margin-bottom: 2rem;
     position: relative;
   }
 
   .page-header p {
-    color: #ffffff;
-    font-family: 'Poppins', sans-serif;
+    color: var(--whiteColor, #ffffff);
+    font-family: var(--fontFamily-body, 'Poppins', sans-serif);
   }
 
   .page-header::after {
@@ -43,7 +43,7 @@ code: |-
     transition: transform 0.3s, box-shadow 0.3s;
     margin-bottom: 2rem;
     position: relative;
-    background: #ffffff;
+    background: var(--whiteColor, #ffffff);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     height: 100%;
   }
@@ -76,12 +76,12 @@ code: |-
     top: 15px;
     right: 15px;
     background-color: rgba(16, 66, 147, 0.8);
-    color: #ffffff;
+    color: var(--whiteColor, #ffffff);
     padding: 5px 10px;
     border-radius: 20px;
     font-size: 0.8rem;
     z-index: 1;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--fontFamily-body, 'Poppins', sans-serif);
   }
 
   /* Corps de la carte */
@@ -92,22 +92,22 @@ code: |-
   /* Titre de la carte */
   .card-title {
     font-weight: 600;
-    color: #104293;
+    color: var(--mainColor, #104293);
     margin-bottom: 0.5rem;
-    font-family: 'Cooper Hewitt', sans-serif;
+    font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif);
   } 
 
   /* Texte de la carte */
   .card-text {
-    color: #555555;
+    color: var(--paragraphColor, #555555);
     font-size: 0.9rem;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--fontFamily-body, 'Poppins', sans-serif);
   }
 
   /* Footer */
   .footer {
-    background-color: #104293;
-    color: #ffffff;
+    background-color: var(--mainColor, #104293);
+    color: var(--whiteColor, #ffffff);
     padding: 2rem 0;
     margin-top: 3rem;
   }
@@ -156,7 +156,7 @@ code: |-
   }
 
   .slick-dots li button:before {
-    color: #ffffff;
+    color: var(--whiteColor, #ffffff);
   }
 
   /* Media queries */

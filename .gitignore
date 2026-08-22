@@ -65,3 +65,9 @@ __MACOSX/
 # settings.php porte le nom de la base, l'utilisateur, le mot de passe et le
 # hash_salt. Il ne doit jamais entrer dans un depot, a plus forte raison public.
 sites/*/settings.php
+
+# --- Fichiers generes par Asset Injector ---
+# Reconstruits par Drupal a partir des fichiers de configuration
+# asset_injector.*.yml, qui sont la source. Les garder en version faisait
+# coexister deux copies du meme CSS.
+sites/*/files/asset_injector/
