@@ -72,16 +72,19 @@
   bloc de messages a ete ajoute cote configuration. Les rendre une seconde fois
   depuis ce gabarit produisait un affichage en double.
 
-  Le fil d'Ariane est provisoirement place ici ; il rejoindra la banniere de
-  titre lors de l'unification des entetes de page.
+  Il n'est pas rendu sur les pages de contenu. Sur un noeud, le fil d'Ariane
+  de Drupal se reduit a « Accueil », ce qui n'apprend rien au visiteur et
+  ajoute une bande vide au-dessus de l'article. Les fiches de service ont par
+  ailleurs leur propre fil d'Ariane dans node--service-au-citoyen.html.twig,
+  qui porte la rubrique et la categorie : le fil generique faisait doublon.
 #}
-<div class="system-area">
-  <div class="container">
-    {% if not is_front %}
+{% if not is_front and node is not defined %}
+  <div class="system-area">
+    <div class="container">
       {{ drupal_breadcrumb() }}
-    {% endif %}
+    </div>
   </div>
-</div>
+{% endif %}
 <!-- Zone systeme end -->
   
  
