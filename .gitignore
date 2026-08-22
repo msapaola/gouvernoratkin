@@ -1,4 +1,55 @@
+# Depot du site du Gouvernorat de Kinshasa
+#
+# Le projet n'avait aucun .gitignore : c'est ainsi qu'une archive de 360 Mo
+# s'est retrouvee dans un commit et a fait rejeter un push par GitHub.
+
+# --- Archives et exports de base de donnees ---
+# Ne doivent jamais entrer dans le depot : GitHub refuse tout fichier de plus
+# de 100 Mo, et un export de base contient des donnees personnelles.
 *.zip
+*.tar
 *.tar.gz
+*.tgz
+*.rar
+*.7z
 *.sql
+*.sql.gz
+
+# --- Journaux ---
+*.log
+error_log
+error_log.*
+
+# --- Sauvegardes et fichiers temporaires ---
+*.bak
+*.old
+*.orig
+*.rej
+*~
+.DS_Store
+Thumbs.db
+
+# --- Reglages locaux : contiennent les identifiants de base de donnees ---
+sites/*/settings.local.php
+sites/*/services.local.yml
+
+# --- Repertoires generes par Drupal a l'execution ---
+# Caches d'agregation, derivees d'images et repertoire prive : reconstruits
+# automatiquement, sans interet dans l'historique.
+sites/*/files/php/
+sites/*/files/css/
+sites/*/files/js/
+sites/*/files/styles/
+sites/*/private/
+
+# --- Outillage front ---
+node_modules/
+
+# Le repertoire de synchronisation de la configuration reste versionne :
+# c'est l'historique des blocs, des vues et des types de contenu.
+
+# --- Parametres SMTP ---
+# Retires du depot le 22/08/2026 : le fichier contenait le mot de passe de la
+# boite contact@gouv.kinshasa.cd en clair, dans un depot public.
 sites/default/files/config_new/smtp.settings.yml
+sites/*/files/config_*/sync/smtp.settings.yml
