@@ -669,73 +669,116 @@
 }
 
 .une__carte {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
   background-color: var(--whiteColor);
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
   text-decoration: none;
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.34);
   transition: transform var(--transition), box-shadow var(--transition);
 }
 
+/* Un liseré aux couleurs de la charte signale la mise en avant sans qu'il
+   faille l'écrire : l'étiquette « À la une » disait ce que la place de la
+   carte montre déjà. */
+.une__carte::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 2;
+  background: linear-gradient(
+    90deg,
+    var(--secondaryColor) 0%,
+    var(--highlightColor) 50%,
+    var(--accentColor) 100%
+  );
+}
+
 .une__carte:hover,
-.une__carte:focus {
+.une__carte:focus-visible {
   transform: translateY(-5px);
-  box-shadow: 0 22px 52px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 26px 58px rgba(0, 0, 0, 0.42);
 }
 
 .une__media {
   display: block;
   overflow: hidden;
+  background-color: #dfe5ee;
 }
 
 .une__media img {
   display: block;
   width: 100%;
-  height: 210px;
+  height: 230px;
   object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.une__carte:hover .une__media img {
+  transform: scale(1.04);
 }
 
 .une__corps {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  padding: 1.25rem 1.4rem 1.5rem;
-}
-
-.une__etiquette {
-  align-self: flex-start;
-  font-family: var(--fontFamily-body);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--whiteColor);
-  background-color: var(--accentColor);
-  padding: 0.3rem 0.75rem;
-  border-radius: 100px;
-}
-
-.une__titre {
-  font-family: var(--fontFamily-heading);
-  font-size: 1.15rem;
-  font-weight: 700;
-  line-height: 1.35;
-  color: var(--mainColor);
-  text-wrap: balance;
+  flex: 1;
+  gap: 0.6rem;
+  padding: 1.35rem 1.5rem 1.45rem;
 }
 
 .une__date {
   font-family: var(--fontFamily-body);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 500;
   color: var(--paragraphColor);
 }
 
 .une__date i {
-  margin-right: 0.35rem;
-  color: var(--secondaryColor);
+  margin-right: 0.4rem;
+  color: var(--secondaryColorDark, #00719A);
+}
+
+/* Le titre porte la carte : il doit être le premier élément lu, donc le plus
+   gros. Il est borné à quatre lignes pour que la carte garde sa hauteur
+   quelle que soit la longueur du titre saisi. */
+.une__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.2rem, 1.5vw, 1.42rem);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--mainColor);
+  text-wrap: balance;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.une__lien {
+  margin-top: auto;
+  padding-top: 0.7rem;
+  font-family: var(--fontFamily-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accentColor);
+}
+
+.une__lien i {
+  margin-left: 0.4rem;
+  font-size: 0.8em;
+  transition: transform var(--transition);
+  display: inline-block;
+}
+
+.une__carte:hover .une__lien i {
+  transform: translateX(4px);
 }
 
 @media (max-width: 991.98px) {
@@ -749,13 +792,18 @@
   }
 
   .une__media img {
-    height: 180px;
+    height: 200px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .une__carte:hover,
-  .une__carte:focus {
+  .une__carte:focus-visible {
+    transform: none;
+  }
+
+  .une__carte:hover .une__media img,
+  .une__carte:hover .une__lien i {
     transform: none;
   }
 }

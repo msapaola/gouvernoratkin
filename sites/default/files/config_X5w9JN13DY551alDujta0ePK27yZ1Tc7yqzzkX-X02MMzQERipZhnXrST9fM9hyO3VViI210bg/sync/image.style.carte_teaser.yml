@@ -18,4 +18,4 @@ effects:
     data:
       width: 600
       height: 420
-      anchor: center-center
+      anchor: center-top

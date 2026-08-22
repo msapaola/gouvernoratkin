@@ -145,8 +145,8 @@ display:
           click_sort_column: value
           type: timestamp
           settings:
-            date_format: medium
-            custom_date_format: ''
+            date_format: custom
+            custom_date_format: 'j F Y'
             timezone: ''
             tooltip:
               date_format: long
@@ -220,7 +220,7 @@ display:
           click_sort_column: target_id
           type: media_thumbnail
           settings:
-            image_link: content
+            image_link: ''
             image_style: carte_teaser
             image_loading:
               attribute: lazy
@@ -263,12 +263,7 @@ display:
           exclude: false
           alter:
             alter_text: true
-            text: "<a href=\"{{ view_node }}\" class=\"une__carte\">\n  <span class=\"\
-              une__media\">{{ field_image_media }}</span>\n  <span class=\"une__corps\"\
-              >\n    <span class=\"une__etiquette\">À la une</span>\n    <span class=\"\
-              une__titre\">{{ title }}</span>\n    <span class=\"une__date\"><i class=\"\
-              far fa-calendar-alt\" aria-hidden=\"true\"></i> {{ created }}</span>\n\
-              \  </span>\n</a>"
+            text: "<a href=\"{{ view_node }}\" class=\"une__carte\"><span class=\"une__media\">{{ field_image_media }}</span><span class=\"une__corps\"><span class=\"une__date\"><i class=\"far fa-calendar-alt\" aria-hidden=\"true\"></i> {{ created }}</span><span class=\"une__titre\">{{ title }}</span><span class=\"une__lien\">Lire l’article <i class=\"fas fa-arrow-right\" aria-hidden=\"true\"></i></span></span></a>"
             make_link: false
             path: ''
             absolute: false
