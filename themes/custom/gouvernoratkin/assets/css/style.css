@@ -82,6 +82,15 @@ a:hover {
   box-shadow: none !important;
 }
 
+/* Retablit un indicateur de focus visible pour la navigation au clavier.
+   La regle ci-dessus supprime l'outline sur tout le site, ce qui rend le
+   parcours au clavier impossible a suivre. :focus-visible ne s'applique qu'au
+   focus clavier : l'apparence au clic de souris reste inchangee. */
+:focus-visible {
+  outline: 3px solid var(--mainColor) !important;
+  outline-offset: 2px;
+}
+
 img {
   max-width: 100%;
   height: auto;
@@ -1359,6 +1368,12 @@ p:last-child {
 
 /* Go Top CSS */
 .go-top {
+  /* Element <button> depuis la correction d'accessibilite : les valeurs par
+     defaut du navigateur sont neutralisees pour conserver le rendu d'origine. */
+  border: 0;
+  background: var(--whiteColor);
+  font: inherit;
+  appearance: none;
   position: fixed;
   cursor: pointer;
   bottom: 0px;

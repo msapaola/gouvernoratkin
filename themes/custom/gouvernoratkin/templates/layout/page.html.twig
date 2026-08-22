@@ -29,15 +29,15 @@
         
         <!-- Boutons à droite sur mobile (recherche et contact) -->
         <div class="d-flex d-lg-none mobile-actions">
-          <button class="popup-button"><i class="fas fa-search"></i></button>
-          <a href="/contact" class="btn-contact-mobile">
-            <i class="fas fa-envelope"></i>
+          <button type="button" class="popup-button" aria-label="{{ 'Rechercher'|t }}"><i class="fas fa-search" aria-hidden="true"></i></button>
+          <a href="/contact" class="btn-contact-mobile" aria-label="{{ 'Nous contacter'|t }}">
+            <i class="fas fa-envelope" aria-hidden="true"></i>
           </a>
         </div>
         
         <!-- Bouton hamburger -->
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <i class="fas fa-bars"></i>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ 'Ouvrir le menu'|t }}">
+          <i class="fas fa-bars" aria-hidden="true"></i>
         </button>
         
         <!-- Menu principal -->
@@ -48,8 +48,8 @@
           
           <!-- Boutons à droite sur desktop (recherche et contact) -->
           <div class="d-none d-lg-flex align-items-center">
-            <button class="popup-button"><i class="fas fa-search"></i></button>
-            <a href="/Contact" class="btn btn-contact">Contact</a>
+            <button type="button" class="popup-button" aria-label="{{ 'Rechercher'|t }}"><i class="fas fa-search" aria-hidden="true"></i></button>
+            <a href="/contact" class="btn btn-contact">Contact</a>
           </div>
         </div>
       </div>
@@ -92,10 +92,14 @@
   
       <div class="container">
           {{page.top_menu}}
-      </di>
+      </div>
   
    {% endif %}
    
+{# Cible du lien d'evitement declare dans html.html.twig, qui pointait vers un
+   identifiant main-content absent de la page. #}
+<main id="main-content" role="main">
+
    <!--========== BEGIN CONTENT ==========--> 
 				{% if page.content %}
 					{{ page.content }}
@@ -129,11 +133,11 @@
             <div class="social-container">
               <p class="social-text">Nous suivre</p>
               <div class="social-icons-wrapper">
-                <a href="https://x.com/gouvernoratk?s=21&t=NMje2EnuC86EYrQumPVdFQ" class="social-icon"><i class="fab fa-twitter"></i></a>
-                <a href="https://www.facebook.com/GouvKinshasa?mibextid=wwXIfr&mibextid=wwXIfr" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                <a href="https://www.instagram.com/gouvernoratk?igsh=MW0zd3NlN3NudTU5dg%3D%3D&utm_source=qr" class="social-icon"><i class="fab fa-instagram"></i></a>
-                <a href="https://youtube.com/@gouvernoratdekinshasa?si=MwKmbGHxB-m8FxNb" class="social-icon"><i class="fab fa-youtube"></i></a>
-                <a href="https://www.tiktok.com/@gouvernoratk?_t=ZM-8uqtzzkLRLi&_r=1" class="social-icon"><i class="fab fa-tiktok"></i></a>
+                <a href="https://x.com/gouvernoratk?s=21&t=NMje2EnuC86EYrQumPVdFQ" class="social-icon" aria-label="{{ 'Nous suivre sur'|t }} X"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+                <a href="https://www.facebook.com/GouvKinshasa?mibextid=wwXIfr&mibextid=wwXIfr" class="social-icon" aria-label="{{ 'Nous suivre sur'|t }} Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+                <a href="https://www.instagram.com/gouvernoratk?igsh=MW0zd3NlN3NudTU5dg%3D%3D&utm_source=qr" class="social-icon" aria-label="{{ 'Nous suivre sur'|t }} Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+                <a href="https://youtube.com/@gouvernoratdekinshasa?si=MwKmbGHxB-m8FxNb" class="social-icon" aria-label="{{ 'Nous suivre sur'|t }} YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a>
+                <a href="https://www.tiktok.com/@gouvernoratk?_t=ZM-8uqtzzkLRLi&_r=1" class="social-icon" aria-label="{{ 'Nous suivre sur'|t }} TikTok"><i class="fab fa-tiktok" aria-hidden="true"></i></a>
               </div>
             </div>
           </div>
@@ -148,15 +152,15 @@
     
     <div class="social-media-desktop">
       <p class="social-text">Nous suivre</p>
-      <a href="https://x.com/gouvernoratk?s=21&t=NMje2EnuC86EYrQumPVdFQ" class="social-icon"><i class="fab fa-twitter"></i></a>
-      <a href="https://www.facebook.com/GouvKinshasa?mibextid=wwXIfr&mibextid=wwXIfr" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-      <a href="https://www.instagram.com/gouvernoratk?igsh=MW0zd3NlN3NudTU5dg%3D%3D&utm_source=qr" class="social-icon"><i class="fab fa-instagram"></i></a>
-      <a href="https://youtube.com/@gouvernoratdekinshasa?si=MwKmbGHxB-m8FxNb" class="social-icon"><i class="fab fa-youtube"></i></a>
-      <a href="https://www.tiktok.com/@gouvernoratk?_t=ZM-8uqtzzkLRLi&_r=1" class="social-icon"><i class="fab fa-tiktok"></i></a>
+      <a href="https://x.com/gouvernoratk?s=21&t=NMje2EnuC86EYrQumPVdFQ" class="social-icon" aria-label="{{ 'Nous suivre sur'|t }} X"><i class="fab fa-twitter" aria-hidden="true"></i></a>
+      <a href="https://www.facebook.com/GouvKinshasa?mibextid=wwXIfr&mibextid=wwXIfr" class="social-icon" aria-label="{{ 'Nous suivre sur'|t }} Facebook"><i class="fab fa-facebook-f" aria-hidden="true"></i></a>
+      <a href="https://www.instagram.com/gouvernoratk?igsh=MW0zd3NlN3NudTU5dg%3D%3D&utm_source=qr" class="social-icon" aria-label="{{ 'Nous suivre sur'|t }} Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>
+      <a href="https://youtube.com/@gouvernoratdekinshasa?si=MwKmbGHxB-m8FxNb" class="social-icon" aria-label="{{ 'Nous suivre sur'|t }} YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a>
+      <a href="https://www.tiktok.com/@gouvernoratk?_t=ZM-8uqtzzkLRLi&_r=1" class="social-icon" aria-label="{{ 'Nous suivre sur'|t }} TikTok"><i class="fab fa-tiktok" aria-hidden="true"></i></a>
     </div>
     
-    <a href="#features" class="scroll-indicator">
-      <i class="fas fa-chevron-down"></i>
+    <a href="#features" class="scroll-indicator" aria-label="{{ 'Aller a la section suivante'|t }}">
+      <i class="fas fa-chevron-down" aria-hidden="true"></i>
     </a>
   </section>
 
@@ -311,6 +315,8 @@
         </section>
 {% endif %}       
 
+</main>
+
 <!-- Footer area start -->
 {% if page.footer %}
         <section class="footer">
@@ -321,7 +327,10 @@
                    </div>
                 </div>
                 <div class="copyright">
-                    <p>powered by <a target="_blank" href="">Agence pour le Développement du Numérique de Kinshasa (APDNK)</a></p>
+                    {# Le lien de credit pointait vers href="" avec target="_blank" : il rechargeait
+                       la page courante dans un nouvel onglet. Remis en texte simple faute
+                       d'URL ; y remettre un lien des que l'adresse de l'APDNK est connue. #}
+                    <p>powered by Agence pour le Développement du Numérique de Kinshasa (APDNK)</p>
                 </div>
             </div>
         </section>
@@ -337,8 +346,8 @@
 <!-- popup area end -->
         
 <!--=== Start Go Top Button ===-->
-<div class="go-top">
-   <i class="fas fa-chevron-up"></i>
-</div>
+<button type="button" class="go-top" aria-label="{{ 'Revenir en haut de page'|t }}">
+   <i class="fas fa-chevron-up" aria-hidden="true"></i>
+</button>
 <!--=== End Go Top Button ===-->
 
