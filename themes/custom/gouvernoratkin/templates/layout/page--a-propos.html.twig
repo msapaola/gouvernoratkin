@@ -19,36 +19,33 @@
 
 {% set img = '/themes/custom/gouvernoratkin/assets/images/' %}
 {% set visuels = {
-  bandeau:     img ~ 'apropos-hero.webp',
   institution: img ~ 'apropos-institution.webp',
   initiatives: img ~ 'apropos-initiatives.webp'
 } %}
 
 {# Le fil d'Ariane générique du partiel est neutralisé : cette page pose le
-   sien sur le bandeau, où il reste lisible et à sa place. #}
+   sien dans son entête, au-dessus du titre. #}
 {% include "@gouvernoratkin/layout/partials/site-header.html.twig" with { sans_fil_ariane: true } %}
 
 <main id="main-content" role="main">
 
   <div class="container page-messages">{{ drupal_messages() }}</div>
 
-  {# ================= BANDEAU ================= #}
-  <section class="ap-bandeau" aria-labelledby="ap-titre">
-    <img class="ap-bandeau__image" src="{{ visuels.bandeau }}" alt="" width="1200" height="480" fetchpriority="high" decoding="async">
-    <div class="ap-bandeau__voile" aria-hidden="true"></div>
-
+  {# ================= ENTÊTE ================= #}
+  <header class="ap-entete">
     <div class="container">
-      <div class="ap-bandeau__contenu">
-        <nav aria-label="{{ 'Fil d’Ariane'|t }}">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a></li>
-            <li class="breadcrumb-item active" aria-current="page">À propos</li>
-          </ol>
-        </nav>
+      <nav aria-label="{{ 'Fil d’Ariane'|t }}">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a></li>
+          <li class="breadcrumb-item active" aria-current="page">À propos</li>
+        </ol>
+      </nav>
 
-        <p class="surtitre surtitre--clair">Le Gouvernorat</p>
-        <h1 class="ap-bandeau__titre" id="ap-titre">À propos de la Ville-Province de Kinshasa</h1>
-        <p class="ap-bandeau__accroche">
+      <div class="ap-entete__contenu">
+        <p class="ap-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
+        <p class="surtitre">Le Gouvernorat</p>
+        <h1 class="ap-entete__titre">À propos de la Ville-Province de Kinshasa</h1>
+        <p class="ap-entete__accroche">
           Institution dédiée à la gestion et au développement de la capitale de la
           République Démocratique du Congo, le Gouvernorat coordonne les services
           publics de la Ville-Province et conduit les politiques de développement
@@ -56,7 +53,7 @@
         </p>
       </div>
     </div>
-  </section>
+  </header>
 
   {# ================= SOMMAIRE ANCRÉ ================= #}
   <nav class="ap-sommaire" aria-label="{{ 'Sommaire de la page'|t }}">

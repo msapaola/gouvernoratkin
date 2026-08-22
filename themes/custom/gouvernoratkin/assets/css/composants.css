@@ -20,7 +20,9 @@
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--secondaryColor);
+  /* Variante assombrie : le surtitre est du petit texte en capitales, il lui
+     faut 4,5:1 sur le blanc des sections claires. */
+  color: var(--secondaryColorDark, #00719A);
   margin: 0 0 0.4rem;
 }
 

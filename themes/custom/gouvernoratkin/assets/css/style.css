@@ -16,6 +16,11 @@
      ete nommee ; elle rejoint la charte pour cesser d'etre recopiee. */
   --secondaryColor: #0095C9;
   /* Bleu secondaire */
+  --secondaryColorDark: #00719A;
+  /* Bleu secondaire assombri — a reserver au texte pose sur fond clair.
+     Le cyan de la charte ne tient que 3,42:1 sur blanc, sous le seuil de
+     4,5:1 exige pour le petit texte ; cette variante monte a 5,48:1 sans
+     changer la teinte percue sur les aplats et les filets. */
   --accentColor: #DB3832;
   /* Rouge */
   --highlightColor: #FFF248;

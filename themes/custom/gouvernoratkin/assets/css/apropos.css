@@ -11,87 +11,78 @@
  */
 
 /* ==========================================================================
-   Bandeau
+   Entête de page
    ========================================================================== */
 
-.ap-bandeau {
-  position: relative;
+/* Entête sobre, sans photo : sur une page institutionnelle, le titre et le
+   chapô doivent être lus d'emblée, sans avoir à lutter contre une image.
+   L'identité vient du filet aux couleurs nationales et de la typographie. */
+.ap-entete {
+  background-color: var(--whiteColor);
+  border-top: 4px solid var(--mainColor);
+  padding: 2.25rem 0 2.5rem;
+}
+
+/* Filet tricolore : le même repère visuel que le blason de la ville. */
+.ap-entete__filet {
   display: flex;
-  align-items: flex-end;
-  min-height: 46vh;
-  padding: 3rem 0 2.75rem;
+  width: 84px;
+  height: 4px;
+  border-radius: 2px;
   overflow: hidden;
-  background-color: var(--mainColor);
+  margin: 0 0 1.5rem;
 }
 
-.ap-bandeau__image {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 35%;
+.ap-entete__filet span {
+  flex: 1;
 }
 
-/* Voile dégradé : il assombrit assez le bas de la photo pour que le texte
-   blanc y garde un contraste supérieur à 7:1, quelle que soit la découpe. */
-.ap-bandeau__voile {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(9, 36, 46, 0.35) 0%,
-    rgba(16, 66, 147, 0.72) 55%,
-    rgba(9, 36, 46, 0.92) 100%
-  );
+.ap-entete__filet span:nth-child(1) { background-color: var(--secondaryColor); }
+.ap-entete__filet span:nth-child(2) { background-color: var(--highlightColor); }
+.ap-entete__filet span:nth-child(3) { background-color: var(--accentColor); }
+
+.ap-entete__contenu {
+  max-width: 66ch;
 }
 
-.ap-bandeau__contenu {
-  position: relative;
-  max-width: 62ch;
-  color: var(--whiteColor);
-}
-
-.ap-bandeau__titre {
+.ap-entete__titre {
   font-family: var(--fontFamily-heading);
-  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-size: clamp(1.85rem, 4.4vw, 2.9rem);
   font-weight: 700;
-  line-height: 1.12;
-  color: var(--whiteColor);
+  line-height: 1.15;
+  color: var(--mainColor);
   margin: 0 0 1rem;
   text-wrap: balance;
 }
 
-.ap-bandeau__accroche {
-  font-size: clamp(1rem, 1.6vw, 1.12rem);
-  line-height: 1.7;
-  color: rgba(255, 255, 255, 0.92);
+.ap-entete__accroche {
+  font-size: clamp(1rem, 1.5vw, 1.1rem);
+  line-height: 1.75;
+  color: var(--paragraphColor);
   margin: 0;
 }
 
-/* Fil d'Ariane posé sur la photo : il reprend le balisage de Drupal mais
-   inverse les couleurs pour rester lisible sur fond sombre. */
-.ap-bandeau .breadcrumb {
+/* Fil d'Ariane de l'entête : même balisage que celui de Drupal, discret. */
+.ap-entete .breadcrumb {
   background: none;
   padding: 0;
-  margin: 0 0 1rem;
+  margin: 0 0 1.1rem;
   font-size: 0.88rem;
 }
 
-.ap-bandeau .breadcrumb a,
-.ap-bandeau .breadcrumb li {
-  color: rgba(255, 255, 255, 0.85);
+.ap-entete .breadcrumb a {
+  color: var(--paragraphColor);
   text-decoration: none;
 }
 
-.ap-bandeau .breadcrumb a:hover,
-.ap-bandeau .breadcrumb a:focus {
-  color: var(--highlightColor);
+.ap-entete .breadcrumb a:hover,
+.ap-entete .breadcrumb a:focus-visible {
+  color: var(--mainColor);
   text-decoration: underline;
 }
 
-.ap-bandeau .breadcrumb-item + .breadcrumb-item::before {
-  color: rgba(255, 255, 255, 0.55);
+.ap-entete .breadcrumb-item.active {
+  color: var(--blackColor);
 }
 
 /* ==========================================================================
@@ -683,9 +674,8 @@
     padding: 3.25rem 0;
   }
 
-  .ap-bandeau {
-    min-height: 0;
-    padding: 2.5rem 0 2.25rem;
+  .ap-entete {
+    padding: 1.75rem 0 2rem;
   }
 }
 
