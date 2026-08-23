@@ -1254,11 +1254,19 @@ p:last-child {
   font-weight: 600;
 }
 
+/* Le filet sous le titre etait en bleu primaire sur le fond sombre du pied de
+   page : quasi invisible. Il reprend le filet tricolore du reste du site. */
 .footer-links h3::before {
   content: "";
-  width: 30%;
-  height: 1px;
-  background-color: var(--mainColor);
+  width: 56px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--secondaryColor) 0%,
+    var(--highlightColor) 50%,
+    var(--accentColor) 100%
+  );
   position: absolute;
   left: 0;
   bottom: 0;
@@ -1305,20 +1313,30 @@ p:last-child {
   list-style: none;
 }
 
+/* Le chevron etait en bleu primaire, la couleur de survol des liens aussi :
+   sur le fond sombre du pied de page, les deux disparaissaient. Le chevron
+   passe au cyan, le survol au jaune de la charte. */
 .footer-quick-links ul li {
   margin-top: 12px;
-  color: var(--mainColor);
+  color: var(--secondaryColor);
   font-size: 15px;
   font-family: var(--fontFamily-body);
 }
 
-.footer-quick-links ul li a {
-  margin-left: 5px;
-  color: var(--whiteColor);
+.footer-quick-links ul li i {
+  font-size: 0.7em;
 }
 
-.footer-quick-links ul li a:hover {
-  color: var(--mainColor);
+.footer-quick-links ul li a {
+  margin-left: 8px;
+  color: var(--whiteColor);
+  text-decoration: none;
+}
+
+.footer-quick-links ul li a:hover,
+.footer-quick-links ul li a:focus-visible {
+  color: var(--highlightColor);
+  text-decoration: underline;
 }
 
 .footer-newsletter {
