@@ -141,26 +141,28 @@
   );
 }
 
+/* Hauteur bornée plutôt qu'un rapport de forme : à pleine largeur de colonne,
+   un 3/4 donnait des portraits de près de 500 px, qui écrasaient le nom et la
+   fonction et n'en laissaient que trois par écran. Le clamp suit la largeur
+   disponible sans jamais dépasser 300 px. */
 .team-card .team-card-img {
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  height: clamp(230px, 24vw, 300px);
   display: grid;
   place-items: center;
   overflow: hidden;
   background-color: #dfe5ee;
 }
 
-/* Un rapport de forme plutôt qu'une hauteur fixe : la carte s'adapte à la
-   largeur de sa colonne au lieu d'imposer 400 px à toutes les tailles.
-   L'ancrage haut garde les visages dans le cadre. */
+/* Le cadrage est légèrement décalé vers le haut : les visages y tiennent sans
+   que le sommet du crâne touche le bord. */
 .team-card .team-card-img img {
   display: block;
   width: 100%;
-  aspect-ratio: 3 / 4;
-  height: auto;
+  height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center 15%;
 }
 
 .team-card .team-card-text {
@@ -193,7 +195,7 @@
 
 /* Deux membres n'ont pas encore de portrait : Drupal affiche alors une icône
    générique, qui ne remplit pas le cadre et décalait la carte. Le conteneur
-   ci-dessus impose le rapport de forme et centre ce qu'il reçoit ; l'icône
+   ci-dessus impose la hauteur et centre ce qu'il reçoit ; l'icône
    n'a plus qu'à être mise à l'échelle. */
 .team-card .team-card-img > svg,
 .team-card .team-card-img > i {
