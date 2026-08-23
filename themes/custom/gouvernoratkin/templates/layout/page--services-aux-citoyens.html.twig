@@ -1,225 +1,167 @@
-<!--========== BEGIN TWIG CLASSES ==========-->
- {% 
-  set logo_classes = (page.logo) ? 'col-3' : ''
-  %} 
+{#
+/**
+ * @file
+ * Page « Services aux citoyens » du site du Gouvernorat de Kinshasa.
+ *
+ * Le gabarit recopiait la barre de navigation et le pied de page en clair,
+ * et embarquait son propre script de dépliage. Il passe désormais par les
+ * partiels du thème et par la bibliothèque gouvernoratkin/services, comme
+ * les autres pages.
+ *
+ * L'entête est celui des autres pages institutionnelles ; la recherche prend
+ * place juste en dessous, dans sa propre bande claire.
+ *
+ * Les variables services_categories_tree et active_category_tid viennent du
+ * prétraitement du thème.
+ */
+#}
+{{ attach_library('gouvernoratkin/services') }}
 
-  {% 
-  set menu_classes = (page.menu) ? 'col-6' : ''
-  %} 
+{# Le fil d'Ariane générique du partiel est neutralisé : cette page pose le
+   sien dans son entête, au-dessus du titre. #}
+{% include "@gouvernoratkin/layout/partials/site-header.html.twig" with { sans_fil_ariane: true } %}
 
-  {% 
-  set sidebar_classes = (page.sidebar) ? 'col-3' : ''
-  %} 
-  
-  {% 
-  set singlepost_classes = (page.singlepost) ? 'blog-details pt-100' : ''  
-  %}
+{% set recherche = app.request.query.get('title') %}
+{% set suffixe = recherche ? '?title=' ~ recherche|url_encode : '' %}
 
-<!--========== END TWIG CLASSES ==========-->
-<!-- Navigation area start -->
-    <header>
-    <nav class="navbar navbar-expand-lg">
-      <div class="container">
-        {% if page.logo %}
-          {{page.logo}}
-        {% endif %}
-        
-        <div class="d-flex d-lg-none mobile-actions">
-          <button class="popup-button"><i class="fas fa-search"></i></button>
-          <a href="/contact" class="btn-contact-mobile">
-            <i class="fas fa-envelope"></i>
-          </a>
-        </div>
-        
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <i class="fas fa-bars"></i>
-        </button>
-        
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          {% if page.menu %}
-            {{page.menu}}
-          {% endif %}
-          
-          <div class="d-none d-lg-flex align-items-center">
-            <button class="popup-button"><i class="fas fa-search"></i></button>
-            <a href="/Contact" class="btn btn-contact">Contact</a>
-          </div>
-        </div>
-      </div>
-    </nav>
-  </header>
-<!-- Navigation area end -->
+<main id="main-content" role="main">
 
-{% if page.top_menu %}
+  {# ================= ENTÊTE ================= #}
+  <header class="page-entete">
     <div class="container">
-        {{page.top_menu}}
+      <nav aria-label="{{ 'Fil d’Ariane'|t }}">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Services aux citoyens</li>
+        </ol>
+      </nav>
+
+      <div class="page-entete__contenu">
+        <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
+        <p class="surtitre">Vos démarches</p>
+        <h1 class="page-entete__titre">Services aux citoyens</h1>
+        <p class="page-entete__accroche">
+          Retrouvez l'ensemble des démarches et services proposés par le
+          Gouvernorat de Kinshasa à la population kinoise : pièces à fournir,
+          étapes et lieux de dépôt.
+        </p>
+      </div>
     </div>
-{% endif %}
+  </header>
 
-<!--========== CONTENT GÉRÉ VIA drupal_view ci-dessous ==========-->
-
-<!-- ===== BANNIÈRE SERVICES AUX CITOYENS ===== -->
-<div class="services-header">
-  <div class="container">
-    <nav aria-label="breadcrumb" class="services-breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/"><i class="fas fa-home"></i> Accueil</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Services aux citoyens</li>
-      </ol>
-    </nav>
-    <h1 class="services-header__title">Services aux citoyens</h1>
-    <p class="services-header__subtitle">Retrouvez l'ensemble des démarches et services proposés par le Gouvernorat de Kinshasa à la population kinoise.</p>
-    
-    <!-- Barre de recherche : connectée au filtre exposé de la vue -->
-    <div class="services-search-bar">
-      <form action="" method="get" class="services-search-form" id="services-search-form">
-        <div class="search-input-wrapper">
-          <i class="fas fa-search search-icon-decorative"></i>
-          <input 
-            type="text" 
-            name="title"
-            id="services-search-input"
-            class="services-search-input" 
-            placeholder="Rechercher une démarche (ex : naissance, permis, acte ...)"
-            autocomplete="off"
-            value="{{ app.request.query.get('title')|e('html_attr') }}"
-          />
-          <button type="submit" class="services-search-btn" id="services-search-submit">
-            <i class="fas fa-search me-2"></i>Rechercher
-          </button>
-        </div>
-      </form>
+  {# ================= RECHERCHE ================= #}
+  <div class="serv-recherche">
+    <div class="container">
+      <div class="services-search-bar">
+        <form action="" method="get" class="services-search-form" role="search">
+          <div class="search-input-wrapper">
+            <i class="fas fa-search search-icon-decorative" aria-hidden="true"></i>
+            <label class="visually-hidden" for="services-search-input">{{ 'Rechercher une démarche'|t }}</label>
+            <input
+              type="search"
+              name="title"
+              id="services-search-input"
+              class="services-search-input"
+              placeholder="Rechercher une démarche (ex : naissance, permis, acte ...)"
+              autocomplete="off"
+              value="{{ recherche }}"
+            />
+            <button type="submit" class="services-search-btn">
+              <i class="fas fa-search me-2" aria-hidden="true"></i>Rechercher
+            </button>
+          </div>
+        </form>
+      </div>
+      {% if recherche %}
+        <p class="serv-recherche__aide">
+          Résultats pour « {{ recherche }} ».
+          <a href="/services-aux-citoyens">Afficher toutes les démarches</a>
+        </p>
+      {% endif %}
     </div>
   </div>
-</div>
-<!-- ===== FIN BANNIÈRE ===== -->
 
-<!-- ===== CORPS DE LA PAGE : 2 COLONNES ===== -->
-<div class="container services-page-body">
-  <div class="row g-4">
-    
-    <!-- COLONNE GAUCHE : Liste des services (col-lg-8) -->
-    <div class="col-lg-8 col-md-12">
-      <div class="services-list-header">
-        <h2 class="services-list-title">Tous les services</h2>
+  {# ================= CORPS : LISTE ET RUBRIQUES ================= #}
+  <div class="container page-messages">{{ drupal_messages() }}</div>
+
+  <div class="container services-page-body">
+    <div class="row g-4">
+
+      <div class="col-lg-8 col-md-12">
+        <div class="services-list-header">
+          <h2 class="services-list-title">Tous les services</h2>
+        </div>
+        <div class="services-list-container">
+          {{ page.content }}
+        </div>
       </div>
-      <div class="services-list-container">
-        {{ page.content }}
-      </div>
-    </div>
 
-    <!-- COLONNE DROITE : Sidebar des catégories (col-lg-4) -->
-    <div class="col-lg-4 col-md-12">
-      <div class="services-sidebar">
-        
-        <!-- En-tête principal "Services aux citoyens" (toujours déplié, clique pour tout afficher) -->
-        <a href="/services-aux-citoyens{{ app.request.query.get('title') ? '?title=' ~ app.request.query.get('title') : '' }}" class="sidebar-main-header-link {{ not active_category_tid ? 'active' }}">
-          <i class="fas fa-hands-helping me-2"></i>Services aux citoyens
-        </a>
+      <div class="col-lg-4 col-md-12">
+        <div class="services-sidebar">
 
-        <!-- Liste des catégories parents (1er niveau) -->
-        <ul class="sidebar-categories-list">
-          {% for root in services_categories_tree %}
-            {# 'root' est le terme de niveau 0 (Services aux citoyens) #}
-            {% for category in root.children %}
-              {# 'category' sont les enfants de niveau 1 (ex: Habitat et logement, Loisirs...) #}
-              {% set has_active_child = false %}
-              {% for grandchild in category.children %}
-                {% if grandchild.tid == active_category_tid %}
-                  {% set has_active_child = true %}
-                {% endif %}
+          <a href="/services-aux-citoyens{{ suffixe }}" class="sidebar-main-header-link {{ not active_category_tid ? 'active' }}">
+            <i class="fas fa-hands-helping me-2" aria-hidden="true"></i>Services aux citoyens
+          </a>
+
+          <ul class="sidebar-categories-list">
+            {% for root in services_categories_tree %}
+              {% for category in root.children %}
+                {% set has_active_child = false %}
+                {% for grandchild in category.children %}
+                  {% if grandchild.tid == active_category_tid %}
+                    {% set has_active_child = true %}
+                  {% endif %}
+                {% endfor %}
+                {% set deplie = category.tid == active_category_tid or has_active_child %}
+
+                <li class="sidebar-parent-item {{ deplie ? 'expanded' }}">
+                  {% if category.children is not empty %}
+                    {# Un bouton, et non un div muni d'un ecouteur de clic :
+                       le depliage devient atteignable au clavier et son etat
+                       est annonce aux lecteurs d'ecran. #}
+                    <button type="button" class="sidebar-parent-header {{ deplie ? 'active' }}" aria-expanded="{{ deplie ? 'true' : 'false' }}">
+                      <span class="cat-label">{{ category.name }}</span>
+                      <span class="cat-toggle-icon"><i class="fas {{ deplie ? 'fa-chevron-down' : 'fa-chevron-right' }}" aria-hidden="true"></i></span>
+                    </button>
+                    <ul class="sidebar-child-list">
+                      {% for grandchild in category.children %}
+                        <li class="sidebar-child-item {{ grandchild.tid == active_category_tid ? 'active' }}">
+                          <a href="/services-aux-citoyens/{{ grandchild.tid }}{{ suffixe }}" class="sidebar-child-link">
+                            {{ grandchild.name }}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {% else %}
+                    <a href="/services-aux-citoyens/{{ category.tid }}{{ suffixe }}" class="sidebar-parent-link-direct {{ category.tid == active_category_tid ? 'active' }}">
+                      <span class="cat-label">{{ category.name }}</span>
+                      <span class="cat-arrow"><i class="fas fa-chevron-right" aria-hidden="true"></i></span>
+                    </a>
+                  {% endif %}
+                </li>
               {% endfor %}
-              
-              <li class="sidebar-parent-item {{ category.tid == active_category_tid or has_active_child ? 'expanded' }}">
-                {% if category.children is not empty %}
-                  <div class="sidebar-parent-header {{ category.tid == active_category_tid or has_active_child ? 'active' }}">
-                    <span class="cat-label">{{ category.name }}</span>
-                    <span class="cat-toggle-icon"><i class="fas {{ category.tid == active_category_tid or has_active_child ? 'fa-chevron-down' : 'fa-chevron-right' }}"></i></span>
-                  </div>
-                  <ul class="sidebar-child-list" style="{{ category.tid == active_category_tid or has_active_child ? 'display: block;' : 'display: none;' }}">
-                    {% for grandchild in category.children %}
-                      <li class="sidebar-child-item {{ grandchild.tid == active_category_tid ? 'active' }}">
-                        <a href="/services-aux-citoyens/{{ grandchild.tid }}{{ app.request.query.get('title') ? '?title=' ~ app.request.query.get('title') : '' }}" class="sidebar-child-link">
-                          {{ grandchild.name }}
-                        </a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                {% else %}
-                  <a href="/services-aux-citoyens/{{ category.tid }}{{ app.request.query.get('title') ? '?title=' ~ app.request.query.get('title') : '' }}" class="sidebar-parent-link-direct {{ category.tid == active_category_tid ? 'active' }}">
-                    <span class="cat-label">{{ category.name }}</span>
-                    <span class="cat-arrow"><i class="fas fa-chevron-right"></i></span>
-                  </a>
-                {% endif %}
-              </li>
             {% endfor %}
-          {% endfor %}
-        </ul>
+          </ul>
 
-        <!-- Bloc aide -->
-        <div class="sidebar-help-box">
-          <div class="sidebar-help-icon">
-            <i class="fas fa-headset"></i>
+          <div class="sidebar-help-box">
+            <div class="sidebar-help-icon">
+              <i class="fas fa-headset" aria-hidden="true"></i>
+            </div>
+            <div class="sidebar-help-content">
+              <h3>Besoin d'aide ?</h3>
+              <p>Contactez nos agents pour vous accompagner dans vos démarches.</p>
+              <a href="/contact" class="sidebar-help-btn">
+                <i class="fas fa-envelope me-2" aria-hidden="true"></i>Nous contacter
+              </a>
+            </div>
           </div>
-          <div class="sidebar-help-content">
-            <h5>Besoin d'aide ?</h5>
-            <p>Contactez nos agents pour vous accompagner dans vos démarches.</p>
-            <a href="/contact" class="sidebar-help-btn">
-              <i class="fas fa-envelope me-2"></i>Nous contacter
-            </a>
-          </div>
+
         </div>
-
       </div>
-    </div>
 
+    </div>
   </div>
-</div>
-<!-- ===== FIN CORPS DE LA PAGE ===== -->
 
-{% if page.footer %}
-    <section class="footer">
-        <div class="container">
-            <div class="footer-content ptb-100">
-               <div class="row">
-                 {{ page.footer }}
-               </div>
-            </div>
-            <div class="copyright">
-                <p>powered by <a target="_blank" href="">Agence pour le Développement du Numérique de Kinshasa (APDNK)</a></p>
-            </div>
-        </div>
-    </section>
-{% endif %}
+</main>
 
-{% if page.popup %}
-    <div class="popup">
-        {{page.popup}}
-    </div>
-{% endif %}
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var headers = document.querySelectorAll('.sidebar-parent-header');
-  headers.forEach(function(header) {
-    header.addEventListener('click', function() {
-      var parentLi = this.parentElement;
-      var childList = parentLi.querySelector('.sidebar-child-list');
-      if (childList) {
-        var isOpen = childList.style.display === 'block';
-        childList.style.display = isOpen ? 'none' : 'block';
-        parentLi.classList.toggle('expanded', !isOpen);
-        var icon = this.querySelector('.cat-toggle-icon i');
-        if (icon) {
-          if (isOpen) {
-            icon.className = 'fas fa-chevron-right';
-          } else {
-            icon.className = 'fas fa-chevron-down';
-          }
-        }
-      }
-    });
-  });
-});
-</script>
-
+{% include "@gouvernoratkin/layout/partials/site-footer.html.twig" %}

@@ -1,0 +1,37 @@
+/**
+ * Page « Services aux citoyens » — barre de recherche et entête
+ *
+ * Chargée par page--services-aux-citoyens.html.twig, via la bibliothèque
+ * gouvernoratkin/services, qui dépend de gouvernoratkin/composants pour
+ * l'entête de page commune.
+ *
+ * La liste, la barre latérale et les fiches restent stylées par style.css :
+ * elles servent aussi sur les pages de détail d'une démarche.
+ */
+
+/* La recherche quitte le bandeau pour une bande claire posée juste sous
+   l'entête : elle reste la première chose que le visiteur voit, sans être
+   noyée dans le titre. */
+.serv-recherche {
+  background-color: #f6f8fc;
+  border-bottom: 1px solid #e2e8f2;
+  padding: 1.5rem 0;
+}
+
+.serv-recherche .services-search-bar {
+  max-width: 780px;
+  margin: 0;
+}
+
+.serv-recherche__aide {
+  font-family: var(--fontFamily-body);
+  font-size: 0.88rem;
+  color: var(--paragraphColor);
+  margin: 0.75rem 0 0;
+}
+
+@media (max-width: 767.98px) {
+  .serv-recherche {
+    padding: 1.1rem 0;
+  }
+}

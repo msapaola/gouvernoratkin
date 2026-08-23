@@ -339,8 +339,8 @@ display:
           click_sort_column: value
           type: timestamp
           settings:
-            date_format: medium
-            custom_date_format: ''
+            date_format: custom
+            custom_date_format: 'j F Y'
             timezone: ''
             tooltip:
               date_format: long
