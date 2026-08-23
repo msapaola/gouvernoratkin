@@ -113,3 +113,30 @@ structures:
         assets/css/structures.css: {}
   dependencies:
     - gouvernoratkin/composants
+
+# Styles propres a la page « Actualites ».
+actualites:
+  css:
+    theme:
+        assets/css/actualites.css: {}
+  dependencies:
+    - gouvernoratkin/composants
+
+# Styles propres a la page « Galerie photo ».
+galerie:
+  css:
+    theme:
+        assets/css/galerie.css: {}
+  dependencies:
+    - gouvernoratkin/composants
+
+# Entete et barre de recherche de « Services aux citoyens ». Le depliage de la
+# barre laterale rejoint le theme au lieu de vivre en clair dans le gabarit.
+services:
+  css:
+    theme:
+        assets/css/services.css: {}
+  js:
+    assets/js/services.js: {}
+  dependencies:
+    - gouvernoratkin/composants

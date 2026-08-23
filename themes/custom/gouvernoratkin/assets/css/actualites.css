@@ -1,0 +1,99 @@
+/**
+ * Page « Actualités » — Gouvernorat de Kinshasa
+ *
+ * Chargée par page--actualites.html.twig, via la bibliothèque
+ * gouvernoratkin/actualites, qui dépend de gouvernoratkin/composants.
+ *
+ * Les cartes elles-mêmes (.blog-card) restent stylées par style.css : elles
+ * servent aussi sur la page d'accueil. Cette feuille ne décrit que la mise en
+ * page propre à la liste et sa pagination.
+ */
+
+.act-corps {
+  padding: 2.5rem 0 4rem;
+  background-color: #f6f8fc;
+}
+
+/* La vue ouvre sa grille sans conteneur : sans cette enveloppe, les cartes
+   se collaient aux bords de la fenêtre. */
+.act-corps .view-content > .row,
+.act-corps .views-row {
+  margin-bottom: 0;
+}
+
+.act-corps .blog-card {
+  height: 100%;
+  margin-bottom: 1.75rem;
+}
+
+/* ==========================================================================
+   Pagination
+   ========================================================================== */
+
+/* Les liens de pagination sortaient tels quels de Drupal, en bleu souligné
+   sur fond clair. Ils reprennent la forme des commandes du site. */
+.act-corps .pager__items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 2.5rem 0 0;
+  padding: 0;
+}
+
+.act-corps .pager__item a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #d7dfeb;
+  background-color: var(--whiteColor);
+  color: var(--mainColor);
+  font-family: var(--fontFamily-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color var(--transition), color var(--transition),
+    border-color var(--transition);
+}
+
+.act-corps .pager__item a:hover,
+.act-corps .pager__item a:focus-visible {
+  background-color: var(--mainColor);
+  border-color: var(--mainColor);
+  color: var(--whiteColor);
+}
+
+.act-corps .pager__item.is-active a {
+  background-color: var(--mainColor);
+  border-color: var(--mainColor);
+  color: var(--whiteColor);
+}
+
+/* Drupal annonce la page courante par un texte masqué visuellement ; il ne
+   doit pas élargir le bouton. */
+.act-corps .pager__item .visually-hidden {
+  position: absolute;
+}
+
+@media (max-width: 991.98px) {
+  .act-corps {
+    padding: 1.75rem 0 3rem;
+  }
+}
+
+/* Le contenu de la vue peut apporter son propre conteneur Bootstrap. Imbriqué
+   dans celui du gabarit, il ajouterait une seconde gouttière : il est remis à
+   plat, de sorte que la mise en page soit la même dans les deux cas. */
+.act-corps .container .container {
+  width: 100%;
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 0;
+  margin-right: 0;
+}

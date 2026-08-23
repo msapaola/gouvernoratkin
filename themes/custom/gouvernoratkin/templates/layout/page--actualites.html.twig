@@ -1,0 +1,49 @@
+{#
+/**
+ * @file
+ * Page « Actualités » du site du Gouvernorat de Kinshasa.
+ *
+ * Même entête que les autres pages du site — filet tricolore, fil d'Ariane à
+ * un seul niveau. La liste et sa pagination sont rendues par la vue
+ * actualites ; assets/css/actualites.css les met en page.
+ */
+#}
+{{ attach_library('gouvernoratkin/actualites') }}
+
+{# Le fil d'Ariane générique du partiel est neutralisé : cette page pose le
+   sien dans son entête, au-dessus du titre. #}
+{% include "@gouvernoratkin/layout/partials/site-header.html.twig" with { sans_fil_ariane: true } %}
+
+<main id="main-content" role="main">
+
+  <header class="page-entete">
+    <div class="container">
+      <nav aria-label="{{ 'Fil d’Ariane'|t }}">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Actualités</li>
+        </ol>
+      </nav>
+
+      <div class="page-entete__contenu">
+        <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
+        <p class="surtitre">Vie de la ville</p>
+        <h1 class="page-entete__titre">Actualités du Gouvernorat</h1>
+        <p class="page-entete__accroche">
+          Communiqués, décisions et annonces officielles de la Ville-Province de
+          Kinshasa, publiés au fil de l'actualité de la capitale.
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="act-corps">
+    <div class="container page-messages">{{ drupal_messages() }}</div>
+    <div class="container">
+      {{ page.content }}
+    </div>
+  </div>
+
+</main>
+
+{% include "@gouvernoratkin/layout/partials/site-footer.html.twig" %}

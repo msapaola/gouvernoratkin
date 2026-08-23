@@ -1,0 +1,239 @@
+/**
+ * Page « Galerie photo » — Gouvernorat de Kinshasa
+ *
+ * Chargée par page--all-gallery.html.twig, via la bibliothèque
+ * gouvernoratkin/galerie, qui dépend de gouvernoratkin/composants.
+ *
+ * Reprend les classes du contenu de la vue all_gallery, jusqu'ici habillées
+ * par asset_injector.css.all_gallery_style.
+ *
+ * Comme pour « Culture et patrimoine », tout est borné à .gal-corps :
+ * l'ancienne feuille visait .footer en sélecteur nu et repeignait donc le
+ * pied de page du site, qui porte la même classe.
+ */
+
+.gal-corps {
+  padding: 2.5rem 0 4rem;
+  background-color: #f6f8fc;
+}
+
+/* L'ancien bandeau — dégradé bleu et frise en damier — est remplacé par
+   l'entête commun aux autres pages. */
+.gal-corps .page-header {
+  display: none;
+}
+
+.gal-corps .footer {
+  background: none;
+  color: inherit;
+  padding: 0;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Carte d'activité
+   ========================================================================== */
+
+.gal-corps .activity-card {
+  position: relative;
+  height: 100%;
+  margin-bottom: 1.75rem;
+  border-radius: 14px;
+  overflow: hidden;
+  background-color: var(--whiteColor);
+  box-shadow: 0 10px 26px rgba(9, 36, 46, 0.09);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.gal-corps .activity-card:hover,
+.gal-corps .activity-card:focus-within {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 44px rgba(9, 36, 46, 0.16);
+}
+
+/* Une hauteur qui suit la largeur disponible. L'ancienne feuille imposait
+   300 px, puis 180 px sous 768 px et 350 px sous 576 px : la plus petite
+   fenêtre recevait donc la plus grande image, ce qui était manifestement
+   l'inverse de l'intention. */
+.gal-corps .card-img-container {
+  position: relative;
+  height: clamp(200px, 26vw, 280px);
+  overflow: hidden;
+}
+
+.gal-corps .card-img-container .card-img-top,
+.gal-corps .image-slider,
+.gal-corps .image-slider li,
+.gal-corps .image-slider img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gal-corps .image-slider {
+  overflow: hidden;
+}
+
+.gal-corps .image-slider ul {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gal-corps .activity-card:hover .card-img-top {
+  transform: scale(1.04);
+}
+
+.gal-corps .card-img-top {
+  transition: transform 0.6s ease;
+}
+
+/* ==========================================================================
+   Date et corps
+   ========================================================================== */
+
+.gal-corps .card-date {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 2;
+  background-color: var(--mainColor);
+  color: var(--whiteColor);
+  font-family: var(--fontFamily-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 100px;
+}
+
+.gal-corps .card-body {
+  padding: 1.35rem 1.4rem 1.5rem;
+}
+
+/* Le titre est borné à trois lignes : sans cela, une carte au titre long
+   étirait toute sa rangée. */
+.gal-corps .card-title {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--mainColor);
+  margin: 0;
+  text-wrap: balance;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.gal-corps .card-title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.gal-corps .card-title a:hover,
+.gal-corps .card-title a:focus-visible {
+  text-decoration: underline;
+}
+
+/* Le champ de texte de la carte est rendu vide par la vue : il n'ajoutait
+   qu'une marge sous le titre. */
+.gal-corps .card-text:empty {
+  display: none;
+}
+
+/* ==========================================================================
+   Contrôles du diaporama
+   ========================================================================== */
+
+.gal-corps .slick-prev,
+.gal-corps .slick-next {
+  z-index: 3;
+  width: 36px;
+  height: 36px;
+}
+
+.gal-corps .slick-prev { left: 10px; }
+.gal-corps .slick-next { right: 10px; }
+.gal-corps .slick-dots { bottom: 8px; }
+
+.gal-corps .slick-dots li button::before {
+  color: var(--whiteColor);
+  opacity: 0.7;
+}
+
+/* ==========================================================================
+   Pagination
+   ========================================================================== */
+
+.gal-corps .pager__items {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+}
+
+.gal-corps .pager__item a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #d7dfeb;
+  background-color: var(--whiteColor);
+  color: var(--mainColor);
+  font-family: var(--fontFamily-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color var(--transition), color var(--transition),
+    border-color var(--transition);
+}
+
+.gal-corps .pager__item a:hover,
+.gal-corps .pager__item a:focus-visible,
+.gal-corps .pager__item.is-active a {
+  background-color: var(--mainColor);
+  border-color: var(--mainColor);
+  color: var(--whiteColor);
+}
+
+.gal-corps .pager__item .visually-hidden {
+  position: absolute;
+}
+
+@media (max-width: 991.98px) {
+  .gal-corps {
+    padding: 1.75rem 0 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gal-corps .activity-card:hover,
+  .gal-corps .activity-card:focus-within {
+    transform: none;
+  }
+
+  .gal-corps .activity-card:hover .card-img-top {
+    transform: none;
+  }
+}
+
+/* Le contenu de la vue peut apporter son propre conteneur Bootstrap. Imbriqué
+   dans celui du gabarit, il ajouterait une seconde gouttière : il est remis à
+   plat, de sorte que la mise en page soit la même dans les deux cas. */
+.gal-corps .container .container {
+  width: 100%;
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 0;
+  margin-right: 0;
+}

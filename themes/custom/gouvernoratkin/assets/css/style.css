@@ -4440,6 +4440,7 @@ blockquote p {
     margin-top: 0.2rem;
 }
 
+.sidebar-help-content h3,
 .sidebar-help-content h5 {
     font-family: var(--fontFamily-heading);
     font-size: 1rem;
@@ -4714,11 +4715,16 @@ blockquote p {
     border-bottom: none;
 }
 
-/* En-tête de catégorie parente */
+/* En-tête de catégorie parente.
+   C'est un <button> depuis que le dépliage est atteignable au clavier : il
+   faut donc annuler le style natif du bouton avant d'appliquer le nôtre. */
 .sidebar-parent-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
+    border: 0;
+    text-align: left;
     padding: 0.9rem 1.5rem;
     color: var(--blackColor);
     font-family: var(--fontFamily-body);
@@ -4771,13 +4777,21 @@ blockquote p {
     font-size: 0.75rem;
 }
 
-/* Liste des enfants (sous-catégories) */
+/* Liste des enfants (sous-catégories).
+   Le dépliage était imposé par un style en ligne écrit par le script ; il
+   passe par la classe .expanded, que le gabarit pose au chargement pour la
+   rubrique courante et que le script bascule ensuite. */
 .sidebar-child-list {
+    display: none;
     list-style: none !important;
     padding: 0 !important;
     margin: 0 !important;
     background: #f8f9fa;
     border-top: 1px solid #e9ecef;
+}
+
+.sidebar-parent-item.expanded > .sidebar-child-list {
+    display: block;
 }
 
 .sidebar-child-item {
