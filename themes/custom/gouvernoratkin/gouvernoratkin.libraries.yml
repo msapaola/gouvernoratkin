@@ -79,3 +79,13 @@ apropos:
         assets/css/apropos.css: {}
   dependencies:
     - gouvernoratkin/composants
+
+# Styles propres a la page « Executif provincial », attachee depuis
+# page--executif-provincial.html.twig. Reprend les classes du contenu saisi
+# dans l'editeur, jusqu'ici habillees par une feuille injectee hors du depot.
+executif:
+  css:
+    theme:
+        assets/css/executif.css: {}
+  dependencies:
+    - gouvernoratkin/composants
