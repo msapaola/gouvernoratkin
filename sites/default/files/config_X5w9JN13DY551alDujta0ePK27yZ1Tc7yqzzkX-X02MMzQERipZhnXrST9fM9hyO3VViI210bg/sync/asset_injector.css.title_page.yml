@@ -10,7 +10,7 @@ code: |-
   #block-gouvernoratkin-page-title h1 {
       font-family: var(--fontFamily-heading, 'Cooper Hewitt', sans-serif); /* Police pour les titres */
       font-size: 2.6rem;
-      background-color: var(--darkGreen, #088832); /* Dark Green */
+      background-color: var(--mainColor, #104293); /* Bleu primaire de la charte */
       color: var(--whiteColor, #ffffff); /* Blanc */
       padding: 15px 30px;
       margin-top: 30px;
