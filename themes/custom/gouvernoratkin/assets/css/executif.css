@@ -61,6 +61,48 @@
 }
 
 /* ==========================================================================
+   Titres de groupe
+   ========================================================================== */
+
+/* Le contenu de l'éditeur ouvre trois groupes — gouverneur et vice-gouverneur,
+   ministres provinciaux, secrétariat exécutif — avec des titres qui n'étaient
+   habillés par rien : ils prenaient les h2 par défaut du navigateur. */
+.ex-corps h2 {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.45rem, 2.6vw, 1.95rem);
+  font-weight: 700;
+  color: var(--mainColor);
+  text-align: center;
+  margin: 3.5rem 0 0.5rem;
+  text-wrap: balance;
+}
+
+.ex-corps .presentation h2 {
+  margin-top: 0;
+}
+
+/* Un filet court sous le titre de groupe, pour marquer la coupure sans
+   ajouter de fond ni de bandeau. */
+.ex-corps h2::after {
+  content: '';
+  display: block;
+  width: 64px;
+  height: 3px;
+  margin: 0.9rem auto 0;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--secondaryColor) 0%,
+    var(--highlightColor) 50%,
+    var(--accentColor) 100%
+  );
+}
+
+.ex-corps .presentation h2::after {
+  content: none;
+}
+
+/* ==========================================================================
    Cartes des membres
    ========================================================================== */
 
@@ -102,6 +144,10 @@
 .team-card .team-card-img {
   position: relative;
   width: 100%;
+  aspect-ratio: 3 / 4;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
   background-color: #dfe5ee;
 }
 
@@ -143,6 +189,16 @@
   font-style: normal;
   color: var(--paragraphColor);
   margin: 0;
+}
+
+/* Deux membres n'ont pas encore de portrait : Drupal affiche alors une icône
+   générique, qui ne remplit pas le cadre et décalait la carte. Le conteneur
+   ci-dessus impose le rapport de forme et centre ce qu'il reçoit ; l'icône
+   n'a plus qu'à être mise à l'échelle. */
+.team-card .team-card-img > svg,
+.team-card .team-card-img > i {
+  font-size: 5rem;
+  color: #b9c4d4;
 }
 
 /* ==========================================================================
