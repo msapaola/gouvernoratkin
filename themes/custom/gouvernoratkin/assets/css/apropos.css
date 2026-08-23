@@ -11,81 +11,6 @@
  */
 
 /* ==========================================================================
-   Entête de page
-   ========================================================================== */
-
-/* Entête sobre, sans photo : sur une page institutionnelle, le titre et le
-   chapô doivent être lus d'emblée, sans avoir à lutter contre une image.
-   L'identité vient du filet aux couleurs nationales et de la typographie. */
-.ap-entete {
-  background-color: var(--whiteColor);
-  border-top: 4px solid var(--mainColor);
-  padding: 2.25rem 0 2.5rem;
-}
-
-/* Filet tricolore : le même repère visuel que le blason de la ville. */
-.ap-entete__filet {
-  display: flex;
-  width: 84px;
-  height: 4px;
-  border-radius: 2px;
-  overflow: hidden;
-  margin: 0 0 1.5rem;
-}
-
-.ap-entete__filet span {
-  flex: 1;
-}
-
-.ap-entete__filet span:nth-child(1) { background-color: var(--secondaryColor); }
-.ap-entete__filet span:nth-child(2) { background-color: var(--highlightColor); }
-.ap-entete__filet span:nth-child(3) { background-color: var(--accentColor); }
-
-.ap-entete__contenu {
-  max-width: 66ch;
-}
-
-.ap-entete__titre {
-  font-family: var(--fontFamily-heading);
-  font-size: clamp(1.85rem, 4.4vw, 2.9rem);
-  font-weight: 700;
-  line-height: 1.15;
-  color: var(--mainColor);
-  margin: 0 0 1rem;
-  text-wrap: balance;
-}
-
-.ap-entete__accroche {
-  font-size: clamp(1rem, 1.5vw, 1.1rem);
-  line-height: 1.75;
-  color: var(--paragraphColor);
-  margin: 0;
-}
-
-/* Fil d'Ariane de l'entête : même balisage que celui de Drupal, discret. */
-.ap-entete .breadcrumb {
-  background: none;
-  padding: 0;
-  margin: 0 0 1.1rem;
-  font-size: 0.88rem;
-}
-
-.ap-entete .breadcrumb a {
-  color: var(--paragraphColor);
-  text-decoration: none;
-}
-
-.ap-entete .breadcrumb a:hover,
-.ap-entete .breadcrumb a:focus-visible {
-  color: var(--mainColor);
-  text-decoration: underline;
-}
-
-.ap-entete .breadcrumb-item.active {
-  color: var(--blackColor);
-}
-
-/* ==========================================================================
    Sommaire ancré
    ========================================================================== */
 
@@ -625,41 +550,6 @@
 }
 
 /* ==========================================================================
-   Appel final
-   ========================================================================== */
-
-.ap-appel {
-  background-color: var(--mainColor);
-  color: var(--whiteColor);
-  padding: 4rem 0;
-  text-align: center;
-}
-
-.ap-appel__titre {
-  font-family: var(--fontFamily-heading);
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  font-weight: 700;
-  color: var(--whiteColor);
-  margin: 0 0 1rem;
-  text-wrap: balance;
-}
-
-.ap-appel__texte {
-  max-width: 68ch;
-  margin: 0 auto 2rem;
-  font-size: 1.05rem;
-  line-height: 1.75;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.ap-appel__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  justify-content: center;
-}
-
-/* ==========================================================================
    Adaptations
    ========================================================================== */
 
@@ -673,10 +563,6 @@
   .ap-section {
     padding: 3.25rem 0;
   }
-
-  .ap-entete {
-    padding: 1.75rem 0 2rem;
-  }
 }
 
 @media (max-width: 575.98px) {
@@ -687,9 +573,5 @@
   .ap-pilier,
   .ap-carte {
     padding: 1.5rem 1.25rem;
-  }
-
-  .ap-appel__actions .bouton {
-    width: 100%;
   }
 }

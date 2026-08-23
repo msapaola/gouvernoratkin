@@ -1,0 +1,227 @@
+/**
+ * Page « Exécutif provincial » — Gouvernorat de Kinshasa
+ *
+ * Chargée par page--executif-provincial.html.twig, via la bibliothèque
+ * gouvernoratkin/executif, qui dépend de gouvernoratkin/composants pour
+ * l'entête de page et les briques communes.
+ *
+ * Le corps de la page reste le contenu saisi dans l'éditeur, rendu par la vue
+ * executif_provincial. Cette feuille reprend les classes de ce contenu
+ * (.presentation, .team-card, …) que l'injecteur d'actifs habillait jusqu'ici
+ * hors du thème, et les remet sur la charte.
+ */
+
+/* ==========================================================================
+   Corps de page
+   ========================================================================== */
+
+.ex-corps {
+  padding: 3rem 0 4.5rem;
+}
+
+/* Le contenu de l'éditeur est enveloppé par la vue : ses conteneurs Bootstrap
+   apportent déjà leurs gouttières, inutile d'en rajouter. */
+.ex-corps > .container > .views-element-container {
+  margin: 0;
+}
+
+/* ==========================================================================
+   Présentation
+   ========================================================================== */
+
+.presentation {
+  background-color: #f6f8fc;
+  border-radius: 14px;
+  padding: 2.5rem 2rem;
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.presentation h2 {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.5rem, 2.8vw, 2rem);
+  font-weight: 700;
+  color: var(--mainColor);
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+}
+
+.presentation p {
+  font-family: var(--fontFamily-body);
+  font-size: 1.05rem;
+  line-height: 1.8;
+  font-weight: 400;
+  color: var(--paragraphColor);
+  max-width: 78ch;
+  margin: 0 auto 1rem;
+}
+
+.presentation p:last-child {
+  margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Cartes des membres
+   ========================================================================== */
+
+.team-card {
+  position: relative;
+  height: 100%;
+  margin-top: 30px;
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  background-color: var(--whiteColor);
+  box-shadow: 0 10px 26px rgba(9, 36, 46, 0.09);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.team-card:hover,
+.team-card:focus-within {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 44px rgba(9, 36, 46, 0.16);
+}
+
+/* Liseré aux couleurs de la charte, comme sur les autres cartes du site. */
+.team-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 2;
+  background: linear-gradient(
+    90deg,
+    var(--secondaryColor) 0%,
+    var(--highlightColor) 50%,
+    var(--accentColor) 100%
+  );
+}
+
+.team-card .team-card-img {
+  position: relative;
+  width: 100%;
+  background-color: #dfe5ee;
+}
+
+/* Un rapport de forme plutôt qu'une hauteur fixe : la carte s'adapte à la
+   largeur de sa colonne au lieu d'imposer 400 px à toutes les tailles.
+   L'ancrage haut garde les visages dans le cadre. */
+.team-card .team-card-img img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  height: auto;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.team-card .team-card-text {
+  text-align: center;
+  padding: 1.5rem 1.4rem 1.6rem;
+}
+
+.team-card .team-card-text h4 {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--mainColor);
+  margin: 0 0 0.5rem;
+  text-wrap: balance;
+}
+
+/* La fonction était écrite en cyan de la charte et en italique : 3,42:1 sur
+   blanc, sous le seuil WCAG de 4,5:1 pour du petit texte, et l'italique en
+   dégradait encore la lecture. Elle passe au gris de texte du site. */
+.team-card .team-card-text p {
+  font-family: var(--fontFamily-body);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  font-weight: 500;
+  font-style: normal;
+  color: var(--paragraphColor);
+  margin: 0;
+}
+
+/* ==========================================================================
+   Réseaux sociaux des membres
+   ========================================================================== */
+
+/* Les icônes n'apparaissaient qu'au survol, superposées à la photo : elles
+   étaient hors d'atteinte au doigt comme au clavier, et le voile noir qui les
+   accompagnait masquait le portrait. Elles descendent sous le nom, visibles
+   en permanence. */
+.team-card .team-card-img .team-social-icons {
+  position: static;
+  opacity: 1;
+  width: auto;
+}
+
+.team-card .team-social-icons {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.team-card .team-social-icons ul {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.team-card .team-social-icons ul li {
+  display: block;
+  margin: 0;
+}
+
+.team-card .team-social-icons ul li a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  color: var(--mainColor);
+  background-color: #eef2f9;
+  text-decoration: none;
+  transition: color var(--transition), background-color var(--transition);
+}
+
+.team-card .team-social-icons ul li a:hover,
+.team-card .team-social-icons ul li a:focus-visible {
+  color: var(--whiteColor);
+  background-color: var(--mainColor);
+}
+
+/* Le voile sombre n'a plus d'objet : il ne servait qu'à faire ressortir les
+   icônes au survol. */
+.team-card .team-card-img::before {
+  content: none;
+}
+
+/* ==========================================================================
+   Adaptations
+   ========================================================================== */
+
+@media (max-width: 991.98px) {
+  .ex-corps {
+    padding: 2.25rem 0 3.25rem;
+  }
+
+  .presentation {
+    padding: 2rem 1.4rem;
+    margin-bottom: 2.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .team-card:hover,
+  .team-card:focus-within {
+    transform: none;
+  }
+}
