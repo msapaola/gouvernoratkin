@@ -1,0 +1,68 @@
+{#
+/**
+ * @file
+ * Page « Culture et patrimoine » du site du Gouvernorat de Kinshasa.
+ *
+ * Même entête que les autres pages institutionnelles — filet tricolore, fil
+ * d'Ariane à un seul niveau — pour qu'elles s'ouvrent toutes de la même façon.
+ *
+ * Le corps reste le contenu saisi dans l'éditeur, rendu par la vue
+ * culture_et_patrimoine. Ce sont ses styles qui reviennent au thème, via
+ * assets/css/culture.css, en remplacement de la feuille injectée hors du dépôt.
+ */
+#}
+{{ attach_library('gouvernoratkin/culture') }}
+
+{# Le fil d'Ariane générique du partiel est neutralisé : cette page pose le
+   sien dans son entête, au-dessus du titre. #}
+{% include "@gouvernoratkin/layout/partials/site-header.html.twig" with { sans_fil_ariane: true } %}
+
+<main id="main-content" role="main">
+
+  {# ================= ENTÊTE ================= #}
+  <header class="page-entete">
+    <div class="container">
+      <nav aria-label="{{ 'Fil d’Ariane'|t }}">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Culture et patrimoine</li>
+        </ol>
+      </nav>
+
+      <div class="page-entete__contenu">
+        <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
+        <p class="surtitre">Kinshasa vivante</p>
+        <h1 class="page-entete__titre">Culture et patrimoine</h1>
+        <p class="page-entete__accroche">
+          Berceau de la rumba congolaise et carrefour culturel de l'Afrique
+          centrale, Kinshasa se raconte par sa musique, ses langues, ses festivals
+          et le patrimoine bâti d'une capitale en mouvement.
+        </p>
+      </div>
+    </div>
+  </header>
+
+  {# ================= CORPS ================= #}
+  <div class="cu-corps">
+    <div class="container page-messages">{{ drupal_messages() }}</div>
+    {{ page.content }}
+  </div>
+
+  {# ================= POURSUIVRE ================= #}
+  <section class="page-appel" aria-labelledby="suite-titre">
+    <div class="container">
+      <h2 class="page-appel__titre" id="suite-titre">Vivre la ville</h2>
+      <p class="page-appel__texte">
+        Les événements du Gouvernorat et les images de la capitale prolongent
+        cette découverte.
+      </p>
+      <div class="page-appel__actions">
+        <a href="/evenements" class="bouton bouton--clair">Les événements</a>
+        <a href="/all-gallery" class="bouton bouton--fantome">La galerie photo</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+{% include "@gouvernoratkin/layout/partials/site-footer.html.twig" %}

@@ -1,0 +1,281 @@
+/**
+ * Page « Culture et patrimoine » — Gouvernorat de Kinshasa
+ *
+ * Chargée par page--culture-et-patrimoine.html.twig, via la bibliothèque
+ * gouvernoratkin/culture, qui dépend de gouvernoratkin/composants.
+ *
+ * Le corps reste le contenu saisi dans l'éditeur. Cette feuille reprend les
+ * classes de ce contenu, jusqu'ici habillées par asset_injector.css.
+ * culture_et_patrimoine.
+ *
+ * Différence importante avec cette feuille injectée : tout est ici porté par
+ * .cu-corps. L'ancienne visait h1, h2, h4, h5, h6, section, img et .footer
+ * en sélecteurs nus ; injectée dans la page entière, elle repeignait aussi
+ * l'entête et le pied de page du site, dont le fond noir du .footer du thème.
+ */
+
+.cu-corps {
+  padding: 0 0 1rem;
+}
+
+/* ==========================================================================
+   Sections
+   ========================================================================== */
+
+.cu-corps section {
+  padding: 3.5rem 0;
+}
+
+.cu-corps h2 {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.45rem, 2.8vw, 2rem);
+  font-weight: 700;
+  color: var(--mainColor);
+  margin: 0 0 1.5rem;
+  text-wrap: balance;
+}
+
+.cu-corps h3,
+.cu-corps h4 {
+  font-family: var(--fontFamily-heading);
+  font-weight: 700;
+  color: var(--mainColor);
+}
+
+.cu-corps h3 {
+  font-size: 1.25rem;
+  margin: 0 0 1rem;
+}
+
+.cu-corps h4 {
+  font-size: 1.1rem;
+  margin: 0 0 0.6rem;
+}
+
+.cu-corps p {
+  font-family: var(--fontFamily-body);
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--paragraphColor);
+}
+
+/* Le bandeau de la feuille injectée pointait vers /api/placeholder/1200/600,
+   une adresse qui n'existe pas sur ce site : il n'affichait qu'un aplat gris
+   de 150 px de marge intérieure. L'entête du gabarit le remplace. */
+.cu-corps .hero {
+  display: none;
+}
+
+/* Fond d'accentuation : une teinte de la charte, pas une transparence qui
+   change d'aspect selon ce qu'il y a dessous. */
+.cu-corps .accent-bg {
+  background-color: #f6f8fc;
+}
+
+/* Le pied de page du thème porte lui aussi la classe .footer : la feuille
+   injectée le repeignait. Ici, la règle est bornée au corps de la page. */
+.cu-corps .footer {
+  background-color: #f6f8fc;
+  color: var(--paragraphColor);
+  padding: 2rem 0;
+}
+
+.cu-corps .section-divider {
+  height: 3px;
+  width: 100%;
+  border-radius: 2px;
+  margin: 0;
+  background: linear-gradient(
+    90deg,
+    var(--secondaryColor) 0%,
+    var(--highlightColor) 50%,
+    var(--accentColor) 100%
+  );
+}
+
+/* ==========================================================================
+   Cartes
+   ========================================================================== */
+
+.cu-corps .card {
+  height: 100%;
+  border: none;
+  border-radius: 14px;
+  overflow: hidden;
+  background-color: var(--whiteColor);
+  box-shadow: 0 10px 26px rgba(9, 36, 46, 0.09);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.cu-corps .card:hover,
+.cu-corps .card:focus-within {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 44px rgba(9, 36, 46, 0.16);
+}
+
+.cu-corps .card-title {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--mainColor);
+  text-wrap: balance;
+}
+
+/* Deux hauteurs d'image se contredisaient dans la feuille injectée : 200 px
+   sur .card-img-top et 300 px sur toute image de carte. Une seule règle,
+   bornée par la largeur disponible. */
+.cu-corps .card img,
+.cu-corps .card-img-top {
+  width: 100%;
+  height: clamp(180px, 20vw, 230px);
+  object-fit: cover;
+  border-radius: 0;
+}
+
+.cu-corps .carousel-item {
+  height: clamp(240px, 34vw, 400px);
+}
+
+.cu-corps .carousel-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ==========================================================================
+   Langues
+   ========================================================================== */
+
+.cu-corps .language-card {
+  text-align: center;
+  background-color: var(--whiteColor);
+  border-radius: 14px;
+  border-top: 4px solid var(--secondaryColor);
+  padding: 1.75rem 1.4rem;
+  height: 100%;
+  box-shadow: 0 10px 26px rgba(9, 36, 46, 0.07);
+}
+
+.cu-corps .language-card .icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: #e7edf7;
+  color: var(--mainColor);
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+/* ==========================================================================
+   Chronologie de l'histoire urbaine
+   ========================================================================== */
+
+.cu-corps .history-timeline {
+  position: relative;
+  padding-left: 2.25rem;
+  margin: 0;
+}
+
+.cu-corps .history-timeline::before {
+  content: '';
+  position: absolute;
+  left: 0.4rem;
+  top: 0.6rem;
+  bottom: 0.6rem;
+  width: 2px;
+  background: linear-gradient(180deg, var(--secondaryColor), var(--mainColor));
+}
+
+.cu-corps .timeline-item {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.cu-corps .timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+/* La pastille faisait 20 px et débordait du trait ; ramenée à l'échelle des
+   autres chronologies du site. */
+.cu-corps .timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -2.25rem;
+  top: 0.45rem;
+  transform: translateX(0.1rem);
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background-color: var(--whiteColor);
+  border: 3px solid var(--mainColor);
+}
+
+/* ==========================================================================
+   Étiquettes
+   ========================================================================== */
+
+.cu-corps .badge-highlight {
+  display: inline-block;
+  background-color: var(--accentColor);
+  color: var(--whiteColor);
+  font-family: var(--fontFamily-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+}
+
+/* L'étiquette de festival était écrite en Great Vibes, une calligraphie
+   pensée pour les ornements : en 0,8 rem, elle était illisible. Elle reprend
+   la police de texte du site. */
+.cu-corps .festival-tag {
+  display: inline-block;
+  background-color: #e7edf7;
+  color: var(--mainColor);
+  font-family: var(--fontFamily-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.3rem 0.75rem;
+  border-radius: 100px;
+  margin: 0 0.35rem 0.35rem 0;
+}
+
+/* ==========================================================================
+   Boutons
+   ========================================================================== */
+
+.cu-corps .btn-primary {
+  background-color: var(--mainColor);
+  border-color: var(--mainColor);
+  font-family: var(--fontFamily-body);
+  font-weight: 600;
+}
+
+.cu-corps .btn-primary:hover,
+.cu-corps .btn-primary:focus-visible {
+  background-color: var(--mainColorDark);
+  border-color: var(--mainColorDark);
+}
+
+/* ==========================================================================
+   Adaptations
+   ========================================================================== */
+
+@media (max-width: 991.98px) {
+  .cu-corps section {
+    padding: 2.5rem 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cu-corps .card:hover,
+  .cu-corps .card:focus-within {
+    transform: none;
+  }
+}

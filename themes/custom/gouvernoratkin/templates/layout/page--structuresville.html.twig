@@ -1,0 +1,68 @@
+{#
+/**
+ * @file
+ * Page « Structures et services de la ville » du site du Gouvernorat de Kinshasa.
+ *
+ * Même entête que les autres pages institutionnelles — filet tricolore, fil
+ * d'Ariane à un seul niveau — pour qu'elles s'ouvrent toutes de la même façon.
+ *
+ * Le corps reste le contenu saisi dans l'éditeur, rendu par la vue
+ * structuresville. Ce sont ses styles qui reviennent au thème, via
+ * assets/css/structures.css, en remplacement de la feuille injectée hors du dépôt.
+ */
+#}
+{{ attach_library('gouvernoratkin/structures') }}
+
+{# Le fil d'Ariane générique du partiel est neutralisé : cette page pose le
+   sien dans son entête, au-dessus du titre. #}
+{% include "@gouvernoratkin/layout/partials/site-header.html.twig" with { sans_fil_ariane: true } %}
+
+<main id="main-content" role="main">
+
+  {# ================= ENTÊTE ================= #}
+  <header class="page-entete">
+    <div class="container">
+      <nav aria-label="{{ 'Fil d’Ariane'|t }}">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Structures et services</li>
+        </ol>
+      </nav>
+
+      <div class="page-entete__contenu">
+        <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
+        <p class="surtitre">Gouvernance</p>
+        <h1 class="page-entete__titre">Structures et services de la ville</h1>
+        <p class="page-entete__accroche">
+          Le Gouvernorat de Kinshasa s'appuie sur des institutions, des ministères
+          et des régies pour assurer le fonctionnement, le développement et le
+          bien-être de la capitale. Voici les services à votre disposition.
+        </p>
+      </div>
+    </div>
+  </header>
+
+  {# ================= CORPS ================= #}
+  <div class="st-corps">
+    <div class="container page-messages">{{ drupal_messages() }}</div>
+    {{ page.content }}
+  </div>
+
+  {# ================= POURSUIVRE ================= #}
+  <section class="page-appel" aria-labelledby="suite-titre">
+    <div class="container">
+      <h2 class="page-appel__titre" id="suite-titre">Poursuivre la découverte</h2>
+      <p class="page-appel__texte">
+        L'exécutif provincial et le cabinet du gouverneur complètent
+        l'organisation du Gouvernorat de Kinshasa.
+      </p>
+      <div class="page-appel__actions">
+        <a href="/executif-provincial" class="bouton bouton--clair">L'exécutif provincial</a>
+        <a href="/cabinet-du-gouverneur" class="bouton bouton--fantome">Le cabinet du gouverneur</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+{% include "@gouvernoratkin/layout/partials/site-footer.html.twig" %}

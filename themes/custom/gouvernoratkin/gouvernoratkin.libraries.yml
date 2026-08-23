@@ -89,3 +89,27 @@ executif:
         assets/css/executif.css: {}
   dependencies:
     - gouvernoratkin/composants
+
+# Styles propres a la page « Cabinet du gouverneur ».
+cabinet:
+  css:
+    theme:
+        assets/css/cabinet.css: {}
+  dependencies:
+    - gouvernoratkin/composants
+
+# Styles propres a la page « Culture et patrimoine ».
+culture:
+  css:
+    theme:
+        assets/css/culture.css: {}
+  dependencies:
+    - gouvernoratkin/composants
+
+# Styles propres a la page « Structures et services de la ville ».
+structures:
+  css:
+    theme:
+        assets/css/structures.css: {}
+  dependencies:
+    - gouvernoratkin/composants

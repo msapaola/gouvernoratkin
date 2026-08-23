@@ -1,0 +1,220 @@
+/**
+ * Page « Structures et services de la ville » — Gouvernorat de Kinshasa
+ *
+ * Chargée par page--structuresville.html.twig, via la bibliothèque
+ * gouvernoratkin/structures, qui dépend de gouvernoratkin/composants.
+ *
+ * Le corps reste le contenu saisi dans l'éditeur. Cette feuille reprend les
+ * classes de ce contenu, jusqu'ici habillées par asset_injector.css.
+ * structures_ville.
+ */
+
+.st-corps {
+  padding: 0 0 1rem;
+}
+
+/* ==========================================================================
+   Ancien bandeau
+   ========================================================================== */
+
+/* Le contenu ouvrait sur son propre bandeau bleu, titre compris. L'entête du
+   gabarit joue ce rôle et porte le h1 : garder les deux donnait deux bandeaux
+   empilés et deux titres de premier niveau. */
+.st-corps .structure-header {
+  display: none;
+}
+
+/* ==========================================================================
+   Sections
+   ========================================================================== */
+
+.st-corps .section-gov {
+  padding: 3.5rem 0;
+  background-color: #f6f8fc;
+}
+
+.st-corps .section-services {
+  padding: 3.5rem 0;
+  background-color: var(--whiteColor);
+}
+
+.st-corps h2 {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.45rem, 2.6vw, 1.95rem);
+  font-weight: 700;
+  color: var(--mainColor);
+  text-align: center;
+  margin: 0 0 0.5rem;
+  text-wrap: balance;
+}
+
+.st-corps h2::after {
+  content: '';
+  display: block;
+  width: 64px;
+  height: 3px;
+  margin: 0.9rem auto 2.25rem;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--secondaryColor) 0%,
+    var(--highlightColor) 50%,
+    var(--accentColor) 100%
+  );
+}
+
+/* ==========================================================================
+   Cartes de structure
+   ========================================================================== */
+
+/* Les cartes étaient hautes de 40 px de marge intérieure pour un nom et un
+   bouton : la grille en devenait très aérée et il fallait beaucoup défiler
+   pour parcourir les vingt-huit structures. Marges resserrées. */
+.st-corps .structure-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+  padding: 1.75rem 1.25rem 1.5rem;
+  border-radius: 14px;
+  overflow: hidden;
+  background-color: var(--whiteColor);
+  box-shadow: 0 8px 22px rgba(9, 36, 46, 0.07);
+  border-bottom: 4px solid transparent;
+  transition: transform var(--transition), box-shadow var(--transition),
+    border-bottom-color var(--transition);
+}
+
+/* Le liseré n'apparaissait qu'au survol : il devient permanent, comme sur les
+   autres cartes du site. */
+.st-corps .structure-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  opacity: 1;
+  background: linear-gradient(
+    90deg,
+    var(--secondaryColor) 0%,
+    var(--highlightColor) 50%,
+    var(--accentColor) 100%
+  );
+}
+
+.st-corps .structure-card:hover,
+.st-corps .structure-card:focus-within {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 40px rgba(16, 66, 147, 0.14);
+  border-bottom-color: var(--accentColor);
+}
+
+/* Les initiales : un repère, pas une animation. La rotation de cinq degrés au
+   survol faisait pencher le sigle sans rien apporter. */
+.st-corps .structure-icon {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background-color: #e7edf7;
+  color: var(--mainColor);
+  font-family: var(--fontFamily-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 1.1rem;
+  border: 2px solid transparent;
+  transition: background-color var(--transition), color var(--transition);
+}
+
+.st-corps .structure-card:hover .structure-icon,
+.st-corps .structure-card:focus-within .structure-icon {
+  background-color: var(--mainColor);
+  color: var(--whiteColor);
+}
+
+.st-corps .structure-name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  font-family: var(--fontFamily-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--mainColor);
+  margin-bottom: 1.25rem;
+  text-wrap: balance;
+}
+
+/* ==========================================================================
+   Bouton de structure
+   ========================================================================== */
+
+.st-corps .btn-structure {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.6rem 1.1rem;
+  border: 2px solid var(--secondaryColorDark, #00719A);
+  border-radius: 100px;
+  background-color: transparent;
+  color: var(--mainColor);
+  font-family: var(--fontFamily-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background-color var(--transition), color var(--transition),
+    border-color var(--transition);
+}
+
+.st-corps .btn-structure:hover,
+.st-corps .btn-structure:focus-visible {
+  background-color: var(--mainColor);
+  border-color: var(--mainColor);
+  color: var(--whiteColor);
+  text-decoration: none;
+}
+
+.st-corps .btn-structure i {
+  margin-left: 0.5rem;
+  font-size: 0.85em;
+  transition: transform var(--transition);
+}
+
+.st-corps .btn-structure:hover i {
+  transform: translateX(4px);
+}
+
+/* ==========================================================================
+   Adaptations
+   ========================================================================== */
+
+@media (max-width: 991.98px) {
+  .st-corps .section-gov,
+  .st-corps .section-services {
+    padding: 2.5rem 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-corps .structure-card:hover,
+  .st-corps .structure-card:focus-within {
+    transform: none;
+  }
+
+  .st-corps .btn-structure:hover i {
+    transform: none;
+  }
+
+  .st-corps .fade-up {
+    animation: none;
+  }
+}
