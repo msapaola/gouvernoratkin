@@ -3,19 +3,18 @@ langcode: fr
 status: true
 dependencies:
   config:
-  - field.storage.node.field_categorie
-  - field.storage.node.field_image_media
-  - image.style.carte_teaser
-  - node.type.article
+    - field.storage.node.field_categorie
+    - field.storage.node.field_image_media
+    - image.style.carte_teaser
+    - node.type.article
   module:
-  - media
-  - node
-  - user
+    - media
+    - node
+    - user
 id: a_la_une
-label: À la une
+label: 'À la une'
 module: views
-description: Article portant la catégorie « À la une », mis en avant dans le bandeau
-  de la page d'accueil.
+description: "Article portant la catégorie « À la une », mis en avant dans le bandeau de la page d'accueil."
 tag: ''
 base_table: node_field_data
 base_field: nid
@@ -26,7 +25,7 @@ display:
     display_plugin: default
     position: 0
     display_options:
-      title: Last News
+      title: 'Last News'
       fields:
         title:
           id: title
@@ -82,7 +81,7 @@ display:
           settings:
             link_to_entity: false
           group_column: value
-          group_columns: {}
+          group_columns: {  }
           group_rows: true
           delta_limit: 0
           delta_offset: 0
@@ -159,7 +158,7 @@ display:
               refresh: 60
               description: ''
           group_column: value
-          group_columns: {}
+          group_columns: {  }
           group_rows: true
           delta_limit: 0
           delta_offset: 0
@@ -225,7 +224,7 @@ display:
             image_loading:
               attribute: lazy
           group_column: target_id
-          group_columns: {}
+          group_columns: {  }
           group_rows: true
           delta_limit: 0
           delta_offset: 0
@@ -263,7 +262,7 @@ display:
           exclude: false
           alter:
             alter_text: true
-            text: "<a href=\"{{ view_node }}\" class=\"une__carte\"><span class=\"une__media\">{{ field_image_media }}</span><span class=\"une__corps\"><span class=\"une__date\"><i class=\"far fa-calendar-alt\" aria-hidden=\"true\"></i> {{ created }}</span><span class=\"une__titre\">{{ title }}</span><span class=\"une__lien\">Lire l’article <i class=\"fas fa-arrow-right\" aria-hidden=\"true\"></i></span></span></a>"
+            text: '<a href="{{ view_node }}" class="une__carte"><span class="une__media">{{ field_image_media }}</span><span class="une__corps"><span class="une__date"><i class="far fa-calendar-alt" aria-hidden="true"></i> {{ created }}</span><span class="une__titre">{{ title }}</span><span class="une__lien">Lire l’article <i class="fas fa-arrow-right" aria-hidden="true"></i></span></span></a>'
             make_link: false
             path: ''
             absolute: false
@@ -311,18 +310,18 @@ display:
           submit_button: Appliquer
           reset_button: false
           reset_button_label: Réinitialiser
-          exposed_sorts_label: Trier par
+          exposed_sorts_label: 'Trier par'
           expose_sort_order: true
           sort_asc_label: Asc
           sort_desc_label: Desc
       access:
         type: perm
         options:
-          perm: access content
+          perm: 'access content'
       cache:
         type: tag
-        options: {}
-      empty: {}
+        options: {  }
+      empty: {  }
       sorts:
         created:
           id: created
@@ -340,7 +339,7 @@ display:
             field_identifier: ''
           exposed: false
           granularity: second
-      arguments: {}
+      arguments: {  }
       filters:
         status:
           id: status
@@ -369,19 +368,14 @@ display:
           relationship: none
           group_type: group
           admin_label: ''
-          operator: or
-          value:
-            '27': '27'
-          group: 1
-          exposed: false
-          is_grouped: false
-          plugin_id: taxonomy_index_tid
-          type: select
-          hierarchy: false
-          limit: false
-          error_message: true
           entity_type: node
           entity_field: field_categorie
+          plugin_id: taxonomy_index_tid
+          operator: or
+          value:
+            27: 27
+          group: 1
+          exposed: false
           expose:
             operator_id: ''
             label: ''
@@ -389,7 +383,7 @@ display:
             use_operator: false
             operator: ''
             operator_limit_selection: false
-            operator_list: []
+            operator_list: {  }
             identifier: ''
             required: false
             remember: false
@@ -397,6 +391,7 @@ display:
             remember_roles:
               authenticated: authenticated
             reduce: false
+          is_grouped: false
           group_info:
             label: ''
             description: ''
@@ -406,19 +401,23 @@ display:
             multiple: false
             remember: false
             default_group: All
-            default_group_multiple: []
-            group_items: {}
+            default_group_multiple: {  }
+            group_items: {  }
+          type: select
+          hierarchy: false
+          limit: false
+          error_message: true
       style:
         type: default
         options:
-          grouping: {}
+          grouping: {  }
           row_class: ''
           default_row_class: false
       row:
         type: fields
         options:
           default_field_elements: false
-          inline: {}
+          inline: {  }
           separator: ''
           hide_empty: false
       query:
@@ -428,35 +427,35 @@ display:
           disable_sql_rewrite: false
           distinct: false
           replica: false
-          query_tags: {}
-      relationships: {}
-      header: {}
-      footer: {}
-      display_extenders: {}
+          query_tags: {  }
+      relationships: {  }
+      header: {  }
+      footer: {  }
+      display_extenders: {  }
     cache_metadata:
       max-age: -1
       contexts:
-      - languages:language_content
-      - languages:language_interface
-      - user.node_grants:view
-      - user.permissions
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - 'user.node_grants:view'
+        - user.permissions
       tags:
-      - config:field.storage.node.field_categorie
-      - config:field.storage.node.field_image_media
+        - 'config:field.storage.node.field_categorie'
+        - 'config:field.storage.node.field_image_media'
   block_1:
     id: block_1
     display_title: Bloc
     display_plugin: block
     position: 1
     display_options:
-      display_extenders: {}
+      display_extenders: {  }
     cache_metadata:
       max-age: -1
       contexts:
-      - languages:language_content
-      - languages:language_interface
-      - user.node_grants:view
-      - user.permissions
+        - 'languages:language_content'
+        - 'languages:language_interface'
+        - 'user.node_grants:view'
+        - user.permissions
       tags:
-      - config:field.storage.node.field_categorie
-      - config:field.storage.node.field_image_media
+        - 'config:field.storage.node.field_categorie'
+        - 'config:field.storage.node.field_image_media'
