@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * Image de partage par défaut pour les contenus sans image.
+ *
+ * Les valeurs par défaut Metatag des contenus pointent vers l'image du
+ * contenu. Quand le champ image est vide, le jeton ne donne rien et Metatag
+ * ne revient pas à la valeur globale : la publication partagée apparaîtrait
+ * sans vignette. Ce module remet alors l'image par défaut du site.
+ */
+
+use Drupal\node\NodeInterface;
+
+/**
+ * Chemin de l'image de partage par défaut, relatif à la racine du site.
+ */
+const GOUVERNORAT_PARTAGE_IMAGE = 'themes/custom/gouvernoratkin/assets/images/partage-defaut.jpg';
+
+/**
+ * Implements hook_metatags_alter().
+ */
+function gouvernorat_partage_metatags_alter(array &$metatags, array &$context) {
+  $entity = $context['entity'] ?? NULL;
+  if (!$entity instanceof NodeInterface) {
+    return;
+  }
+
+  $token = \Drupal::token();
+  $image_tags = [
+    'og_image' => 'og_image_alt',
+    'twitter_cards_image' => 'twitter_cards_image_alt',
+  ];
+  foreach ($image_tags as $image_tag => $alt_tag) {
+    if (empty($metatags[$image_tag])) {
+      continue;
+    }
+    $url = $token->replacePlain($metatags[$image_tag], ['node' => $entity], ['clear' => TRUE]);
+    if (trim($url) === '') {
+      $metatags[$image_tag] = '[site:url]' . GOUVERNORAT_PARTAGE_IMAGE;
+      $metatags[$alt_tag] = '[site:name]';
+    }
+  }
+}

@@ -9,3 +9,20 @@ label: Global
 tags:
   canonical_url: '[current-page:url]'
   title: '[current-page:title] | [site:name]'
+  description: 'Site officiel du Gouvernorat de la Ville-Province de Kinshasa.'
+  og_site_name: '[site:name]'
+  og_type: website
+  og_url: '[current-page:url]'
+  og_title: '[current-page:title]'
+  og_description: 'Site officiel du Gouvernorat de la Ville-Province de Kinshasa.'
+  og_image: '[site:url]themes/custom/gouvernoratkin/assets/images/partage-defaut.jpg'
+  og_image_type: image/jpeg
+  og_image_width: '1200'
+  og_image_height: '630'
+  og_image_alt: '[site:name]'
+  og_locale: fr_FR
+  twitter_cards_type: summary_large_image
+  twitter_cards_title: '[current-page:title]'
+  twitter_cards_description: 'Site officiel du Gouvernorat de la Ville-Province de Kinshasa.'
+  twitter_cards_image: '[site:url]themes/custom/gouvernoratkin/assets/images/partage-defaut.jpg'
+  twitter_cards_image_alt: '[site:name]'
