@@ -422,9 +422,20 @@ p:last-child {
   color: var(--mainColor);
 }
 
-.dropdown-item:hover {
-  background-color: var(--highlightColor);
+/* Survol des sous-menus : teinte bleue legere de la charte, a la place de
+   l'aplat jaune. Meme rendu au clavier (focus) et pour la rubrique active,
+   qui recevait sinon le bleu vif par defaut de Bootstrap. */
+.dropdown-item:hover,
+.dropdown-item:focus-visible {
+  background-color: rgba(16, 66, 147, 0.07);
+  color: var(--secondaryColorDark);
+}
+
+.dropdown-item.active,
+.dropdown-item:active {
+  background-color: rgba(16, 66, 147, 0.1);
   color: var(--mainColor);
+  font-weight: 600;
 }
 
 .btn-contact {
@@ -4136,6 +4147,57 @@ blockquote p {
     /* Le parent doit rester en position relative */
     .navbar .dropdown-menu .dropdown {
         position: relative;
+    }
+
+    /* Libelles longs : Bootstrap interdit le retour a la ligne dans les
+       sous-menus (white-space: nowrap). Un intitule long elargissait le
+       panneau jusqu'a sortir de l'ecran, et la fin du texte disparaissait.
+       Le panneau a desormais une largeur bornee et le texte passe a la
+       ligne. */
+    /* width: max-content : sans elle, le panneau positionne en absolu se
+       cale sur la largeur minimale et coupe meme les libelles moyens. */
+    .navbar .dropdown-menu {
+        width: max-content;
+        min-width: 13rem;
+        max-width: 22rem;
+        padding: 0.4rem 0;
+    }
+
+    .navbar .dropdown-item {
+        white-space: normal;
+        line-height: 1.4;
+        padding: 0.55rem 1.1rem;
+    }
+
+    /* Rubrique a sous-menu : chevron cale a droite, tourne vers le cote ou
+       s'ouvre le sous-menu, quelle que soit la longueur du libelle. */
+    .navbar .dropdown-menu .dropdown-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .navbar .dropdown-menu .dropdown-toggle::after {
+        flex-shrink: 0;
+        transform: rotate(-90deg);
+    }
+
+    /* Les dernieres rubriques sont pres du bord droit : leur panneau s'aligne
+       sur la droite et les niveaux suivants s'ouvrent vers la gauche, pour
+       rester dans l'ecran. */
+    .navbar-nav > .nav-item:nth-last-child(-n+2) > .dropdown-menu {
+        left: auto;
+        right: 0;
+    }
+
+    .navbar-nav > .nav-item:nth-last-child(-n+2) .dropdown-menu .dropdown-menu {
+        left: auto;
+        right: 100%;
+    }
+
+    .navbar-nav > .nav-item:nth-last-child(-n+2) .dropdown-menu .dropdown-toggle::after {
+        transform: rotate(90deg);
     }
 }
 
