@@ -1,5 +1,5 @@
 name: Gouvernorat Partage
-description: "Image de partage par défaut (Open Graph, Twitter) pour les contenus sans image."
+description: "Valeurs de repli des balises de partage : image par défaut et titre quand le contenu n'a ni image ni texte."
 package: Custom
 type: module
 core_version_requirement: ^10 || ^11
