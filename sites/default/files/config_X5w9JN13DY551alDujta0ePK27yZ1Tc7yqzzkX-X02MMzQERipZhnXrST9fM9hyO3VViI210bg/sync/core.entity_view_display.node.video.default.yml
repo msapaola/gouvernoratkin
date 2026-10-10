@@ -1,0 +1,28 @@
+uuid: 0cd5f284-daee-4166-822c-56671377f44b
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.node.video.body
+    - field.field.node.video.field_youtube_url
+    - node.type.video
+  module:
+    - text
+    - user
+id: node.video.default
+targetEntityType: node
+bundle: video
+mode: default
+content:
+  body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  addtoany: true
+  field_youtube_url: true
+  langcode: true
+  links: true

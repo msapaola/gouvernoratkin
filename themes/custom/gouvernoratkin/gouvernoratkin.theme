@@ -17,6 +17,14 @@ function gouvernoratkin_theme_suggestions_page_alter(array &$suggestions, array 
   if ($alias == '/services-aux-citoyens' || strpos($alias, '/services-aux-citoyens/') === 0) {
     $suggestions[] = 'page__services_aux_citoyens';
   }
+
+  // Suggérer page--video pour la page d'un contenu « Vidéo » (pas pour ses
+  // pages d'édition ou de révision, qui gardent le gabarit général).
+  $route_match = \Drupal::routeMatch();
+  $node = $route_match->getParameter('node');
+  if ($route_match->getRouteName() === 'entity.node.canonical' && $node instanceof \Drupal\node\NodeInterface && $node->bundle() === 'video') {
+    $suggestions[] = 'page__video';
+  }
 }
 
 /**

@@ -1,0 +1,115 @@
+<?php
+
+/**
+ * @file
+ * Vidéos YouTube du Gouvernorat.
+ *
+ * Le type de contenu « Vidéo » ne stocke que l'adresse YouTube saisie par la
+ * rédaction (champ field_youtube_url). Ce module en tire l'identifiant de la
+ * vidéo, puis fournit aux gabarits la miniature et l'adresse du lecteur. Le
+ * lecteur n'est chargé qu'au clic, depuis youtube-nocookie.com (voir
+ * themes/custom/gouvernoratkin/assets/js/videos.js).
+ *
+ * Aucun appel n'est fait à YouTube depuis le serveur : tout se déduit de
+ * l'adresse, ce qui évite de dépendre de l'accès sortant de l'hébergement.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\NodeInterface;
+
+/**
+ * Extrait l'identifiant d'une vidéo YouTube de son adresse.
+ *
+ * Formes reconnues : youtube.com/watch?v=…, youtu.be/…, youtube.com/shorts/…,
+ * youtube.com/live/…, youtube.com/embed/… (avec ou sans www, m. ou
+ * youtube-nocookie.com).
+ *
+ * @param string|null $url
+ *   L'adresse saisie.
+ *
+ * @return string|null
+ *   L'identifiant de 11 caractères, ou NULL si l'adresse n'est pas une vidéo
+ *   YouTube.
+ */
+function gouvernorat_videos_youtube_id(?string $url): ?string {
+  if (!$url) {
+    return NULL;
+  }
+  $pattern = '~^(?:https?://)?(?:www\.|m\.)?(?:youtube(?:-nocookie)?\.com/(?:watch\?(?:.*&)?v=|shorts/|live/|embed/)|youtu\.be/)([A-Za-z0-9_-]{11})(?:[?&#/].*)?$~';
+  return preg_match($pattern, trim($url), $matches) ? $matches[1] : NULL;
+}
+
+/**
+ * Renvoie l'identifiant YouTube d'un contenu « Vidéo ».
+ */
+function gouvernorat_videos_node_youtube_id(NodeInterface $node): ?string {
+  if ($node->bundle() !== 'video' || !$node->hasField('field_youtube_url') || $node->get('field_youtube_url')->isEmpty()) {
+    return NULL;
+  }
+  return gouvernorat_videos_youtube_id($node->get('field_youtube_url')->uri);
+}
+
+/**
+ * Implements hook_preprocess_node().
+ *
+ * Variables fournies aux gabarits node--video*.html.twig :
+ * - youtube_id : identifiant de la vidéo ;
+ * - youtube_miniature : miniature 480 × 360 servie par YouTube ;
+ * - youtube_lecteur : adresse du lecteur, en mode confidentialité renforcée.
+ */
+function gouvernorat_videos_preprocess_node(array &$variables) {
+  $node = $variables['node'] ?? NULL;
+  if (!$node instanceof NodeInterface || $node->bundle() !== 'video') {
+    return;
+  }
+  $id = gouvernorat_videos_node_youtube_id($node);
+  $variables['youtube_id'] = $id;
+  if ($id) {
+    $variables['youtube_miniature'] = 'https://i.ytimg.com/vi/' . $id . '/hqdefault.jpg';
+    $variables['youtube_lecteur'] = 'https://www.youtube-nocookie.com/embed/' . $id . '?autoplay=1&rel=0';
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for node_form.
+ *
+ * Refuse à l'enregistrement une adresse qui n'est pas une vidéo YouTube :
+ * sans cette vérification, une erreur de copier-coller produirait une carte
+ * vide sur l'accueil.
+ */
+function gouvernorat_videos_form_node_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  if (isset($form['field_youtube_url'])) {
+    $form['#validate'][] = '_gouvernorat_videos_valider_adresse';
+  }
+}
+
+/**
+ * Validation du champ field_youtube_url.
+ */
+function _gouvernorat_videos_valider_adresse(array &$form, FormStateInterface $form_state) {
+  $uri = $form_state->getValue(['field_youtube_url', 0, 'uri']);
+  if ($uri && !gouvernorat_videos_youtube_id($uri)) {
+    $form_state->setErrorByName('field_youtube_url][0][uri', t("Cette adresse n'est pas une vidéo YouTube. Copiez l'adresse de la vidéo depuis YouTube, par exemple https://www.youtube.com/watch?v=… ou https://youtu.be/…"));
+  }
+}
+
+/**
+ * Implements hook_metatags_alter().
+ *
+ * Une vidéo n'a pas de champ image : sa vignette de partage est la miniature
+ * YouTube. Ce module s'exécute après gouvernorat_partage, qui aurait mis
+ * l'image par défaut du site.
+ */
+function gouvernorat_videos_metatags_alter(array &$metatags, array &$context) {
+  $entity = $context['entity'] ?? NULL;
+  if (!$entity instanceof NodeInterface || !($id = gouvernorat_videos_node_youtube_id($entity))) {
+    return;
+  }
+  $miniature = 'https://i.ytimg.com/vi/' . $id . '/hqdefault.jpg';
+  $metatags['og_image'] = $miniature;
+  $metatags['og_image_width'] = '480';
+  $metatags['og_image_height'] = '360';
+  $metatags['og_image_alt'] = '[node:title]';
+  $metatags['twitter_cards_image'] = $miniature;
+  $metatags['twitter_cards_image_alt'] = '[node:title]';
+}

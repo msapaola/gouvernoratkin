@@ -1,0 +1,11 @@
+uuid: cf419912-dd33-49f9-bf68-e26485e8213d
+langcode: fr
+status: true
+dependencies: {  }
+name: Vidéo
+type: video
+description: "Vidéo publiée sur la chaîne YouTube du Gouvernorat. Collez l'adresse de la vidéo : le titre, la miniature et le lecteur s'affichent sur l'accueil et sur la page Vidéos."
+help: "Copiez l'adresse de la vidéo depuis YouTube (bouton « Partager » ou barre d'adresse), puis collez-la dans le champ « Adresse YouTube »."
+new_revision: true
+preview_mode: 1
+display_submitted: false

@@ -140,3 +140,19 @@ services:
     assets/js/services.js: {}
   dependencies:
     - gouvernoratkin/composants
+
+# Vidéos YouTube : cartes, lecteur charge au clic, page « Vidéos » et page
+# d'une video. Attachee par les gabarits node--video*, page--video(s) et par
+# la section video de l'accueil. Depend de la bibliotheque des actualites pour
+# reprendre le style de la pagination.
+videos:
+  css:
+    theme:
+        assets/css/videos.css: {}
+  js:
+    assets/js/videos.js: {}
+  dependencies:
+    - core/drupal
+    - core/once
+    - gouvernoratkin/composants
+    - gouvernoratkin/actualites

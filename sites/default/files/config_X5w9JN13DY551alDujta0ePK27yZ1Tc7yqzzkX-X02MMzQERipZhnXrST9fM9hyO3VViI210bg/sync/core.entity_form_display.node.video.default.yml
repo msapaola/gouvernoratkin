@@ -1,0 +1,88 @@
+uuid: 571b7beb-d99e-40ef-8e65-acb977bb9b6f
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.node.video.body
+    - field.field.node.video.field_youtube_url
+    - node.type.video
+  module:
+    - link
+    - path
+    - text
+id: node.video.default
+targetEntityType: node
+bundle: video
+mode: default
+content:
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_youtube_url:
+    type: link_default
+    weight: 1
+    region: content
+    settings:
+      placeholder_url: 'https://www.youtube.com/watch?v=…'
+      placeholder_title: ''
+    third_party_settings: {  }
+  body:
+    type: text_textarea_with_summary
+    weight: 2
+    region: content
+    settings:
+      rows: 6
+      summary_rows: 3
+      placeholder: ''
+      show_summary: false
+    third_party_settings: {  }
+  created:
+    type: datetime_timestamp
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 11
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 30
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    weight: 15
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    weight: 16
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 120
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+hidden:
+  langcode: true

@@ -1,0 +1,285 @@
+/**
+ * Vidéos YouTube — Gouvernorat de Kinshasa
+ *
+ * Chargée par la bibliothèque gouvernoratkin/videos : section « Vidéos » de
+ * l'accueil, page « Vidéos » (/videos) et page d'une vidéo.
+ *
+ * Balisage :
+ * - .videos-liste : enveloppe de la vue videos ; chaque ligne porte
+ *   .videos-liste__item ;
+ * - .video-carte : une vidéo (node--video--teaser.html.twig) ;
+ * - .video-lecteur : miniature et bouton de lecture, remplacés au clic par le
+ *   lecteur YouTube (assets/js/videos.js).
+ */
+
+/* ==========================================================================
+   Lecteur : miniature, bouton, lecteur YouTube
+   ========================================================================== */
+
+.video-lecteur {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 10px;
+  background-color: #0b1d3a;
+}
+
+/* Les miniatures YouTube sont au format 4:3 avec des bandes noires en haut et
+   en bas : le recadrage en 16:9 les fait disparaître. */
+.video-lecteur__miniature {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition);
+}
+
+/* Le bouton couvre toute la miniature : on lance la vidéo en cliquant
+   n'importe où sur l'image, pas seulement sur le triangle. */
+.video-lecteur__bouton {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: linear-gradient(to top, rgba(11, 29, 58, 0.45), rgba(11, 29, 58, 0.05) 60%);
+  cursor: pointer;
+}
+
+.video-lecteur__icone {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--accentColor);
+  color: var(--whiteColor);
+  font-size: 1.3rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  transition: transform var(--transition), background-color var(--transition);
+}
+
+/* Le triangle de lecture paraît décentré s'il est centré géométriquement. */
+.video-lecteur__icone i {
+  margin-left: 4px;
+}
+
+.video-lecteur__bouton:hover .video-lecteur__icone,
+.video-lecteur__bouton:focus-visible .video-lecteur__icone {
+  transform: scale(1.08);
+  background-color: var(--darkRed, #b42b26);
+}
+
+.video-lecteur:hover .video-lecteur__miniature {
+  transform: scale(1.03);
+}
+
+.video-lecteur__bouton:focus-visible {
+  outline: 3px solid var(--highlightColor);
+  outline-offset: -3px;
+}
+
+.video-lecteur iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.video-lecteur--grand .video-lecteur__icone {
+  width: 84px;
+  height: 84px;
+  font-size: 1.7rem;
+}
+
+/* ==========================================================================
+   Carte
+   ========================================================================== */
+
+.video-carte {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.video-carte__corps {
+  padding-top: 0.85rem;
+}
+
+.video-carte__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0 0 0.35rem;
+}
+
+.video-carte__titre a {
+  color: var(--mainColor);
+  text-decoration: none;
+}
+
+.video-carte__titre a:hover,
+.video-carte__titre a:focus-visible {
+  color: var(--secondaryColorDark);
+  text-decoration: underline;
+}
+
+.video-carte__date {
+  font-family: var(--fontFamily-body);
+  font-size: 0.88rem;
+  color: var(--paragraphColor);
+  margin: 0;
+}
+
+/* ==========================================================================
+   Liste : page « Vidéos »
+   ========================================================================== */
+
+.videos-liste .view-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem 1.75rem;
+}
+
+.videos-entete__chaine {
+  margin: 1.5rem 0 0;
+}
+
+/* ==========================================================================
+   Accueil : une vidéo à la une, quatre à côté
+   ========================================================================== */
+
+.videos-liens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.75rem;
+}
+
+.videos-liens .fa-youtube {
+  color: #e00;
+  font-size: 1.1em;
+  margin: 0 0.35rem 0 0;
+}
+
+/* Sur téléphone et tablette : la plus récente en pleine largeur, les quatre
+   autres sur deux colonnes, pour ne pas empiler cinq grandes images. */
+@media (max-width: 991.98px) {
+  .videos-liste--accueil .view-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem 1rem;
+  }
+
+  .videos-liste--accueil .videos-liste__item:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .videos-liste--accueil .videos-liste__item:not(:first-child) .video-carte__titre {
+    font-size: 0.9rem;
+  }
+
+  .videos-liste--accueil .videos-liste__item:not(:first-child) .video-lecteur__icone {
+    width: 42px;
+    height: 42px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .videos-liste--accueil .view-content {
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1.75rem;
+  }
+
+  /* La plus récente occupe la colonne de gauche sur deux rangées. */
+  .videos-liste--accueil .videos-liste__item:first-child {
+    grid-row: span 2;
+  }
+
+  .videos-liste--accueil .videos-liste__item:first-child .video-carte__titre {
+    font-size: 1.35rem;
+  }
+
+  .videos-liste--accueil .videos-liste__item:first-child .video-lecteur__icone {
+    width: 84px;
+    height: 84px;
+    font-size: 1.7rem;
+  }
+
+  .videos-liste--accueil .videos-liste__item:not(:first-child) .video-carte__titre {
+    font-size: 0.95rem;
+  }
+
+  .videos-liste--accueil .videos-liste__item:not(:first-child) .video-lecteur__icone {
+    width: 48px;
+    height: 48px;
+    font-size: 1rem;
+  }
+}
+
+/* ==========================================================================
+   Page d'une vidéo
+   ========================================================================== */
+
+.videos-corps {
+  padding: 2.5rem 0 4rem;
+  background-color: #f6f8fc;
+}
+
+.video-page {
+  max-width: 960px;
+}
+
+.video-page__description {
+  margin-top: 1.75rem;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--blackColor, #222);
+}
+
+.video-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 2rem 0 0;
+}
+
+/* ==========================================================================
+   Boutons propres aux vidéos
+   ========================================================================== */
+
+.bouton--youtube {
+  background-color: #e00;
+  color: var(--whiteColor);
+}
+
+.bouton--youtube:hover,
+.bouton--youtube:focus {
+  background-color: #b00;
+  color: var(--whiteColor);
+}
+
+.bouton--contour {
+  background-color: var(--whiteColor);
+  border-color: var(--mainColor);
+  color: var(--mainColor);
+}
+
+.bouton--contour:hover,
+.bouton--contour:focus {
+  background-color: var(--mainColor);
+  color: var(--whiteColor);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .video-lecteur__miniature,
+  .video-lecteur__icone {
+    transition: none;
+  }
+
+  .video-lecteur:hover .video-lecteur__miniature {
+    transform: none;
+  }
+}

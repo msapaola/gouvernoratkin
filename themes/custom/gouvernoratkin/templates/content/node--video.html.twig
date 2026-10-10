@@ -1,0 +1,38 @@
+{#
+/**
+ * @file
+ * Page d'une vidéo : lecteur, description, liens vers la chaîne.
+ *
+ * Le titre et la date sont dans l'entête de page--video.html.twig. Le lecteur
+ * suit le même principe que les cartes (node--video--teaser.html.twig) :
+ * miniature d'abord, lecteur YouTube au clic.
+ */
+#}
+{{ attach_library('gouvernoratkin/videos') }}
+<article{{ attributes.addClass('video-page') }}>
+  {{ title_prefix }}
+  {{ title_suffix }}
+
+  {% if youtube_id %}
+    <div class="video-lecteur video-lecteur--grand" data-lecteur="{{ youtube_lecteur }}" data-titre="{{ label|render|striptags|trim }}">
+      <img class="video-lecteur__miniature" src="{{ youtube_miniature }}" alt="" width="480" height="360" decoding="async">
+      <button type="button" class="video-lecteur__bouton">
+        <span class="video-lecteur__icone" aria-hidden="true"><i class="fas fa-play"></i></span>
+        <span class="visually-hidden">{{ 'Lire la vidéo :'|t }} {{ label }}</span>
+      </button>
+    </div>
+  {% endif %}
+
+  {% if content.body|render|trim %}
+    <div class="video-page__description">
+      {{ content.body }}
+    </div>
+  {% endif %}
+
+  <p class="video-page__actions">
+    <a href="/videos" class="bouton bouton--contour"><i class="fas fa-th-large" aria-hidden="true"></i> Toutes les vidéos</a>
+    <a href="https://www.youtube.com/@GouvernoratdeKinshasa" class="bouton bouton--youtube" target="_blank" rel="noopener">
+      <i class="fab fa-youtube" aria-hidden="true"></i> Voir la chaîne YouTube<span class="visually-hidden"> (nouvel onglet)</span>
+    </a>
+  </p>
+</article>

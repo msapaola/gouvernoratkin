@@ -30,6 +30,7 @@ module:
   file: 0
   filter: 0
   gouvernorat_partage: 0
+  gouvernorat_videos: 0
   help: 0
   history: 0
   image: 0

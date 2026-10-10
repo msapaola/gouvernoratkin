@@ -6,6 +6,7 @@ dependencies:
     - filter.format.full_html
     - node.type.article
     - node.type.page
+    - node.type.video
     - taxonomy.vocabulary.tags
   module:
     - comment
@@ -32,14 +33,18 @@ permissions:
   - 'create page content'
   - 'create terms in tags'
   - 'create url aliases'
+  - 'create video content'
   - 'delete article revisions'
   - 'delete own article content'
   - 'delete own files'
   - 'delete own page content'
+  - 'delete own video content'
   - 'delete page revisions'
+  - 'delete video revisions'
   - 'edit own article content'
   - 'edit own comments'
   - 'edit own page content'
+  - 'edit own video content'
   - 'edit terms in tags'
   - 'revert all revisions'
   - 'use text format full_html'

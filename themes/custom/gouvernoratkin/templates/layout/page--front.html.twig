@@ -3,8 +3,8 @@
  * @file
  * Page d'accueil du site du Gouvernorat de Kinshasa.
  *
- * Cette page est entièrement décrite ici, section par section. Les actualités
- * et la galerie sont injectées depuis leurs vues avec Twig Tweak, de sorte que
+ * Cette page est entièrement décrite ici, section par section. Les actualités,
+ * les vidéos et la galerie sont injectées depuis leurs vues avec Twig Tweak, de sorte que
  * la rédaction publie normalement et que la mise en page reste sous contrôle
  * du thème.
  *
@@ -165,6 +165,36 @@
       </div>
     </div>
   </section>
+
+  {# ================= VIDÉOS (vue injectée) =================
+     Les 5 dernières vidéos du type de contenu « Vidéo ». La section n'est
+     affichée que si au moins une vidéo est publiée : sans cela, l'accueil
+     montrerait un titre au-dessus d'un vide. #}
+  {% if drupal_view_result('videos', 'block_1') %}
+  {{ attach_library('gouvernoratkin/videos') }}
+  <section class="bloc" aria-labelledby="videos-titre">
+    <div class="container">
+      <div class="bloc__entete">
+        <div>
+          <p class="surtitre">En vidéo</p>
+          <h2 class="bloc__titre" id="videos-titre">Le Gouvernorat en vidéo</h2>
+        </div>
+        <div class="videos-liens">
+          <a href="https://www.youtube.com/@GouvernoratdeKinshasa" class="lien-suite" target="_blank" rel="noopener">
+            <i class="fab fa-youtube" aria-hidden="true"></i> Voir la chaîne<span class="visually-hidden"> YouTube (nouvel onglet)</span>
+          </a>
+          <a href="/videos" class="lien-suite">
+            Toutes les vidéos <i class="fas fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="bloc__contenu">
+        {{ drupal_view('videos', 'block_1') }}
+      </div>
+    </div>
+  </section>
+  {% endif %}
 
 
   {# ================= À PROPOS DE KINSHASA ================= #}

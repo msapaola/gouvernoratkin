@@ -1,0 +1,34 @@
+{#
+/**
+ * @file
+ * Carte d'une vidéo YouTube : accueil et page « Vidéos ».
+ *
+ * Seule la miniature est chargée avec la page. Le lecteur YouTube (près d'un
+ * mégaoctet de scripts) n'est appelé qu'au clic sur le bouton de lecture, par
+ * assets/js/videos.js, depuis youtube-nocookie.com : aucun cookie YouTube
+ * n'est déposé tant que la vidéo n'est pas lancée.
+ *
+ * Variables fournies par le module gouvernorat_videos :
+ * - youtube_id, youtube_miniature, youtube_lecteur.
+ */
+#}
+{{ attach_library('gouvernoratkin/videos') }}
+<article{{ attributes.addClass('video-carte') }}>
+  {% if youtube_id %}
+    <div class="video-lecteur" data-lecteur="{{ youtube_lecteur }}" data-titre="{{ label|render|striptags|trim }}">
+      <img class="video-lecteur__miniature" src="{{ youtube_miniature }}" alt="" width="480" height="360" loading="lazy" decoding="async">
+      <button type="button" class="video-lecteur__bouton">
+        <span class="video-lecteur__icone" aria-hidden="true"><i class="fas fa-play"></i></span>
+        <span class="visually-hidden">{{ 'Lire la vidéo :'|t }} {{ label }}</span>
+      </button>
+    </div>
+  {% endif %}
+  <div class="video-carte__corps">
+    {{ title_prefix }}
+    <h3 class="video-carte__titre"><a href="{{ url }}">{{ label }}</a></h3>
+    {{ title_suffix }}
+    <p class="video-carte__date">
+      <time datetime="{{ node.createdtime|format_date('html_datetime') }}">{{ node.createdtime|format_date('custom', 'j F Y') }}</time>
+    </p>
+  </div>
+</article>

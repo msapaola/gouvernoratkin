@@ -1,0 +1,52 @@
+{#
+/**
+ * @file
+ * Page « Vidéos » : toutes les vidéos YouTube publiées sur le site.
+ *
+ * La liste et sa pagination sont rendues par la vue videos (page_1). La
+ * pagination reprend le style de la page Actualités : la bibliothèque
+ * gouvernoratkin/videos dépend de gouvernoratkin/actualites, et le corps
+ * porte la classe act-corps à laquelle ces règles sont rattachées.
+ */
+#}
+{{ attach_library('gouvernoratkin/videos') }}
+
+{% include "@gouvernoratkin/layout/partials/site-header.html.twig" with { sans_fil_ariane: true } %}
+
+<main id="main-content" role="main">
+
+  <header class="page-entete">
+    <div class="container">
+      <nav aria-label="{{ 'Fil d’Ariane'|t }}">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Vidéos</li>
+        </ol>
+      </nav>
+
+      <div class="page-entete__contenu">
+        <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
+        <p class="surtitre">En vidéo</p>
+        <h1 class="page-entete__titre">Le Gouvernorat en vidéo</h1>
+        <p class="page-entete__accroche">
+          Événements, inaugurations, discours et reportages de la Ville-Province
+          de Kinshasa, publiés sur la chaîne YouTube du Gouvernorat.
+        </p>
+        <p class="videos-entete__chaine">
+          <a href="https://www.youtube.com/@GouvernoratdeKinshasa" class="bouton bouton--youtube" target="_blank" rel="noopener">
+            <i class="fab fa-youtube" aria-hidden="true"></i> Voir la chaîne YouTube<span class="visually-hidden"> (nouvel onglet)</span>
+          </a>
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="act-corps videos-corps">
+    <div class="container">
+      {{ page.content }}
+    </div>
+  </div>
+
+</main>
+
+{% include "@gouvernoratkin/layout/partials/site-footer.html.twig" %}

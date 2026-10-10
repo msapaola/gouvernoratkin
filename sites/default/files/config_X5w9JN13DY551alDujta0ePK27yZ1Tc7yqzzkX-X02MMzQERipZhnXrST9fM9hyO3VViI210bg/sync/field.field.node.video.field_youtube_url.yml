@@ -1,0 +1,23 @@
+uuid: e3c3d453-0264-450e-9c8f-023dde06daa0
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_youtube_url
+    - node.type.video
+  module:
+    - link
+id: node.video.field_youtube_url
+field_name: field_youtube_url
+entity_type: node
+bundle: video
+label: 'Adresse YouTube'
+description: "Adresse de la vidéo sur YouTube, par exemple https://www.youtube.com/watch?v=… ou https://youtu.be/…"
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 0
+  link_type: 16
+field_type: link

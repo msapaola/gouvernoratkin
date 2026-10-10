@@ -1,0 +1,49 @@
+{#
+/**
+ * @file
+ * Page d'un contenu « Vidéo ».
+ *
+ * Suggestion ajoutée par gouvernoratkin_theme_suggestions_page_alter() : les
+ * suggestions de Drupal se fondent sur le chemin système (node/123) et ne
+ * distinguent pas les types de contenu.
+ *
+ * Même entête que les pages Actualités et Vidéos ; le lecteur et la
+ * description viennent de node--video.html.twig, rendu dans page.content.
+ */
+#}
+{{ attach_library('gouvernoratkin/videos') }}
+
+{% include "@gouvernoratkin/layout/partials/site-header.html.twig" with { sans_fil_ariane: true } %}
+
+<main id="main-content" role="main">
+
+  <header class="page-entete">
+    <div class="container">
+      <nav aria-label="{{ 'Fil d’Ariane'|t }}">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a></li>
+          <li class="breadcrumb-item"><a href="/videos">Vidéos</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ node.label }}</li>
+        </ol>
+      </nav>
+
+      <div class="page-entete__contenu">
+        <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
+        <p class="surtitre">Vidéo</p>
+        <h1 class="page-entete__titre">{{ node.label }}</h1>
+        <p class="page-entete__accroche">
+          <time datetime="{{ node.createdtime|format_date('html_datetime') }}">Publiée le {{ node.createdtime|format_date('custom', 'j F Y') }}</time>
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="videos-corps">
+    <div class="container">
+      {{ page.content }}
+    </div>
+  </div>
+
+</main>
+
+{% include "@gouvernoratkin/layout/partials/site-footer.html.twig" %}
