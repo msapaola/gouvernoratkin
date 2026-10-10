@@ -1,0 +1,58 @@
+<?php
+
+/**
+ * @file
+ * Valeurs de repli des balises de partage pour les contenus.
+ *
+ * Les valeurs par défaut Metatag des contenus pointent vers l'image et le
+ * résumé du contenu. Quand un jeton ne donne rien, Metatag ne revient pas à la
+ * valeur globale : la publication partagée apparaîtrait sans vignette ni
+ * description. Ce module remet alors :
+ * - l'image par défaut du site, si le contenu n'a pas d'image ;
+ * - le titre du contenu, si le résumé et le corps sont vides.
+ *
+ * Le jeton [node:summary] reprend déjà le corps quand le résumé n'est pas
+ * rempli ; sa longueur est limitée par les réglages Metatag (metatag.settings).
+ */
+
+use Drupal\node\NodeInterface;
+
+/**
+ * Chemin de l'image de partage par défaut, relatif à la racine du site.
+ */
+const GOUVERNORAT_PARTAGE_IMAGE = 'themes/custom/gouvernoratkin/assets/images/partage-defaut.jpg';
+
+/**
+ * Implements hook_metatags_alter().
+ */
+function gouvernorat_partage_metatags_alter(array &$metatags, array &$context) {
+  $entity = $context['entity'] ?? NULL;
+  if (!$entity instanceof NodeInterface) {
+    return;
+  }
+
+  $is_empty = function (string $tag) use ($metatags, $entity): bool {
+    if (empty($metatags[$tag])) {
+      return FALSE;
+    }
+    $value = \Drupal::token()->replacePlain($metatags[$tag], ['node' => $entity], ['clear' => TRUE]);
+    return trim(html_entity_decode(strip_tags($value))) === '';
+  };
+
+  $image_tags = [
+    'og_image' => 'og_image_alt',
+    'twitter_cards_image' => 'twitter_cards_image_alt',
+  ];
+  foreach ($image_tags as $image_tag => $alt_tag) {
+    if ($is_empty($image_tag)) {
+      $metatags[$image_tag] = '[site:url]' . GOUVERNORAT_PARTAGE_IMAGE;
+      $metatags[$alt_tag] = '[site:name]';
+    }
+  }
+
+  foreach (['description', 'og_description', 'twitter_cards_description'] as $description_tag) {
+    if ($is_empty($description_tag)) {
+      $metatags[$description_tag] = '[node:title]';
+    }
+  }
+}

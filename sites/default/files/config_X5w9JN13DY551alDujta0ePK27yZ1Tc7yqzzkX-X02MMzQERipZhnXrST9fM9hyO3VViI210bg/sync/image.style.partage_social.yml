@@ -1,0 +1,21 @@
+uuid: c3cd846b-3a97-46ed-badf-38022e12062f
+langcode: fr
+status: true
+dependencies: {  }
+name: partage_social
+label: 'Partage social (1200×630, JPG)'
+effects:
+  53c479f8-e4d6-4f19-a92d-4a62132f6dd0:
+    uuid: 53c479f8-e4d6-4f19-a92d-4a62132f6dd0
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 1200
+      height: 630
+      anchor: center-center
+  7b105ca6-8c18-4efc-8c2b-4936c29052b9:
+    uuid: 7b105ca6-8c18-4efc-8c2b-4936c29052b9
+    id: image_convert
+    weight: 2
+    data:
+      extension: jpg

@@ -9,3 +9,11 @@ label: "Page d'accueil"
 tags:
   canonical_url: '[site:url]'
   shortlink: '[site:url]'
+  title: '[site:name] | Site officiel de la Ville-Province de Kinshasa'
+  description: 'Site officiel du Gouvernorat de la Ville-Province de Kinshasa : actualités, événements, galeries et services aux citoyens.'
+  og_type: website
+  og_url: '[site:url]'
+  og_title: '[site:name]'
+  og_description: 'Site officiel du Gouvernorat de la Ville-Province de Kinshasa : actualités, événements, galeries et services aux citoyens.'
+  twitter_cards_title: '[site:name]'
+  twitter_cards_description: 'Site officiel du Gouvernorat de la Ville-Province de Kinshasa : actualités, événements, galeries et services aux citoyens.'
