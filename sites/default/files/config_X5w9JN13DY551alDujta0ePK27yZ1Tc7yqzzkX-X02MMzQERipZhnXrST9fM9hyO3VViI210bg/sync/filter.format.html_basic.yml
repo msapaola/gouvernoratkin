@@ -2,8 +2,11 @@ uuid: cd6b8088-0285-4e4b-9d69-db50cce9ebd7
 langcode: fr
 status: true
 dependencies:
+  config:
+    - core.entity_view_mode.media.media_library
   module:
     - blazy
+    - media
 name: 'HTML Basic'
 format: html_basic
 weight: 0
@@ -35,7 +38,7 @@ filters:
     status: true
     weight: -10
     settings:
-      allowed_html: '<br> <p> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <cite> <dl> <dt> <dd> <span> <a hreflang href> <blockquote cite> <ul type> <ol type reversed start> <img data-entity-type data-entity-uuid data-align data-caption src alt height width> <strong> <em> <code> <li>'
+      allowed_html: '<br> <p> <h2 id> <h3 id> <h4 id> <h5 id> <h6 id> <cite> <dl> <dt> <dd> <span> <a hreflang href> <blockquote cite> <ul type> <ol type reversed start> <strong> <em> <code> <li> <img src alt height width data-entity-uuid data-entity-type>'
       filter_html_help: true
       filter_html_nofollow: false
   filter_url:
@@ -45,3 +48,14 @@ filters:
     weight: 0
     settings:
       filter_url_length: 72
+  media_embed:
+    id: media_embed
+    provider: media
+    status: false
+    weight: 100
+    settings:
+      default_view_mode: default
+      allowed_view_modes:
+        media_library: media_library
+      allowed_media_types:
+        image: image
