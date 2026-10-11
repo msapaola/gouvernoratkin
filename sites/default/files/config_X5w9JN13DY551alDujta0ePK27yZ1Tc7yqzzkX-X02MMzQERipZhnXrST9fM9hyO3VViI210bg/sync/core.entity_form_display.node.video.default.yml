@@ -15,22 +15,6 @@ targetEntityType: node
 bundle: video
 mode: default
 content:
-  title:
-    type: string_textfield
-    weight: 0
-    region: content
-    settings:
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
-  field_youtube_url:
-    type: link_default
-    weight: 1
-    region: content
-    settings:
-      placeholder_url: 'https://www.youtube.com/watch?v=…'
-      placeholder_title: ''
-    third_party_settings: {  }
   body:
     type: text_textarea_with_summary
     weight: 2
@@ -47,15 +31,13 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
-  uid:
-    type: entity_reference_autocomplete
-    weight: 11
+  field_youtube_url:
+    type: link_default
+    weight: 1
     region: content
     settings:
-      match_operator: CONTAINS
-      match_limit: 10
-      size: 60
-      placeholder: ''
+      placeholder_url: 'https://www.youtube.com/watch?v=…'
+      placeholder_title: ''
     third_party_settings: {  }
   path:
     type: path
@@ -70,6 +52,13 @@ content:
     settings:
       display_label: true
     third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 120
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
   sticky:
     type: boolean_checkbox
     weight: 16
@@ -77,12 +66,23 @@ content:
     settings:
       display_label: true
     third_party_settings: {  }
-  status:
-    type: boolean_checkbox
-    weight: 120
+  title:
+    type: string_textfield
+    weight: 0
     region: content
     settings:
-      display_label: true
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 11
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
 hidden:
   langcode: true

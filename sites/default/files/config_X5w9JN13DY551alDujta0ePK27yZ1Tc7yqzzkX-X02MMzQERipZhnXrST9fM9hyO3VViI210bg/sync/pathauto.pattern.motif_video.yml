@@ -7,7 +7,7 @@ dependencies:
 id: motif_video
 label: 'Motif Vidéo/[node:title]'
 type: 'canonical_entities:node'
-pattern: 'videos/[node:title]'
+pattern: '/videos/[node:title]'
 selection_criteria:
   1eadfb17-1782-45a9-b269-16c04eb61280:
     id: 'entity_bundle:node'
