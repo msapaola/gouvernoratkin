@@ -1,36 +1,30 @@
 /**
- * Barre latérale des services aux citoyens : dépliage des catégories.
+ * Barre latérale des services aux citoyens : dépliage des rubriques.
  *
- * Ce script vivait en clair dans page--services-aux-citoyens.html.twig. Il
- * rejoint le thème pour être versionné et chargé une seule fois, avec la
- * bibliothèque gouvernoratkin/services.
+ * Chaque rubrique de 2e niveau porte un lien (afficher toutes ses démarches)
+ * et, à côté, un bouton chevron qui déplie ses sous-rubriques. Le script ne
+ * gère que ce bouton : le lien navigue normalement.
  *
- * Trois corrections par rapport à la version d'origine :
- * - l'entête de catégorie était un <div> muni d'un écouteur de clic, donc
- *   inatteignable au clavier ; c'est désormais un <button> annoncé par
- *   aria-expanded, que le gabarit produit ;
- * - l'état déplié n'était porté que par un style en ligne ; il passe par la
- *   classe .expanded, ce qui laisse la feuille de styles décider du rendu ;
- * - le script s'exécutait même sur les pages sans barre latérale.
+ * Le gabarit (layout/partials/services-sidebar.html.twig) pose la classe
+ * .expanded et aria-expanded au chargement pour la rubrique courante.
  */
 (function () {
   'use strict';
 
   document.addEventListener('DOMContentLoaded', function () {
-    var entetes = document.querySelectorAll('.services-sidebar .sidebar-parent-header');
+    var boutons = document.querySelectorAll('.services-sidebar .sidebar-parent-toggle');
 
-    Array.prototype.forEach.call(entetes, function (entete) {
-      entete.addEventListener('click', function () {
-        var parent = entete.closest('.sidebar-parent-item');
-        var enfants = parent ? parent.querySelector('.sidebar-child-list') : null;
-        if (!enfants) {
+    Array.prototype.forEach.call(boutons, function (bouton) {
+      bouton.addEventListener('click', function () {
+        var parent = bouton.closest('.sidebar-parent-item');
+        if (!parent || !parent.querySelector('.sidebar-child-list')) {
           return;
         }
 
         var ouvert = parent.classList.toggle('expanded');
-        entete.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
+        bouton.setAttribute('aria-expanded', ouvert ? 'true' : 'false');
 
-        var icone = entete.querySelector('.cat-toggle-icon i');
+        var icone = bouton.querySelector('i');
         if (icone) {
           icone.className = ouvert ? 'fas fa-chevron-down' : 'fas fa-chevron-right';
         }

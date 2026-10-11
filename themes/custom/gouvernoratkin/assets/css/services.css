@@ -35,3 +35,117 @@
     padding: 1.1rem 0;
   }
 }
+
+/* ==========================================================================
+   Barre latérale : rubriques de 2e niveau
+   ==========================================================================
+   L'entête de rubrique était un bouton qui ne faisait que déplier : on ne
+   pouvait pas afficher toutes les démarches d'une rubrique. Il porte
+   désormais un lien (toute la largeur) et, à droite, un bouton chevron
+   distinct pour déplier les sous-rubriques. */
+
+.sidebar-parent-header {
+  padding: 0;
+  cursor: default;
+}
+
+.sidebar-parent-link {
+  flex: 1;
+  min-width: 0;
+  padding: 0.9rem 0.5rem 0.9rem 1.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.sidebar-parent-link:hover,
+.sidebar-parent-link:focus-visible {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.sidebar-parent-toggle {
+  flex-shrink: 0;
+  align-self: stretch;
+  width: 48px;
+  border: 0;
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
+  background: transparent;
+  color: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.sidebar-parent-toggle:hover,
+.sidebar-parent-toggle:focus-visible {
+  background: rgba(16, 66, 147, 0.08);
+}
+
+.sidebar-parent-header.active .sidebar-parent-toggle {
+  border-left-color: rgba(255, 255, 255, 0.25);
+}
+
+.sidebar-parent-header.active .sidebar-parent-toggle:hover,
+.sidebar-parent-header.active .sidebar-parent-toggle:focus-visible {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Une sous-rubrique est choisie : sa rubrique reste dépliée et repérable,
+   sans prendre l'aplat bleu réservé à la rubrique courante. */
+.sidebar-parent-header.is-open {
+  background: #edf4ff;
+  color: var(--mainColor);
+}
+
+/* ==========================================================================
+   Liste : entête, nombre de résultats, pagination
+   ========================================================================== */
+
+.services-list-header {
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+.services-list-reset {
+  font-family: var(--fontFamily-body);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--mainColor);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.services-list-reset:hover,
+.services-list-reset:focus-visible {
+  text-decoration: underline;
+}
+
+.services-result-count {
+  font-family: var(--fontFamily-body);
+  font-size: 0.88rem;
+  color: var(--paragraphColor);
+  margin: -0.5rem 0 0.5rem;
+}
+
+/* Le gabarit de pagination du thème ouvre son propre .container : dans la
+   colonne de la liste, il ajouterait une seconde gouttière. */
+.services-list-container .pager .container,
+.services-list-container > .container {
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.services-no-results h3 {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.25rem;
+  color: var(--blackColor);
+  margin-bottom: 0.5rem;
+}
+
+/* La ligne de la vue et la carte portaient chacune un espacement et un
+   filet : l'écart entre deux démarches était doublé. La ligne garde les
+   siens, la carte n'en porte plus. */
+.services-result-item .service-teaser-item {
+  padding: 0;
+  border-bottom: 0;
+}

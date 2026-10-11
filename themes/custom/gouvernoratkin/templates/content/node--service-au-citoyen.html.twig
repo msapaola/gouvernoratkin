@@ -7,13 +7,16 @@
  * Variables disponibles :
  * - label : Titre du service
  * - url   : Lien du service
- * - content : Ensemble des champs (body, field_categorie, etc.)
+ * - content : Ensemble des champs (body, field_service_au_citoyen, etc.)
  * - node  : L'entité noeud service_au_citoyen
  * - services_categories_tree : Arbre complet des catégories de services
  * - active_category_tid : TID de la catégorie associée
  * - service_category_name : Nom de la catégorie associée
  */
 #}
+
+{# Dépliage de la barre latérale et styles de la page des services. #}
+{{ attach_library('gouvernoratkin/services') }}
 
 <!-- ===== BANNIÈRE SERVICE (EN-TÊTE DE PAGE) ===== -->
 <div class="services-header services-header--detail">
@@ -38,10 +41,10 @@
     </nav>
 
     {# Badge Catégorie #}
-    {% if service_category_name or node.field_categorie.entity.label is not empty %}
+    {% if service_category_name %}
       <div class="service-detail-category-badge">
         <i class="fas fa-folder-open me-2"></i>
-        {{ service_category_name ?: node.field_categorie.entity.label }}
+        {{ service_category_name }}
       </div>
     {% endif %}
 
@@ -155,87 +158,9 @@
 
     <!-- COLONNE DROITE : SIDEBAR CATÉGORIES ET AIDE (col-lg-4) -->
     <div class="col-lg-4 col-md-12">
-      <div class="services-sidebar">
-        
-        <!-- En-tête principal "Services aux citoyens" -->
-        <a href="/services-aux-citoyens" class="sidebar-main-header-link">
-          <i class="fas fa-hands-helping me-2"></i>Services aux citoyens
-        </a>
-
-        <!-- Liste des catégories parents (1er niveau) et enfants (2ème / 3ème niveau) -->
-        <ul class="sidebar-categories-list">
-          {% for root in services_categories_tree %}
-            {% for category in root.children %}
-              {% set has_active_child = false %}
-              {% for grandchild in category.children %}
-                {% if grandchild.tid == active_category_tid %}
-                  {% set has_active_child = true %}
-                {% endif %}
-              {% endfor %}
-              
-              <li class="sidebar-parent-item {{ category.tid == active_category_tid or has_active_child ? 'expanded' }}">
-                {% if category.children is not empty %}
-                  <div class="sidebar-parent-header {{ category.tid == active_category_tid or has_active_child ? 'active' }}">
-                    <span class="cat-label">{{ category.name }}</span>
-                    <span class="cat-toggle-icon"><i class="fas {{ category.tid == active_category_tid or has_active_child ? 'fa-chevron-down' : 'fa-chevron-right' }}"></i></span>
-                  </div>
-                  <ul class="sidebar-child-list" style="{{ category.tid == active_category_tid or has_active_child ? 'display: block;' : 'display: none;' }}">
-                    {% for grandchild in category.children %}
-                      <li class="sidebar-child-item {{ grandchild.tid == active_category_tid ? 'active' }}">
-                        <a href="/services-aux-citoyens/{{ grandchild.tid }}" class="sidebar-child-link">
-                          {{ grandchild.name }}
-                        </a>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                {% else %}
-                  <a href="/services-aux-citoyens/{{ category.tid }}" class="sidebar-parent-link-direct {{ category.tid == active_category_tid ? 'active' }}">
-                    <span class="cat-label">{{ category.name }}</span>
-                    <span class="cat-arrow"><i class="fas fa-chevron-right"></i></span>
-                  </a>
-                {% endif %}
-              </li>
-            {% endfor %}
-          {% endfor %}
-        </ul>
-
-        <!-- Bloc aide -->
-        <div class="sidebar-help-box">
-          <div class="sidebar-help-icon">
-            <i class="fas fa-headset"></i>
-          </div>
-          <div class="sidebar-help-content">
-            <h5>Besoin d'aide ?</h5>
-            <p>Nos conseillers sont à votre disposition pour vous orienter dans l'accomplissement de vos démarches.</p>
-            <a href="/contact" class="sidebar-help-btn">
-              <i class="fas fa-envelope me-2"></i>Nous contacter
-            </a>
-          </div>
-        </div>
-
-      </div>
+      {% include "@gouvernoratkin/layout/partials/services-sidebar.html.twig" %}
     </div>
 
   </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var headers = document.querySelectorAll('.sidebar-parent-header');
-  headers.forEach(function(header) {
-    header.addEventListener('click', function() {
-      var parentLi = this.parentElement;
-      var childList = parentLi.querySelector('.sidebar-child-list');
-      if (childList) {
-        var isOpen = childList.style.display === 'block';
-        childList.style.display = isOpen ? 'none' : 'block';
-        parentLi.classList.toggle('expanded', !isOpen);
-        var icon = this.querySelector('.cat-toggle-icon i');
-        if (icon) {
-          icon.className = isOpen ? 'fas fa-chevron-right' : 'fas fa-chevron-down';
-        }
-      }
-    });
-  });
-});
-</script>

@@ -267,3 +267,64 @@
     width: 100%;
   }
 }
+
+/* ==========================================================================
+   Pagination
+   ==========================================================================
+   Le gabarit navigation/pager.html.twig produit les classes de Bootstrap
+   (.pagination, .page-item, .page-link), affichées jusqu'ici avec le bleu
+   par défaut de Bootstrap. Les règles .pager__item d'actualites.css ne
+   visaient que la mini-pagination. Ces règles alignent la pagination
+   complète sur les commandes du site : Actualités, Vidéos, Services. */
+
+.pager .pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 2.5rem 0 0;
+  padding: 0;
+}
+
+.pager .page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 0.9rem;
+  border-radius: 8px !important;
+  border: 1px solid #d7dfeb;
+  background-color: var(--whiteColor);
+  color: var(--mainColor);
+  font-family: var(--fontFamily-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color var(--transition), color var(--transition), border-color var(--transition);
+}
+
+.pager .page-link:hover,
+.pager .page-link:focus-visible {
+  background-color: var(--mainColor);
+  border-color: var(--mainColor);
+  color: var(--whiteColor);
+}
+
+.pager .page-item.active .page-link {
+  background-color: var(--mainColor);
+  border-color: var(--mainColor);
+  color: var(--whiteColor);
+}
+
+.pager .page-item.disabled .page-link {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--paragraphColor);
+}
+
+/* Drupal annonce la page courante par un texte masqué visuellement ; il ne
+   doit pas élargir le bouton. */
+.pager .page-link .visually-hidden {
+  position: absolute;
+}

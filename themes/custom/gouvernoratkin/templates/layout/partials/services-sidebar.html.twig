@@ -1,0 +1,85 @@
+{#
+/**
+ * @file
+ * Barre latérale des services aux citoyens : rubriques et bloc d'aide.
+ *
+ * Partagée par la liste (page--services-aux-citoyens.html.twig) et par la
+ * fiche d'une démarche (node--service-au-citoyen.html.twig), qui en avaient
+ * chacune leur copie, avec deux scripts de dépliage différents.
+ *
+ * Chaque rubrique de 2e niveau est à la fois :
+ * - un lien, qui affiche toutes les démarches de ses sous-rubriques (la vue
+ *   services_citoyens filtre la rubrique et ses descendants) ;
+ * - un bouton chevron, distinct du lien, qui déplie ses sous-rubriques
+ *   (assets/js/services.js).
+ *
+ * Variables :
+ * - services_categories_tree : arbre de la taxonomie service_au_citoyen ;
+ * - active_category_tid : rubrique courante ;
+ * - suffixe : chaîne de requête à conserver dans les liens (recherche).
+ */
+#}
+{% set suffixe = suffixe|default('') %}
+<div class="services-sidebar">
+
+  <a href="/services-aux-citoyens{{ suffixe }}" class="sidebar-main-header-link {{ not active_category_tid ? 'active' }}">
+    <i class="fas fa-hands-helping me-2" aria-hidden="true"></i>Services aux citoyens
+  </a>
+
+  <ul class="sidebar-categories-list">
+    {% for root in services_categories_tree %}
+      {% for category in root.children %}
+        {% set has_active_child = false %}
+        {% for grandchild in category.children %}
+          {% if grandchild.tid == active_category_tid %}
+            {% set has_active_child = true %}
+          {% endif %}
+        {% endfor %}
+        {% set courant = category.tid == active_category_tid %}
+        {% set deplie = courant or has_active_child %}
+
+        <li class="sidebar-parent-item {{ deplie ? 'expanded' }}">
+          {% if category.children is not empty %}
+            <div class="sidebar-parent-header {{ courant ? 'active' }} {{ has_active_child ? 'is-open' }}">
+              <a href="/services-aux-citoyens/{{ category.tid }}{{ suffixe }}" class="sidebar-parent-link"{{ courant ? ' aria-current="page"' }}>
+                <span class="cat-label">{{ category.name }}</span>
+              </a>
+              <button type="button" class="sidebar-parent-toggle" aria-expanded="{{ deplie ? 'true' : 'false' }}" aria-controls="rubrique-{{ category.tid }}">
+                <span class="visually-hidden">{{ 'Sous-rubriques de'|t }} {{ category.name }}</span>
+                <i class="fas {{ deplie ? 'fa-chevron-down' : 'fa-chevron-right' }}" aria-hidden="true"></i>
+              </button>
+            </div>
+            <ul class="sidebar-child-list" id="rubrique-{{ category.tid }}">
+              {% for grandchild in category.children %}
+                <li class="sidebar-child-item {{ grandchild.tid == active_category_tid ? 'active' }}">
+                  <a href="/services-aux-citoyens/{{ grandchild.tid }}{{ suffixe }}" class="sidebar-child-link"{{ grandchild.tid == active_category_tid ? ' aria-current="page"' }}>
+                    {{ grandchild.name }}
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <a href="/services-aux-citoyens/{{ category.tid }}{{ suffixe }}" class="sidebar-parent-link-direct {{ courant ? 'active' }}"{{ courant ? ' aria-current="page"' }}>
+              <span class="cat-label">{{ category.name }}</span>
+              <span class="cat-arrow"><i class="fas fa-chevron-right" aria-hidden="true"></i></span>
+            </a>
+          {% endif %}
+        </li>
+      {% endfor %}
+    {% endfor %}
+  </ul>
+
+  <div class="sidebar-help-box">
+    <div class="sidebar-help-icon">
+      <i class="fas fa-headset" aria-hidden="true"></i>
+    </div>
+    <div class="sidebar-help-content">
+      <h3>Besoin d'aide ?</h3>
+      <p>Contactez nos agents pour vous accompagner dans vos démarches.</p>
+      <a href="/contact" class="sidebar-help-btn">
+        <i class="fas fa-envelope me-2" aria-hidden="true"></i>Nous contacter
+      </a>
+    </div>
+  </div>
+
+</div>

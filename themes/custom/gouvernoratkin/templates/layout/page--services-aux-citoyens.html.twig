@@ -11,8 +11,10 @@
  * L'entête est celui des autres pages institutionnelles ; la recherche prend
  * place juste en dessous, dans sa propre bande claire.
  *
- * Les variables services_categories_tree et active_category_tid viennent du
- * prétraitement du thème.
+ * Les variables services_categories_tree, active_category_tid et
+ * active_category_name viennent du prétraitement du thème. La barre latérale
+ * est le partiel services-sidebar.html.twig, partagé avec la fiche d'une
+ * démarche.
  */
 #}
 {{ attach_library('gouvernoratkin/services') }}
@@ -32,7 +34,12 @@
       <nav aria-label="{{ 'Fil d’Ariane'|t }}">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a></li>
-          <li class="breadcrumb-item active" aria-current="page">Services aux citoyens</li>
+          {% if active_category_name %}
+            <li class="breadcrumb-item"><a href="/services-aux-citoyens">Services aux citoyens</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ active_category_name }}</li>
+          {% else %}
+            <li class="breadcrumb-item active" aria-current="page">Services aux citoyens</li>
+          {% endif %}
         </ol>
       </nav>
 
@@ -89,7 +96,12 @@
 
       <div class="col-lg-8 col-md-12">
         <div class="services-list-header">
-          <h2 class="services-list-title">Tous les services</h2>
+          <h2 class="services-list-title">{{ active_category_name ?: 'Tous les services' }}</h2>
+          {% if active_category_tid %}
+            <a href="/services-aux-citoyens{{ suffixe }}" class="services-list-reset">
+              <i class="fas fa-times" aria-hidden="true"></i> Toutes les rubriques
+            </a>
+          {% endif %}
         </div>
         <div class="services-list-container">
           {{ page.content }}
@@ -97,66 +109,7 @@
       </div>
 
       <div class="col-lg-4 col-md-12">
-        <div class="services-sidebar">
-
-          <a href="/services-aux-citoyens{{ suffixe }}" class="sidebar-main-header-link {{ not active_category_tid ? 'active' }}">
-            <i class="fas fa-hands-helping me-2" aria-hidden="true"></i>Services aux citoyens
-          </a>
-
-          <ul class="sidebar-categories-list">
-            {% for root in services_categories_tree %}
-              {% for category in root.children %}
-                {% set has_active_child = false %}
-                {% for grandchild in category.children %}
-                  {% if grandchild.tid == active_category_tid %}
-                    {% set has_active_child = true %}
-                  {% endif %}
-                {% endfor %}
-                {% set deplie = category.tid == active_category_tid or has_active_child %}
-
-                <li class="sidebar-parent-item {{ deplie ? 'expanded' }}">
-                  {% if category.children is not empty %}
-                    {# Un bouton, et non un div muni d'un ecouteur de clic :
-                       le depliage devient atteignable au clavier et son etat
-                       est annonce aux lecteurs d'ecran. #}
-                    <button type="button" class="sidebar-parent-header {{ deplie ? 'active' }}" aria-expanded="{{ deplie ? 'true' : 'false' }}">
-                      <span class="cat-label">{{ category.name }}</span>
-                      <span class="cat-toggle-icon"><i class="fas {{ deplie ? 'fa-chevron-down' : 'fa-chevron-right' }}" aria-hidden="true"></i></span>
-                    </button>
-                    <ul class="sidebar-child-list">
-                      {% for grandchild in category.children %}
-                        <li class="sidebar-child-item {{ grandchild.tid == active_category_tid ? 'active' }}">
-                          <a href="/services-aux-citoyens/{{ grandchild.tid }}{{ suffixe }}" class="sidebar-child-link">
-                            {{ grandchild.name }}
-                          </a>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  {% else %}
-                    <a href="/services-aux-citoyens/{{ category.tid }}{{ suffixe }}" class="sidebar-parent-link-direct {{ category.tid == active_category_tid ? 'active' }}">
-                      <span class="cat-label">{{ category.name }}</span>
-                      <span class="cat-arrow"><i class="fas fa-chevron-right" aria-hidden="true"></i></span>
-                    </a>
-                  {% endif %}
-                </li>
-              {% endfor %}
-            {% endfor %}
-          </ul>
-
-          <div class="sidebar-help-box">
-            <div class="sidebar-help-icon">
-              <i class="fas fa-headset" aria-hidden="true"></i>
-            </div>
-            <div class="sidebar-help-content">
-              <h3>Besoin d'aide ?</h3>
-              <p>Contactez nos agents pour vous accompagner dans vos démarches.</p>
-              <a href="/contact" class="sidebar-help-btn">
-                <i class="fas fa-envelope me-2" aria-hidden="true"></i>Nous contacter
-              </a>
-            </div>
-          </div>
-
-        </div>
+        {% include "@gouvernoratkin/layout/partials/services-sidebar.html.twig" %}
       </div>
 
     </div>

@@ -95,7 +95,53 @@ function gouvernoratkin_preprocess_page(&$variables) {
       $active_tid = (int) $parts[1];
     }
     $variables['active_category_tid'] = $active_tid;
+
+    // Nom de la rubrique choisie, pour le titre de la liste.
+    if ($active_tid && ($term = Term::load($active_tid)) && $term->bundle() === 'service_au_citoyen') {
+      $variables['active_category_name'] = $term->label();
+    }
   }
+}
+
+/**
+ * Renvoie la rubrique d'une fiche « Service au citoyen ».
+ *
+ * Le champ de rubrique de ce type de contenu est field_service_au_citoyen.
+ * Le thème lisait field_categorie, qui n'existe pas sur ces fiches : le badge,
+ * le fil d'Ariane et la rubrique active de la barre latérale restaient vides.
+ * field_categorie est gardé en repli au cas où il serait ajouté plus tard.
+ */
+function _gouvernoratkin_service_term($node) {
+  foreach (['field_service_au_citoyen', 'field_categorie'] as $field) {
+    if ($node->hasField($field) && !$node->get($field)->isEmpty() && ($term = $node->get($field)->entity)) {
+      return $term;
+    }
+  }
+  return NULL;
+}
+
+/**
+ * Résumé d'une fiche pour la liste des services.
+ *
+ * Beaucoup de fiches commencent par reprendre leur titre en tête du texte :
+ * découpé tel quel, le résumé répétait le titre juste sous celui-ci. Le titre
+ * est donc retiré du début du texte avant la découpe.
+ */
+function _gouvernoratkin_service_resume($node, $longueur = 220) {
+  if (!$node->hasField('body') || $node->get('body')->isEmpty()) {
+    return '';
+  }
+  $body = $node->get('body')->first();
+  $texte = $body->summary ?: $body->value;
+  $texte = html_entity_decode(strip_tags(str_replace('<', ' <', $texte)), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+  $texte = trim(preg_replace('/\s+/u', ' ', $texte));
+
+  $titre = trim(preg_replace('/\s+/u', ' ', $node->label()));
+  if ($titre !== '' && mb_stripos($texte, $titre) === 0) {
+    $texte = ltrim(mb_substr($texte, mb_strlen($titre)), " \t.:;,-–—");
+  }
+
+  return \Drupal\Component\Utility\Unicode::truncate($texte, $longueur, TRUE, TRUE);
 }
 
 /**
@@ -104,20 +150,15 @@ function gouvernoratkin_preprocess_page(&$variables) {
 function gouvernoratkin_preprocess_node(&$variables) {
   $node = $variables['node'] ?? NULL;
   if ($node && is_object($node) && method_exists($node, 'bundle') && $node->bundle() === 'service_au_citoyen') {
-    $variables['services_categories_tree'] = _gouvernoratkin_get_services_categories_tree();
-    
-    $active_tid = null;
-    $category_name = null;
-    
-    if ($node->hasField('field_categorie') && !$node->get('field_categorie')->isEmpty()) {
-      $term = $node->get('field_categorie')->entity;
-      if ($term) {
-        $active_tid = (int) $term->id();
-        $category_name = $term->label();
-      }
+    $term = _gouvernoratkin_service_term($node);
+    $variables['active_category_tid'] = $term ? (int) $term->id() : NULL;
+    $variables['service_category_name'] = $term ? $term->label() : NULL;
+
+    if ($variables['view_mode'] === 'teaser') {
+      $variables['service_resume'] = _gouvernoratkin_service_resume($node);
     }
-    
-    $variables['active_category_tid'] = $active_tid;
-    $variables['service_category_name'] = $category_name;
+    else {
+      $variables['services_categories_tree'] = _gouvernoratkin_get_services_categories_tree();
+    }
   }
 }
