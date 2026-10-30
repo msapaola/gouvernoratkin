@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * @file
+ * Services aux citoyens : rattachement de chaque démarche à un secteur.
+ *
+ * Le vocabulaire service_au_citoyen a trois niveaux : la racine (« Services
+ * aux citoyens »), les rubriques (« Droits, Taxes et Redevances », « Habitat
+ * et logement »…) et les secteurs (« Secteur de la Justice »…). Une démarche
+ * doit être rattachée à un secteur : c'est lui qui la range dans la barre
+ * latérale de la page des services.
+ *
+ * La liste du formulaire proposait tous les termes à plat, par ordre
+ * alphabétique, racine et rubriques comprises. Elle présente désormais les
+ * secteurs regroupés sous leur rubrique, et seuls les secteurs se
+ * sélectionnent.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Renvoie les options du champ : les secteurs, groupés par rubrique.
+ *
+ * Une rubrique sans sous-terme reste sélectionnable telle quelle.
+ */
+function gouvernorat_services_options_secteurs(): array {
+  $arbre = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree('service_au_citoyen');
+  $enfants = [];
+  foreach ($arbre as $terme) {
+    foreach ($terme->parents as $parent) {
+      $enfants[(int) $parent][] = $terme;
+    }
+  }
+
+  $options = [];
+  foreach ($arbre as $terme) {
+    if ($terme->depth !== 1) {
+      continue;
+    }
+    if (empty($enfants[(int) $terme->tid])) {
+      $options[$terme->tid] = $terme->name;
+      continue;
+    }
+    foreach ($enfants[(int) $terme->tid] as $secteur) {
+      $options[$terme->name][$secteur->tid] = $secteur->name;
+    }
+  }
+  return $options;
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for node_form.
+ */
+function gouvernorat_services_form_node_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  $node = $form_state->getFormObject()->getEntity();
+  if ($node->bundle() !== 'service_au_citoyen' || !isset($form['field_service_au_citoyen']['widget']['#options'])) {
+    return;
+  }
+
+  $widget = &$form['field_service_au_citoyen']['widget'];
+  $vide = array_intersect_key($widget['#options'], ['_none' => TRUE]);
+  $widget['#options'] = $vide + gouvernorat_services_options_secteurs();
+  $widget['#description'] = t('Le secteur sous lequel la démarche apparaît sur la page des services. Choisissez un secteur, pas une rubrique.');
+}

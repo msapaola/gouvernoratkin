@@ -99,6 +99,17 @@ function gouvernoratkin_preprocess_page(&$variables) {
     // Nom de la rubrique choisie, pour le titre de la liste.
     if ($active_tid && ($term = Term::load($active_tid)) && $term->bundle() === 'service_au_citoyen') {
       $variables['active_category_name'] = $term->label();
+
+      // Présentation du secteur (description du terme), affichée en tête de
+      // la liste : base légale commune, arrêté fixant les taux…
+      if (trim((string) $term->getDescription()) !== '') {
+        $variables['active_category_description'] = [
+          '#type' => 'processed_text',
+          '#text' => $term->getDescription(),
+          '#format' => $term->getFormat(),
+        ];
+      }
+      $variables['#cache']['tags'][] = 'taxonomy_term:' . $term->id();
     }
   }
 }

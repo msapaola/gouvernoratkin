@@ -103,6 +103,11 @@
             </a>
           {% endif %}
         </div>
+        {% if active_category_description %}
+          <div class="services-secteur-presentation">
+            {{ active_category_description }}
+          </div>
+        {% endif %}
         <div class="services-list-container">
           {{ page.content }}
         </div>

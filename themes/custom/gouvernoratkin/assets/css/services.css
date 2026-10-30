@@ -149,3 +149,71 @@
   padding: 0;
   border-bottom: 0;
 }
+
+/* Présentation du secteur choisi (description du terme) : arrêté fixant les
+   taux, base légale commune. Placée entre le titre et la liste. */
+.services-secteur-presentation {
+  font-family: var(--fontFamily-body);
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--paragraphColor);
+  background-color: #f6f8fc;
+  border-left: 4px solid var(--secondaryColor);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+  margin: 0 0 1.5rem;
+}
+
+.services-secteur-presentation p:last-child {
+  margin-bottom: 0;
+}
+
+/* Tableaux des fiches (taux, tarifs, amendes) : lisibles et défilables sur
+   téléphone plutôt que de déborder de la page. */
+.service-detail-card table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 1rem 0 1.5rem;
+  font-size: 0.92rem;
+}
+
+.service-detail-card th,
+.service-detail-card td {
+  border: 1px solid #dde3ec;
+  padding: 0.55rem 0.8rem;
+  vertical-align: top;
+  text-align: left;
+}
+
+.service-detail-card thead th {
+  background-color: #edf2fa;
+  color: var(--mainColor);
+}
+
+/* « En bref » : le résumé de la démarche en tête de fiche. */
+.service-detail-resume {
+  background-color: #fff9d6;
+  border-left: 4px solid var(--highlightColor);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.25rem;
+  margin: 0 0 1.75rem;
+}
+
+.service-detail-resume__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mainColor);
+  margin: 0 0 0.35rem;
+}
+
+.service-detail-resume p:last-child {
+  font-size: 1.02rem;
+  line-height: 1.7;
+  color: var(--blackColor);
+  margin: 0;
+}

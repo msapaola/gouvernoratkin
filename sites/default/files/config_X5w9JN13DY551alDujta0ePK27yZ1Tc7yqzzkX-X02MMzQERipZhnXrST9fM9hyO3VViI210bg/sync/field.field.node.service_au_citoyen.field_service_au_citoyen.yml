@@ -11,8 +11,8 @@ field_name: field_service_au_citoyen
 entity_type: node
 bundle: service_au_citoyen
 label: 'Service au citoyen'
-description: ''
-required: false
+description: 'Le secteur sous lequel la démarche apparaît sur la page des services.'
+required: true
 translatable: false
 default_value: {  }
 default_value_callback: ''

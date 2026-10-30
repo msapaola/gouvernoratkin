@@ -109,6 +109,15 @@
           <h1 class="print-service-title fw-bold mb-4">{{ label }}</h1>
         </div>
 
+        {# L'essentiel de la démarche en deux phrases : le champ « Résumé »,
+           déjà affiché dans la liste des services. #}
+        {% if node.body.summary %}
+          <div class="service-detail-resume">
+            <p class="service-detail-resume__titre">En bref</p>
+            <p>{{ node.body.summary }}</p>
+          </div>
+        {% endif %}
+
         {# Contenu principal (Texte administratif du service / Body) #}
         <div class="service-detail-content">
           {% if content.body|render|trim is not empty %}
