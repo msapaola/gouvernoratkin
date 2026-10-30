@@ -1,5 +1,5 @@
 name: Gouvernorat Services aux citoyens
-description: "Rattachement obligatoire de chaque démarche à un secteur, et import des démarches « Droits, Taxes et Redevances »."
+description: "Rattachement obligatoire de chaque démarche à un secteur, et import des démarches « Droits, Taxes et Redevances » (19 + 159)."
 package: Custom
 type: module
 core_version_requirement: ^10.1 || ^11
