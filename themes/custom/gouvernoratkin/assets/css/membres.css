@@ -1,0 +1,313 @@
+/**
+ * Membres — pages Exécutif provincial et Cabinet du gouverneur
+ *
+ * Chargée par la bibliothèque gouvernoratkin/membres (gabarits
+ * page--executif-provincial, page--cabinet-du-gouverneur et node--membre),
+ * qui dépend de gouvernoratkin/composants pour l'entête et les titres.
+ *
+ * Remplace executif.css et cabinet.css, qui habillaient le HTML saisi dans
+ * l'éditeur (.team-card, .membre-card…). Les cartes sont désormais produites
+ * par le thème à partir des fiches « Membre ».
+ */
+
+.membres-corps {
+  padding: 1rem 0 4.5rem;
+}
+
+/* ==========================================================================
+   Sections et grilles
+   ========================================================================== */
+
+.membres-section {
+  padding-top: 3rem;
+}
+
+.membres-section__titre {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  font-weight: 700;
+  color: var(--mainColor);
+  margin: 0 0 1.75rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid #dde3ec;
+  text-wrap: balance;
+}
+
+.membres-grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Gouverneur et vice-gouverneur : deux cartes plus larges. */
+.membres-grille--large {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  max-width: 820px;
+}
+
+.membres-grille__item {
+  display: flex;
+}
+
+/* ==========================================================================
+   Carte
+   ========================================================================== */
+
+.membre-carte {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  background-color: var(--whiteColor);
+  box-shadow: 0 10px 26px rgba(9, 36, 46, 0.09);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.membre-carte:hover,
+.membre-carte:focus-within {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(9, 36, 46, 0.15);
+}
+
+/* Liseré aux couleurs nationales, comme les autres cartes du site. */
+.membre-carte::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  z-index: 1;
+  background: linear-gradient(90deg, var(--secondaryColor) 0%, var(--highlightColor) 50%, var(--accentColor) 100%);
+}
+
+/* Les photos d'origine ont toutes les tailles et tous les cadrages : le style
+   d'image portrait_membre les recadre en 4:5, centré sur le haut, et ce cadre
+   garde la même proportion quand une photo manque. */
+.membre-carte__photo {
+  aspect-ratio: 4 / 5;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: linear-gradient(160deg, #e6ecf5, #cfd9e8);
+}
+
+.membre-carte__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.membre-carte__initiales {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(2.5rem, 6vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--mainColor);
+  opacity: 0.55;
+}
+
+.membre-carte__corps {
+  flex: 1;
+  padding: 1.3rem 1.3rem 1.5rem;
+  text-align: center;
+}
+
+.membre-carte__nom {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 0.45rem;
+  text-wrap: balance;
+}
+
+.membre-carte__nom a {
+  color: var(--mainColor);
+  text-decoration: none;
+}
+
+/* Toute la carte est cliquable, le lien restant sur le nom pour les
+   lecteurs d'écran. */
+.membre-carte__nom a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.membre-carte__nom a:focus-visible {
+  outline: none;
+}
+
+.membre-carte:has(a:focus-visible) {
+  outline: 3px solid var(--secondaryColor);
+  outline-offset: 3px;
+}
+
+.membre-carte__fonction {
+  font-family: var(--fontFamily-body);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--secondaryColorDark, #00719A);
+  margin: 0;
+}
+
+.membre-carte__description {
+  font-family: var(--fontFamily-body);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--paragraphColor);
+  margin: 0.75rem 0 0;
+}
+
+/* ==========================================================================
+   Mot du cabinet
+   ========================================================================== */
+
+.membres-mot {
+  background-color: #f6f8fc;
+  padding: 3rem 0;
+  margin-top: 1rem;
+}
+
+.membres-mot__grille {
+  display: grid;
+  grid-template-columns: minmax(180px, 260px) 1fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.membres-mot__photo {
+  aspect-ratio: 4 / 5;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 14px;
+  background: linear-gradient(160deg, #e6ecf5, #cfd9e8);
+  box-shadow: 0 10px 26px rgba(9, 36, 46, 0.12);
+}
+
+.membres-mot__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.membres-mot .membres-section__titre {
+  border-bottom: 0;
+  padding-bottom: 0;
+  margin-bottom: 1rem;
+}
+
+/* style.css habille tout <blockquote> du site (fond gris, texte centré et
+   gras, largeur bornée) : la citation reprend ici une lecture simple. */
+.membres-mot__citation {
+  margin: 0;
+  padding: 0 0 0 1.25rem;
+  background: none;
+  border-left: 4px solid var(--highlightColor);
+}
+
+.membres-mot__citation p {
+  max-width: none;
+  font-family: var(--fontFamily-body);
+  font-size: 1.05rem;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.85;
+  text-align: left;
+  color: var(--blackColor);
+  margin: 0 0 0.9rem;
+}
+
+.membres-mot__signature {
+  font-family: var(--fontFamily-body);
+  font-size: 0.95rem;
+  color: var(--paragraphColor);
+  margin: 1rem 0 0;
+}
+
+.membres-mot__signature strong {
+  color: var(--mainColor);
+}
+
+@media (max-width: 767.98px) {
+  .membres-mot__grille {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .membres-mot__photo {
+    max-width: 220px;
+  }
+}
+
+/* ==========================================================================
+   Page d'un membre
+   ========================================================================== */
+
+.membre-fiche {
+  padding: 2.5rem 0 3.5rem;
+}
+
+.membre-fiche__nom {
+  margin-bottom: 1.75rem;
+}
+
+.membre-fiche__grille {
+  display: grid;
+  grid-template-columns: minmax(200px, 300px) 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.membre-fiche__photo {
+  border-radius: 14px;
+}
+
+.membre-fiche__fonction {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--secondaryColorDark, #00719A);
+}
+
+.membre-fiche__texte p {
+  line-height: 1.75;
+}
+
+@media (max-width: 767.98px) {
+  .membre-fiche__grille {
+    grid-template-columns: 1fr;
+  }
+
+  .membre-fiche__photo {
+    max-width: 240px;
+  }
+}
+
+/* ==========================================================================
+   Lien de gestion (rédaction connectée)
+   ========================================================================== */
+
+.membres-gestion {
+  margin: 2.5rem 0 0;
+  font-size: 0.9rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .membre-carte {
+    transition: none;
+  }
+
+  .membre-carte:hover,
+  .membre-carte:focus-within {
+    transform: none;
+  }
+}

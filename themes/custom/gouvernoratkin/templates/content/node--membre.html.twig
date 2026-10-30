@@ -1,0 +1,47 @@
+{#
+/**
+ * @file
+ * Page d'un membre (gouvernorat/nom-de-la-personne).
+ *
+ * Variable : membre, préparée par gouvernorat_institutions_carte(), plus
+ * membre.instance pour le lien de retour vers la bonne page.
+ */
+#}
+{{ attach_library('gouvernoratkin/membres') }}
+{% set retour = membre.instance == 'cabinet'
+  ? { url: '/cabinet-du-gouverneur', libelle: 'Le cabinet du gouverneur' }
+  : { url: '/executif-provincial', libelle: "L'exécutif provincial" } %}
+
+{# page.html.twig rend le contenu sans conteneur : la fiche pose le sien. #}
+<article{{ attributes.addClass('membre-fiche', 'container') }}>
+  {# Le bloc de titre de Drupal est masqué sur les pages de contenu : chaque
+     gabarit pose le sien. #}
+  {{ title_prefix }}
+  <h1 class="page-entete__titre membre-fiche__nom">{{ label }}</h1>
+  {{ title_suffix }}
+
+  <div class="membre-fiche__grille">
+    <div class="membre-carte__photo membre-fiche__photo">
+      {% if membre.photo %}
+        <img src="{{ membre.photo.url }}" alt="{{ membre.photo.alt }}" width="480" height="600" decoding="async">
+      {% else %}
+        <span class="membre-carte__initiales" aria-hidden="true">{{ membre.initiales }}</span>
+      {% endif %}
+    </div>
+
+    <div class="membre-fiche__texte">
+      <p class="membre-fiche__fonction">{{ membre.fonction }}</p>
+      {% if membre.description %}
+        <p>{{ membre.description }}</p>
+      {% endif %}
+      {% if membre.mot %}
+        <blockquote class="membres-mot__citation">
+          {% for paragraphe in membre.mot %}
+            <p>{{ paragraphe }}</p>
+          {% endfor %}
+        </blockquote>
+      {% endif %}
+      <p><a href="{{ retour.url }}" class="lien-suite"><i class="fas fa-arrow-left" aria-hidden="true"></i> {{ retour.libelle }}</a></p>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,19 @@
+uuid: 579ed56a-e86d-4c39-8e8b-30b835717fdc
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_membre_fonction
+    - node.type.membre
+id: node.membre.field_membre_fonction
+field_name: field_membre_fonction
+entity_type: node
+bundle: membre
+label: 'Fonction'
+description: "Telle qu'elle s'affiche sous le nom, par exemple « Ministre de la Santé, Hygiène et Prévention »."
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

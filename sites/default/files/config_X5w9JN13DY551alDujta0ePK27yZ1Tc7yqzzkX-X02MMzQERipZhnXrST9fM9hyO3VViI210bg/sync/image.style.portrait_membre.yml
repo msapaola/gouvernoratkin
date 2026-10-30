@@ -1,0 +1,21 @@
+uuid: 6e94b21a-394f-4e28-8cad-69c7b72b0cda
+langcode: fr
+status: true
+dependencies: {  }
+name: portrait_membre
+label: 'Portrait d''un membre (480×600)'
+effects:
+  ead2673b-49ec-4b59-8a0b-75bd676253dd:
+    uuid: ead2673b-49ec-4b59-8a0b-75bd676253dd
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 480
+      height: 600
+      anchor: center-top
+  f973c55d-b6db-4d59-aabc-c0f0837d826f:
+    uuid: f973c55d-b6db-4d59-aabc-c0f0837d826f
+    id: image_convert
+    weight: 2
+    data:
+      extension: webp

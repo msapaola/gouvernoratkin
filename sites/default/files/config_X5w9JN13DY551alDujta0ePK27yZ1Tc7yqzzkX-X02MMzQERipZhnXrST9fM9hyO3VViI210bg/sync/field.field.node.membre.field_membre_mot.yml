@@ -1,0 +1,19 @@
+uuid: cb79fc5e-7e53-4117-8399-33daa9a5bc46
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_membre_mot
+    - node.type.membre
+id: node.membre.field_membre_mot
+field_name: field_membre_mot
+entity_type: node
+bundle: membre
+label: 'Mot'
+description: "Facultatif. Pour le directeur de cabinet : le texte de la section « Mot du directeur de cabinet ». Séparez les paragraphes par une ligne vide."
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

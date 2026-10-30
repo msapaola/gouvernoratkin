@@ -1,0 +1,28 @@
+{#
+/**
+ * @file
+ * Carte d'un membre : pages Exécutif provincial et Cabinet du gouverneur.
+ *
+ * Variable : membre, préparée par gouvernorat_institutions_carte() (nom,
+ * fonction, description, photo { url, alt }, initiales, id).
+ * Sans photo, les initiales prennent sa place.
+ */
+#}
+<article class="membre-carte">
+  <div class="membre-carte__photo">
+    {% if membre.photo %}
+      <img src="{{ membre.photo.url }}" alt="{{ membre.photo.alt }}" width="480" height="600" loading="lazy" decoding="async">
+    {% else %}
+      <span class="membre-carte__initiales" aria-hidden="true">{{ membre.initiales }}</span>
+    {% endif %}
+  </div>
+  <div class="membre-carte__corps">
+    <h3 class="membre-carte__nom">
+      <a href="{{ path('entity.node.canonical', {'node': membre.id}) }}">{{ membre.nom }}</a>
+    </h3>
+    <p class="membre-carte__fonction">{{ membre.fonction }}</p>
+    {% if membre.description %}
+      <p class="membre-carte__description">{{ membre.description }}</p>
+    {% endif %}
+  </div>
+</article>

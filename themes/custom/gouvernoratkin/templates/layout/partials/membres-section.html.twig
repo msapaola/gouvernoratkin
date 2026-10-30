@@ -1,0 +1,22 @@
+{#
+/**
+ * @file
+ * Une section de membres : titre et grille de cartes.
+ *
+ * Variables : cle (identifiant de l'instance), titre, liste (cartes),
+ * variante (facultative : « large » pour deux cartes par rangée).
+ * La section n'est pas affichée si la liste est vide.
+ */
+#}
+{% if liste %}
+  <section class="membres-section" aria-labelledby="membres-{{ cle }}">
+    <h2 class="membres-section__titre" id="membres-{{ cle }}">{{ titre }}</h2>
+    <ul class="membres-grille {{ variante ? 'membres-grille--' ~ variante }}">
+      {% for membre in liste %}
+        <li class="membres-grille__item">
+          {% include "@gouvernoratkin/layout/partials/membre-carte.html.twig" with { membre: membre } only %}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}

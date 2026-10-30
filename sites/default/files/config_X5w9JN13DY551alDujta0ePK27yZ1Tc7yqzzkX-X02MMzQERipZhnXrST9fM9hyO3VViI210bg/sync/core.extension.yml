@@ -30,6 +30,7 @@ module:
   file: 0
   filter: 0
   gouvernorat_accueil: 0
+  gouvernorat_institutions: 0
   gouvernorat_partage: 0
   gouvernorat_videos: 0
   help: 0

@@ -80,21 +80,14 @@ apropos:
   dependencies:
     - gouvernoratkin/composants
 
-# Styles propres a la page « Executif provincial », attachee depuis
-# page--executif-provincial.html.twig. Reprend les classes du contenu saisi
-# dans l'editeur, jusqu'ici habillees par une feuille injectee hors du depot.
-executif:
+# Pages « Executif provincial » et « Cabinet du gouverneur », et page d'un
+# membre : cartes construites a partir des fiches « Membre ». Remplace les
+# anciennes bibliotheques executif et cabinet, qui habillaient le HTML saisi
+# dans l'editeur.
+membres:
   css:
     theme:
-        assets/css/executif.css: {}
-  dependencies:
-    - gouvernoratkin/composants
-
-# Styles propres a la page « Cabinet du gouverneur ».
-cabinet:
-  css:
-    theme:
-        assets/css/cabinet.css: {}
+        assets/css/membres.css: {}
   dependencies:
     - gouvernoratkin/composants
 

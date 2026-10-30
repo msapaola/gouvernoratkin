@@ -6,12 +6,16 @@
  * Même entête que les autres pages institutionnelles — filet tricolore, fil
  * d'Ariane à un seul niveau — pour qu'elles s'ouvrent toutes de la même façon.
  *
- * Le corps reste le contenu saisi dans l'éditeur, rendu par la vue
- * cabinet_du_gouverneur. Ce sont ses styles qui reviennent au thème, via
- * assets/css/cabinet.css, en remplacement de la feuille injectée hors du dépôt.
+ * Le corps se construit à partir des fiches « Membre » de l'instance
+ * « Cabinet du gouverneur » (variable membres, fournie par le module
+ * gouvernorat_institutions). Le premier membre dont le champ « Mot » est
+ * rempli — le directeur de cabinet — ouvre la page avec son mot.
+ *
+ * La vue cabinet_du_gouverneur ne sert plus qu'à fournir l'adresse de la
+ * page : son contenu (l'ancien bloc HTML n° 23) n'est plus affiché.
  */
 #}
-{{ attach_library('gouvernoratkin/cabinet') }}
+{{ attach_library('gouvernoratkin/membres') }}
 
 {# Le fil d'Ariane générique du partiel est neutralisé : cette page pose le
    sien dans son entête, au-dessus du titre. #}
@@ -43,9 +47,49 @@
   </header>
 
   {# ================= CORPS ================= #}
-  <div class="cab-corps">
+  <div class="membres-corps">
     <div class="container page-messages">{{ drupal_messages() }}</div>
-    {{ page.content }}
+
+    {# Mot du directeur de cabinet : le premier membre qui a un mot. #}
+    {% set auteur = (membres.cabinet|default([])|filter(membre => membre.mot))|first %}
+
+    {% if auteur %}
+      <section class="membres-mot" aria-labelledby="membres-mot-titre">
+        <div class="container">
+          <div class="membres-mot__grille">
+            <div class="membres-mot__photo">
+              {% if auteur.photo %}
+                <img src="{{ auteur.photo.url }}" alt="{{ auteur.photo.alt }}" width="480" height="600" loading="lazy" decoding="async">
+              {% else %}
+                <span class="membre-carte__initiales" aria-hidden="true">{{ auteur.initiales }}</span>
+              {% endif %}
+            </div>
+            <div class="membres-mot__texte">
+              <p class="surtitre">{{ auteur.fonction }}</p>
+              <h2 class="membres-section__titre" id="membres-mot-titre">Le mot du cabinet</h2>
+              <blockquote class="membres-mot__citation">
+                {% for paragraphe in auteur.mot %}
+                  <p>{{ paragraphe }}</p>
+                {% endfor %}
+              </blockquote>
+              <p class="membres-mot__signature">
+                <strong>{{ auteur.nom }}</strong>, {{ auteur.fonction }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    {% endif %}
+
+    <div class="container">
+      {% include "@gouvernoratkin/layout/partials/membres-section.html.twig" with { cle: 'cabinet', titre: 'Équipe du cabinet', liste: membres.cabinet } only %}
+
+      {% if user.hasPermission('edit any membre content') %}
+        <p class="membres-gestion">
+          <a href="/admin/content?type=membre">Gérer les fiches des membres</a>
+        </p>
+      {% endif %}
+    </div>
   </div>
 
   {# ================= POURSUIVRE ================= #}

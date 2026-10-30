@@ -1,0 +1,25 @@
+uuid: 2703845c-c45f-4aa5-ab16-613a4e1032ae
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_membre_ordre
+    - node.type.membre
+id: node.membre.field_membre_ordre
+field_name: field_membre_ordre
+entity_type: node
+bundle: membre
+label: 'Ordre'
+description: "Position dans sa section : les plus petits nombres viennent en premier. À égalité, l'ordre alphabétique s'applique."
+required: false
+translatable: false
+default_value:
+  -
+    value: 100
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

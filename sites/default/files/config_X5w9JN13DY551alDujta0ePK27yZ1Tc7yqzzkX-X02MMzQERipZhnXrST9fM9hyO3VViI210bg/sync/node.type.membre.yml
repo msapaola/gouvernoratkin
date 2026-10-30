@@ -1,0 +1,11 @@
+uuid: 584f7644-58fd-4b2d-87de-7d0cd0f2e4e8
+langcode: fr
+status: true
+dependencies: {  }
+name: Membre
+type: membre
+description: "Membre de l'exécutif provincial ou du cabinet du gouverneur : une fiche par personne. Les pages Exécutif provincial et Cabinet du gouverneur se construisent à partir de ces fiches."
+help: "Pour retirer une personne des pages sans perdre sa fiche, décochez « Publié »."
+new_revision: true
+preview_mode: 1
+display_submitted: false

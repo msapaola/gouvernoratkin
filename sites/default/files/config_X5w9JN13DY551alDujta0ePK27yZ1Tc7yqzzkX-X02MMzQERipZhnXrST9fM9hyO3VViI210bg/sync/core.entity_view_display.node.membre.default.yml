@@ -1,0 +1,29 @@
+uuid: c5333677-c669-461c-b68e-ea96f7c13d7e
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.node.membre.field_membre_description
+    - field.field.node.membre.field_membre_fonction
+    - field.field.node.membre.field_membre_instance
+    - field.field.node.membre.field_membre_mot
+    - field.field.node.membre.field_membre_ordre
+    - field.field.node.membre.field_membre_photo
+    - node.type.membre
+  module:
+    - user
+id: node.membre.default
+targetEntityType: node
+bundle: membre
+mode: default
+content: {  }
+hidden:
+  addtoany: true
+  field_membre_description: true
+  field_membre_fonction: true
+  field_membre_instance: true
+  field_membre_mot: true
+  field_membre_ordre: true
+  field_membre_photo: true
+  langcode: true
+  links: true

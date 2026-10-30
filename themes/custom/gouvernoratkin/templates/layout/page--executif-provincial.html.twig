@@ -7,14 +7,16 @@
  * tricolore, même fil d'Ariane — pour que les pages institutionnelles du site
  * s'ouvrent toutes de la même façon.
  *
- * Le corps reste le contenu saisi dans l'éditeur, rendu par la vue
- * executif_provincial : les noms et les fonctions des membres de l'exécutif
- * changent au gré des nominations, ils n'ont pas à être figés dans le thème.
- * Ce sont ses styles qui reviennent au thème, via assets/css/executif.css,
- * en remplacement de la feuille injectée hors du dépôt.
+ * Le corps se construit à partir des fiches « Membre » (variable membres,
+ * fournie par le module gouvernorat_institutions) : une fiche par personne,
+ * modifiable sans toucher au code ni au HTML. Les noms et les fonctions
+ * changent au gré des nominations ; ils n'ont pas à être figés ici.
+ *
+ * La vue executif_provincial ne sert plus qu'à fournir l'adresse de la page :
+ * son contenu (l'ancien bloc HTML n° 10) n'est plus affiché.
  */
 #}
-{{ attach_library('gouvernoratkin/executif') }}
+{{ attach_library('gouvernoratkin/membres') }}
 
 {# Le fil d'Ariane générique du partiel est neutralisé : cette page pose le
    sien dans son entête, au-dessus du titre. #}
@@ -47,11 +49,19 @@
   </header>
 
   {# ================= CORPS ================= #}
-  <div class="ex-corps">
+  <div class="membres-corps">
     <div class="container page-messages">{{ drupal_messages() }}</div>
 
     <div class="container">
-      {{ page.content }}
+      {% include "@gouvernoratkin/layout/partials/membres-section.html.twig" with { cle: 'gouvernorat', titre: 'Gouverneur et vice-gouverneur', liste: membres.gouvernorat, variante: 'large' } only %}
+      {% include "@gouvernoratkin/layout/partials/membres-section.html.twig" with { cle: 'ministres', titre: 'Ministres provinciaux', liste: membres.ministres } only %}
+      {% include "@gouvernoratkin/layout/partials/membres-section.html.twig" with { cle: 'secretariat', titre: 'Secrétariat exécutif', liste: membres.secretariat } only %}
+
+      {% if user.hasPermission('edit any membre content') %}
+        <p class="membres-gestion">
+          <a href="/admin/content?type=membre">Gérer les fiches des membres</a>
+        </p>
+      {% endif %}
     </div>
   </div>
 

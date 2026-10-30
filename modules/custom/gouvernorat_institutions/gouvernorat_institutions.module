@@ -1,0 +1,117 @@
+<?php
+
+/**
+ * @file
+ * Pages Exécutif provincial et Cabinet du gouverneur.
+ *
+ * Ces pages affichaient chacune un bloc de contenu saisi en HTML, où chaque
+ * membre était une carte écrite à la main : changer un ministre voulait dire
+ * modifier du balisage dans l'éditeur. Chaque personne a désormais une fiche
+ * « Membre » (nom, fonction, instance, photo, description, ordre) et les
+ * pages se construisent à partir des fiches publiées.
+ *
+ * Ce module donne aux gabarits page--executif-provincial et
+ * page--cabinet-du-gouverneur les membres de chaque instance, sous forme de
+ * variables simples ; la mise en page reste dans le thème.
+ */
+
+use Drupal\image\Entity\ImageStyle;
+use Drupal\node\NodeInterface;
+
+/**
+ * Routes des pages qui reçoivent les membres.
+ */
+const GOUVERNORAT_INSTITUTIONS_ROUTES = [
+  'view.executif_provincial.page_1',
+  'view.cabinet_du_gouverneur.page_1',
+];
+
+/**
+ * Renvoie les membres publiés d'une instance, dans l'ordre d'affichage.
+ *
+ * @return \Drupal\node\NodeInterface[]
+ */
+function gouvernorat_institutions_membres(string $instance): array {
+  $storage = \Drupal::entityTypeManager()->getStorage('node');
+  $ids = $storage->getQuery()
+    ->accessCheck(TRUE)
+    ->condition('type', 'membre')
+    ->condition('status', 1)
+    ->condition('field_membre_instance', $instance)
+    ->sort('field_membre_ordre', 'ASC')
+    ->sort('title', 'ASC')
+    ->execute();
+  return $ids ? $storage->loadMultiple($ids) : [];
+}
+
+/**
+ * Prépare une fiche pour le gabarit.
+ */
+function gouvernorat_institutions_carte(NodeInterface $membre): array {
+  $photo = NULL;
+  $image = $membre->get('field_membre_photo')->first();
+  if ($image && $image->entity) {
+    $style = ImageStyle::load('portrait_membre');
+    $uri = $image->entity->getFileUri();
+    $photo = [
+      'url' => $style ? $style->buildUrl($uri) : \Drupal::service('file_url_generator')->generateString($uri),
+      'alt' => $image->alt,
+    ];
+  }
+
+  // Initiales affichées à la place d'une photo manquante : les deux premiers
+  // mots du nom suffisent à identifier la carte.
+  $mots = preg_split('/[\s-]+/u', trim($membre->label()));
+  $initiales = '';
+  foreach (array_slice($mots, 0, 2) as $mot) {
+    $initiales .= mb_strtoupper(mb_substr($mot, 0, 1));
+  }
+
+  $mot = (string) $membre->get('field_membre_mot')->value;
+  return [
+    'nom' => $membre->label(),
+    'fonction' => $membre->get('field_membre_fonction')->value,
+    'description' => $membre->get('field_membre_description')->value,
+    'mot' => array_values(array_filter(array_map('trim', preg_split('/\R\s*\R/u', trim($mot))), 'strlen')),
+    'photo' => $photo,
+    'initiales' => $initiales,
+    'id' => $membre->id(),
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for page templates.
+ *
+ * Variable fournie : membres, un tableau indexé par instance (gouvernorat,
+ * ministres, secretariat, cabinet) de cartes préparées par
+ * gouvernorat_institutions_carte().
+ */
+function gouvernorat_institutions_preprocess_page(array &$variables) {
+  if (!in_array(\Drupal::routeMatch()->getRouteName(), GOUVERNORAT_INSTITUTIONS_ROUTES, TRUE)) {
+    return;
+  }
+
+  // Toute fiche ajoutée, modifiée ou dépubliée doit se voir aussitôt, y
+  // compris dans le cache des pages servies aux visiteurs anonymes.
+  $variables['#cache']['tags'][] = 'node_list';
+  $variables['#cache']['contexts'][] = 'user.permissions';
+
+  $variables['membres'] = [];
+  foreach (['gouvernorat', 'ministres', 'secretariat', 'cabinet'] as $instance) {
+    $variables['membres'][$instance] = array_map('gouvernorat_institutions_carte', gouvernorat_institutions_membres($instance));
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for node templates.
+ *
+ * La page propre à chaque fiche (gouvernorat/nom-de-la-personne) reçoit la
+ * même carte que les pages de liste.
+ */
+function gouvernorat_institutions_preprocess_node(array &$variables) {
+  $node = $variables['node'] ?? NULL;
+  if ($node instanceof NodeInterface && $node->bundle() === 'membre') {
+    $variables['membre'] = gouvernorat_institutions_carte($node);
+    $variables['membre']['instance'] = $node->get('field_membre_instance')->value;
+  }
+}

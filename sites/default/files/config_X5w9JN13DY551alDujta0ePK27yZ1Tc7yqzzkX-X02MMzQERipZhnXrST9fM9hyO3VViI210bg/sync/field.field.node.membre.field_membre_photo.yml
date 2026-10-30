@@ -1,0 +1,38 @@
+uuid: 0a1d635d-8c78-49c3-9b69-febb0cb18dc8
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_membre_photo
+    - node.type.membre
+  module:
+    - image
+id: node.membre.field_membre_photo
+field_name: field_membre_photo
+entity_type: node
+bundle: membre
+label: 'Photo'
+description: "Portrait de la personne, au moins 400 × 500 pixels. Il est recadré automatiquement au format portrait. Sans photo, ses initiales s'affichent."
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: membres
+  file_extensions: 'png jpg jpeg webp'
+  max_filesize: '8 MB'
+  max_resolution: ''
+  min_resolution: ''
+  alt_field: true
+  alt_field_required: true
+  title_field: false
+  title_field_required: false
+  default_image:
+    uuid: null
+    alt: ''
+    title: ''
+    width: null
+    height: null
+field_type: image

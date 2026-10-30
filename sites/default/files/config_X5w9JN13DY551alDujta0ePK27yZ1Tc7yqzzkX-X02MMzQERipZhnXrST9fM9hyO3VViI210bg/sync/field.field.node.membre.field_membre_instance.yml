@@ -1,0 +1,21 @@
+uuid: 64878ce2-116b-4ccc-a0f0-d103a1e9f207
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_membre_instance
+    - node.type.membre
+  module:
+    - options
+id: node.membre.field_membre_instance
+field_name: field_membre_instance
+entity_type: node
+bundle: membre
+label: 'Instance'
+description: "La section où la personne apparaît : les trois premières sur la page Exécutif provincial, la dernière sur la page Cabinet du gouverneur."
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

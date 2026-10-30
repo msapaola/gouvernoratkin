@@ -1,0 +1,33 @@
+uuid: 659c3444-67f3-46fc-9eac-099bffb12818
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_membre_instance
+field_name: field_membre_instance
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: gouvernorat
+      label: 'Gouverneur et vice-gouverneur'
+    -
+      value: ministres
+      label: 'Ministres provinciaux'
+    -
+      value: secretariat
+      label: 'Secrétariat exécutif'
+    -
+      value: cabinet
+      label: 'Cabinet du gouverneur'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false
