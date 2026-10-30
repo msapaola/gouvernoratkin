@@ -13,14 +13,6 @@ targetEntityType: block_content
 bundle: chiffres_cles
 mode: default
 content:
-  info:
-    type: string_textfield
-    weight: -5
-    region: content
-    settings:
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
   field_chiffres:
     type: paragraphs
     weight: 0
@@ -43,6 +35,14 @@ content:
   field_chiffres_source:
     type: string_textfield
     weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  info:
+    type: string_textfield
+    weight: -5
     region: content
     settings:
       size: 60
