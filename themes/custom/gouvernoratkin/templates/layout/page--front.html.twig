@@ -13,6 +13,10 @@
  *
  * Pour changer une image, une seule ligne à modifier : le tableau « visuels »
  * ci-dessous. Les chemins sont relatifs à la racine du site.
+ *
+ * Le mot du gouverneur (nom, citation, portrait) et les chiffres clés ne sont
+ * plus écrits ici : la rédaction les modifie dans Contenu › Blocs, et le
+ * module gouvernorat_accueil les fournit à ce gabarit.
  */
 #}
 {{ attach_library('gouvernoratkin/accueil') }}
@@ -24,7 +28,6 @@
 {% set img = '/themes/custom/gouvernoratkin/assets/images/' %}
 {% set visuels = {
   hero:       img ~ 'kinhero.png',
-  gouverneur: img ~ 'bumba01.png',
   apropos:    img ~ 'aboutville.png'
 } %}
 
@@ -119,33 +122,35 @@
     </div>
   </section>
 
-  {# ================= MOT DU GOUVERNEUR ================= #}
+  {# ================= MOT DU GOUVERNEUR =================
+     Textes et portrait modifiables dans Contenu › Blocs, bloc de type
+     « Mot du gouverneur » (variables fournies par le module
+     gouvernorat_accueil). Sans bloc publié, la section n'est pas affichée. #}
+  {% if gouverneur %}
   <section class="gouverneur" aria-labelledby="gouverneur-titre">
     <div class="container gouverneur__grille">
       <div class="gouverneur__texte">
         <p class="surtitre surtitre--clair">Le mot du gouverneur</p>
-        <h2 class="gouverneur__titre" id="gouverneur-titre">Daniel Bumba</h2>
-        <p class="gouverneur__fonction">Gouverneur de la Ville-Province de Kinshasa</p>
+        <h2 class="gouverneur__titre" id="gouverneur-titre">{{ gouverneur.nom }}</h2>
+        {% if gouverneur.fonction %}
+          <p class="gouverneur__fonction">{{ gouverneur.fonction }}</p>
+        {% endif %}
 
         <blockquote class="gouverneur__citation">
-          <p>
-            Chers Kinois, chères Kinoises, nous sommes à l'aube d'une nouvelle ère
-            pour Kinshasa. Nous nous engageons dans un voyage vers l'amélioration
-            de notre ville bien-aimée.
-          </p>
-          <p>
-            Chaque projet, chaque effort est un pas vers cette transformation :
-            faire de Kinshasa une ville qui s'améliore continuellement, pour nous
-            et pour les générations futures.
-          </p>
+          {% for paragraphe in gouverneur.paragraphes %}
+            <p>{{ paragraphe }}</p>
+          {% endfor %}
         </blockquote>
       </div>
 
-      <figure class="gouverneur__portrait">
-        <img src="{{ visuels.gouverneur }}" alt="Daniel Bumba, gouverneur de la Ville-Province de Kinshasa" width="800" height="600" loading="lazy" decoding="async">
-      </figure>
+      {% if gouverneur.portrait %}
+        <figure class="gouverneur__portrait">
+          <img src="{{ gouverneur.portrait.url }}" alt="{{ gouverneur.portrait.alt }}" width="800" height="600" loading="lazy" decoding="async">
+        </figure>
+      {% endif %}
     </div>
   </section>
+  {% endif %}
 
   {# ================= ACTUALITÉS (vue injectée) ================= #}
   <section class="bloc bloc--clair" aria-labelledby="actu-titre">
@@ -242,36 +247,31 @@
     </div>
   </section>
 
-  {# ================= CHIFFRES CLÉS ================= #}
+  {# ================= CHIFFRES CLÉS =================
+     Chiffres et source modifiables dans Contenu › Blocs, bloc de type
+     « Chiffres clés » (variables fournies par le module gouvernorat_accueil).
+     Sans bloc publié ou sans chiffre, la section n'est pas affichée. #}
+  {% if chiffres.items %}
   <section class="chiffres" aria-labelledby="chiffres-titre">
     <div class="container">
       <p class="surtitre surtitre--clair">Kinshasa en bref</p>
       <h2 class="chiffres__titre" id="chiffres-titre">Quelques repères</h2>
 
       <dl class="chiffres__liste">
-        <div class="chiffres__item">
-          <dt class="chiffres__valeur">17,7 M</dt>
-          <dd class="chiffres__libelle">habitants dans l'aire urbaine</dd>
-        </div>
-        <div class="chiffres__item">
-          <dt class="chiffres__valeur">9 965 km²</dt>
-          <dd class="chiffres__libelle">de superficie, 24 communes</dd>
-        </div>
-        <div class="chiffres__item">
-          <dt class="chiffres__valeur">90 %</dt>
-          <dd class="chiffres__libelle">de taux de scolarisation primaire</dd>
-        </div>
-        <div class="chiffres__item">
-          <dt class="chiffres__valeur">60 %</dt>
-          <dd class="chiffres__libelle">de la population a moins de 25 ans</dd>
-        </div>
+        {% for chiffre in chiffres.items %}
+          <div class="chiffres__item">
+            <dt class="chiffres__valeur">{{ chiffre.valeur }}</dt>
+            <dd class="chiffres__libelle">{{ chiffre.libelle }}</dd>
+          </div>
+        {% endfor %}
       </dl>
 
-      {# Un chiffre sans source est un chiffre contestable : la ligne ci-dessous
-         est à compléter avec la référence et l'année réelles avant mise en ligne. #}
-      <p class="chiffres__source">Source : à compléter — institut et année de référence.</p>
+      {% if chiffres.source %}
+        <p class="chiffres__source">{{ chiffres.source }}</p>
+      {% endif %}
     </div>
   </section>
+  {% endif %}
 
   {# ================= GALERIE (vue injectée) ================= #}
   <section class="bloc" aria-labelledby="galerie-titre">

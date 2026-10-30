@@ -3,12 +3,15 @@ langcode: fr
 status: true
 dependencies:
   config:
+    - block_content.type.chiffres_cles
+    - block_content.type.mot_gouverneur
     - filter.format.full_html
     - node.type.article
     - node.type.page
     - node.type.video
     - taxonomy.vocabulary.tags
   module:
+    - block_content
     - comment
     - contextual
     - file
@@ -25,6 +28,7 @@ weight: 2
 is_admin: false
 permissions:
   - 'access administration pages'
+  - 'access block library'
   - 'access content overview'
   - 'access contextual links'
   - 'access files overview'
@@ -41,6 +45,8 @@ permissions:
   - 'delete own video content'
   - 'delete page revisions'
   - 'delete video revisions'
+  - 'edit any chiffres_cles block content'
+  - 'edit any mot_gouverneur block content'
   - 'edit own article content'
   - 'edit own comments'
   - 'edit own page content'

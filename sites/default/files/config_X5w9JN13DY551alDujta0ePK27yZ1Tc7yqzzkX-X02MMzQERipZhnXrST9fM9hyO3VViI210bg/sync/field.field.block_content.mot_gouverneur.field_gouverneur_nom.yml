@@ -1,0 +1,19 @@
+uuid: 606507d3-63e9-474d-aaec-68e051f8012d
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.block_content.field_gouverneur_nom
+    - block_content.type.mot_gouverneur
+id: block_content.mot_gouverneur.field_gouverneur_nom
+field_name: field_gouverneur_nom
+entity_type: block_content
+bundle: mot_gouverneur
+label: 'Nom'
+description: "Prénom et nom du gouverneur, tels qu'ils apparaissent en titre de la section."
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

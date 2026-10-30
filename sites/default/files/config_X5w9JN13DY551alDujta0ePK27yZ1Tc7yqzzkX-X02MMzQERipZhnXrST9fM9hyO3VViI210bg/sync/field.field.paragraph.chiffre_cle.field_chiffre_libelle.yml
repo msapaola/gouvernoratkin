@@ -1,0 +1,19 @@
+uuid: 7db8c71e-dc7b-4908-a6da-50b2ff672a3c
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_chiffre_libelle
+    - paragraphs.paragraphs_type.chiffre_cle
+id: paragraph.chiffre_cle.field_chiffre_libelle
+field_name: field_chiffre_libelle
+entity_type: paragraph
+bundle: chiffre_cle
+label: 'Libellé'
+description: "Ce que mesure le chiffre, par exemple « habitants dans l'aire urbaine »."
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,8 @@
+uuid: 959fbe5b-c1df-42d9-991d-b68da65fbfb6
+langcode: fr
+status: true
+dependencies: {  }
+id: mot_gouverneur
+label: 'Mot du gouverneur'
+revision: false
+description: "Section « Le mot du gouverneur » de la page d'accueil : nom, fonction, citation et portrait. Un seul bloc de ce type est utilisé : le plus récent."

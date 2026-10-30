@@ -1,0 +1,21 @@
+uuid: 2cca0f78-6e83-4fd2-a35d-2e6233808c90
+langcode: fr
+status: true
+dependencies:
+  module:
+    - block_content
+id: block_content.field_gouverneur_nom
+field_name: field_gouverneur_nom
+entity_type: block_content
+type: string
+settings:
+  max_length: 255
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

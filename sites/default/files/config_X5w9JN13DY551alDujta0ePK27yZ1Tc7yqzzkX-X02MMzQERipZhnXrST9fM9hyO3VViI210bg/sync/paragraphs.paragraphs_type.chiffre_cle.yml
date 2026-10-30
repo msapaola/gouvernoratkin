@@ -1,0 +1,10 @@
+uuid: cc474f3a-3937-4cab-9712-14a6ddb730eb
+langcode: fr
+status: true
+dependencies: {  }
+id: chiffre_cle
+label: 'Chiffre clé'
+icon_uuid: null
+icon_default: null
+description: "Un chiffre de la section « Kinshasa en bref » de l'accueil."
+behavior_plugins: {  }

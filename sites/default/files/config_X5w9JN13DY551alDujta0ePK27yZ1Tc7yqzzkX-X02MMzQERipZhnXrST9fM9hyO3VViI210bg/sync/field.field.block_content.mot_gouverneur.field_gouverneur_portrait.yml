@@ -1,0 +1,38 @@
+uuid: 0d7ba2c8-24b4-4fa3-a0b3-c1c2d024b801
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.block_content.field_gouverneur_portrait
+    - block_content.type.mot_gouverneur
+  module:
+    - image
+id: block_content.mot_gouverneur.field_gouverneur_portrait
+field_name: field_gouverneur_portrait
+entity_type: block_content
+bundle: mot_gouverneur
+label: 'Portrait'
+description: "Photo du gouverneur, de préférence au format paysage (4:3), au moins 800 × 600 pixels. Elle est recadrée automatiquement."
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: accueil
+  file_extensions: 'png jpg jpeg webp'
+  max_filesize: '8 MB'
+  max_resolution: ''
+  min_resolution: 600x450
+  alt_field: true
+  alt_field_required: true
+  title_field: false
+  title_field_required: false
+  default_image:
+    uuid: null
+    alt: ''
+    title: ''
+    width: null
+    height: null
+field_type: image

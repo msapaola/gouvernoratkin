@@ -1,0 +1,96 @@
+<?php
+
+/**
+ * @file
+ * Textes de la page d'accueil modifiables par la rédaction.
+ *
+ * Le mot du gouverneur et les chiffres clés étaient écrits en dur dans
+ * page--front.html.twig : seule une personne modifiant le code pouvait les
+ * mettre à jour, et ils n'existaient pas dans la base (donc invisibles pour
+ * tout outil qui lit les contenus de Drupal). Ils vivent désormais dans deux
+ * blocs de contenu, que la rédaction modifie dans Contenu › Blocs :
+ * - « Mot du gouverneur » (type mot_gouverneur) ;
+ * - « Chiffres clés » (type chiffres_cles).
+ *
+ * Ce module lit le plus récent bloc publié de chaque type et le donne au
+ * gabarit sous forme de variables simples ; la mise en page reste dans le
+ * thème. Les textes de départ sont recopiés par gouvernorat_accueil.deploy.php.
+ */
+
+use Drupal\block_content\BlockContentInterface;
+use Drupal\image\Entity\ImageStyle;
+
+/**
+ * Renvoie le plus récent bloc publié d'un type donné.
+ */
+function gouvernorat_accueil_bloc(string $type): ?BlockContentInterface {
+  $storage = \Drupal::entityTypeManager()->getStorage('block_content');
+  $ids = $storage->getQuery()
+    ->accessCheck(FALSE)
+    ->condition('type', $type)
+    ->condition('status', 1)
+    ->sort('changed', 'DESC')
+    ->range(0, 1)
+    ->execute();
+  return $ids ? $storage->load(reset($ids)) : NULL;
+}
+
+/**
+ * Découpe un texte saisi en paragraphes, sur les lignes vides.
+ */
+function gouvernorat_accueil_paragraphes(?string $texte): array {
+  $paragraphes = preg_split('/\R\s*\R/u', trim((string) $texte));
+  return array_values(array_filter(array_map('trim', $paragraphes), 'strlen'));
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for page templates.
+ *
+ * Variables fournies à page--front.html.twig :
+ * - gouverneur : nom, fonction, paragraphes (liste), portrait (url, alt) ;
+ * - chiffres : items (liste de { valeur, libelle }), source.
+ * Une variable reste vide si aucun bloc n'est publié : la section n'est alors
+ * pas affichée.
+ */
+function gouvernorat_accueil_preprocess_page(array &$variables) {
+  if (!\Drupal::service('path.matcher')->isFrontPage()) {
+    return;
+  }
+
+  // Toute modification d'un bloc de contenu doit rafraîchir l'accueil, y
+  // compris dans le cache des pages servies aux visiteurs anonymes.
+  $variables['#cache']['tags'][] = 'block_content_list';
+
+  if ($bloc = gouvernorat_accueil_bloc('mot_gouverneur')) {
+    $portrait = NULL;
+    $image = $bloc->get('field_gouverneur_portrait')->first();
+    if ($image && $image->entity) {
+      $style = ImageStyle::load('portrait_gouverneur');
+      $uri = $image->entity->getFileUri();
+      $portrait = [
+        'url' => $style ? $style->buildUrl($uri) : \Drupal::service('file_url_generator')->generateString($uri),
+        'alt' => $image->alt,
+      ];
+    }
+    $variables['gouverneur'] = [
+      'nom' => $bloc->get('field_gouverneur_nom')->value,
+      'fonction' => $bloc->get('field_gouverneur_fonction')->value,
+      'paragraphes' => gouvernorat_accueil_paragraphes($bloc->get('field_gouverneur_citation')->value),
+      'portrait' => $portrait,
+    ];
+  }
+
+  if ($bloc = gouvernorat_accueil_bloc('chiffres_cles')) {
+    $items = [];
+    foreach ($bloc->get('field_chiffres')->referencedEntities() as $chiffre) {
+      $items[] = [
+        'valeur' => $chiffre->get('field_chiffre_valeur')->value,
+        'libelle' => $chiffre->get('field_chiffre_libelle')->value,
+      ];
+    }
+    $variables['chiffres'] = [
+      'items' => $items,
+      'source' => $bloc->get('field_chiffres_source')->value,
+    ];
+  }
+}

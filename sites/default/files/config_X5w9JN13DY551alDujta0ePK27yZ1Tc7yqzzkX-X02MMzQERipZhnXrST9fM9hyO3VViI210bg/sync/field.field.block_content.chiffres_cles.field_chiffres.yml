@@ -1,0 +1,31 @@
+uuid: 3587d061-e936-4055-a2fa-58080d5a6c50
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.block_content.field_chiffres
+    - block_content.type.chiffres_cles
+    - paragraphs.paragraphs_type.chiffre_cle
+  module:
+    - entity_reference_revisions
+id: block_content.chiffres_cles.field_chiffres
+field_name: field_chiffres
+entity_type: block_content
+bundle: chiffres_cles
+label: 'Chiffres'
+description: "Un chiffre par ligne : la valeur (ex. « 17,7 M ») et son libellé (ex. « habitants dans l'aire urbaine »). Quatre chiffres remplissent une rangée."
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      chiffre_cle: chiffre_cle
+    negate: 0
+    target_bundles_drag_drop:
+      chiffre_cle:
+        weight: 0
+        enabled: true
+field_type: entity_reference_revisions

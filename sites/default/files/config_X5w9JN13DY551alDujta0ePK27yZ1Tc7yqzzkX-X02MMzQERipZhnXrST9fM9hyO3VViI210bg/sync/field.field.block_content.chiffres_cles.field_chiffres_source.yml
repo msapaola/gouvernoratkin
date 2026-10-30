@@ -1,0 +1,19 @@
+uuid: 520aec38-38a8-4e97-a1b6-50591d221994
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.block_content.field_chiffres_source
+    - block_content.type.chiffres_cles
+id: block_content.chiffres_cles.field_chiffres_source
+field_name: field_chiffres_source
+entity_type: block_content
+bundle: chiffres_cles
+label: 'Source'
+description: "Institut et année de référence des chiffres, affichés sous la rangée. Un chiffre sans source est un chiffre contestable."
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

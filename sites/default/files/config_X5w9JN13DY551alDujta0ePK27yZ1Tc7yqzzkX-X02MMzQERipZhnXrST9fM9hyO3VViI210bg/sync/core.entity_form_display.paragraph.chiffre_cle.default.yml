@@ -1,0 +1,32 @@
+uuid: 4ba6a495-d09b-46e3-ba9f-645a1ec6a568
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.chiffre_cle.field_chiffre_libelle
+    - field.field.paragraph.chiffre_cle.field_chiffre_valeur
+    - paragraphs.paragraphs_type.chiffre_cle
+id: paragraph.chiffre_cle.default
+targetEntityType: paragraph
+bundle: chiffre_cle
+mode: default
+content:
+  field_chiffre_valeur:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_chiffre_libelle:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

@@ -1,0 +1,21 @@
+uuid: 398677a7-008f-4e6d-a5ed-5455da8310aa
+langcode: fr
+status: true
+dependencies: {  }
+name: portrait_gouverneur
+label: 'Portrait du gouverneur (800×600)'
+effects:
+  b24bc4c9-751b-4de0-96d0-87aa2e7c7640:
+    uuid: b24bc4c9-751b-4de0-96d0-87aa2e7c7640
+    id: image_scale_and_crop
+    weight: 1
+    data:
+      width: 800
+      height: 600
+      anchor: center-center
+  f736a627-788e-44c4-8aab-8d8aff998bbc:
+    uuid: f736a627-788e-44c4-8aab-8d8aff998bbc
+    id: image_convert
+    weight: 2
+    data:
+      extension: webp

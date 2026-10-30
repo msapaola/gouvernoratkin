@@ -1,0 +1,9 @@
+name: Gouvernorat Accueil
+description: "Textes de la page d'accueil modifiables par la rédaction : mot du gouverneur et chiffres clés."
+package: Custom
+type: module
+core_version_requirement: ^10.1 || ^11
+dependencies:
+  - drupal:block_content
+  - drupal:image
+  - paragraphs:paragraphs

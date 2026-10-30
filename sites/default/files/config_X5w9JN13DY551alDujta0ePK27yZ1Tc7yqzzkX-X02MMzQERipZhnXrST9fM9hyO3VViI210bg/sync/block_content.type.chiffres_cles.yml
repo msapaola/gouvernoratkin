@@ -1,0 +1,8 @@
+uuid: 8ea59fd1-56cb-47a0-8a0c-9048695ebd9c
+langcode: fr
+status: true
+dependencies: {  }
+id: chiffres_cles
+label: 'Chiffres clés'
+revision: false
+description: "Section « Kinshasa en bref » de la page d'accueil : les chiffres clés et leur source. Un seul bloc de ce type est utilisé : le plus récent."

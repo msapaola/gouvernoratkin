@@ -1,0 +1,19 @@
+uuid: 42ec6d2d-caea-44c4-af6d-f67181418375
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.block_content.field_gouverneur_citation
+    - block_content.type.mot_gouverneur
+id: block_content.mot_gouverneur.field_gouverneur_citation
+field_name: field_gouverneur_citation
+entity_type: block_content
+bundle: mot_gouverneur
+label: 'Citation'
+description: "Le mot du gouverneur. Séparez les paragraphes par une ligne vide."
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long
