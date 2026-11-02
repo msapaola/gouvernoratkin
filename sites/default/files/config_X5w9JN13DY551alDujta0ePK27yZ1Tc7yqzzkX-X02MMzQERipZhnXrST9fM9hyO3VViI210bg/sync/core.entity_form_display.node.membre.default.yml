@@ -19,12 +19,12 @@ targetEntityType: node
 bundle: membre
 mode: default
 content:
-  title:
-    type: string_textfield
-    weight: 0
+  field_membre_description:
+    type: string_textarea
+    weight: 5
     region: content
     settings:
-      size: 60
+      rows: 3
       placeholder: ''
     third_party_settings: {  }
   field_membre_fonction:
@@ -41,6 +41,14 @@ content:
     region: content
     settings: {  }
     third_party_settings: {  }
+  field_membre_mot:
+    type: string_textarea
+    weight: 6
+    region: content
+    settings:
+      rows: 6
+      placeholder: ''
+    third_party_settings: {  }
   field_membre_ordre:
     type: number
     weight: 3
@@ -56,22 +64,6 @@ content:
       progress_indicator: throbber
       preview_image_style: thumbnail
     third_party_settings: {  }
-  field_membre_description:
-    type: string_textarea
-    weight: 5
-    region: content
-    settings:
-      rows: 3
-      placeholder: ''
-    third_party_settings: {  }
-  field_membre_mot:
-    type: string_textarea
-    weight: 6
-    region: content
-    settings:
-      rows: 6
-      placeholder: ''
-    third_party_settings: {  }
   path:
     type: path
     weight: 30
@@ -84,6 +76,14 @@ content:
     region: content
     settings:
       display_label: true
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
 hidden:
   created: true

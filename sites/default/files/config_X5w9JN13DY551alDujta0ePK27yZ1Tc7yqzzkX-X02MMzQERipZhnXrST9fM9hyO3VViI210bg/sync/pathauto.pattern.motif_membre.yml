@@ -7,7 +7,7 @@ dependencies:
 id: motif_membre
 label: 'Motif Membre/[node:title]'
 type: 'canonical_entities:node'
-pattern: 'gouvernorat/[node:title]'
+pattern: '/gouvernorat/[node:title]'
 selection_criteria:
   6ce933a8-8483-421b-884f-3a7274de4f08:
     id: 'entity_bundle:node'
