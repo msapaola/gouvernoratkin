@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Réglages de sécurité qui ne peuvent pas vivre dans le .htaccess.
+ *
+ * Voir aussi src/EventSubscriber/ReponseSubscriber.php et les règles du
+ * .htaccess, qui complètent ce module.
+ */
+
+/**
+ * Implements hook_page_attachments_alter().
+ *
+ * Retire la balise <meta name="Generator" content="Drupal 11 …"> : avec
+ * l'en-tête X-Generator, elle annonçait le logiciel et sa version majeure
+ * (constat S5 du diagnostic).
+ */
+function gouvernorat_securite_page_attachments_alter(array &$attachments) {
+  foreach ($attachments['#attached']['html_head'] ?? [] as $cle => $element) {
+    if (($element[1] ?? '') === 'system_meta_generator') {
+      unset($attachments['#attached']['html_head'][$cle]);
+    }
+  }
+}

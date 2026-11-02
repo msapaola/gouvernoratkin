@@ -1,0 +1,6 @@
+services:
+  gouvernorat_securite.reponse:
+    class: Drupal\gouvernorat_securite\EventSubscriber\ReponseSubscriber
+    arguments: ['@settings']
+    tags:
+      - { name: event_subscriber }

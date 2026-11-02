@@ -116,14 +116,32 @@ AddType image/webp .webp
   # uncomment the following line:
   # RewriteBase /
 
-  # Redirect common PHP files to their new locations.
-  RewriteCond %{REQUEST_URI} ^(.*)?/(install\.php) [OR]
-  RewriteCond %{REQUEST_URI} ^(.*)?/(rebuild\.php)
-  RewriteCond %{REQUEST_URI} !core
-  RewriteRule ^ %1/core/%2 [L,QSA,R=301]
+  # ---------------------------------------------------------------------------
+  # Gouvernorat de Kinshasa — règles ajoutées après le diagnostic technique du
+  # 1er novembre 2026. Ce fichier n'est plus réécrit par Composer (voir
+  # extra.drupal-scaffold.file-mapping dans composer.json) : ces règles
+  # survivent aux mises à jour de Drupal.
+  # ---------------------------------------------------------------------------
 
-  # Rewrite install.php during installation to see if mod_rewrite is working
-  RewriteRule ^core/install\.php core/install.php?rewrite=ok [QSA,L]
+  # S3 — L'installeur et le script de reconstruction ne servent qu'à
+  # l'installation. Ils remplacent les deux règles de Drupal qui les
+  # redirigeaient vers /core et y laissaient l'installeur joignable.
+  RewriteRule ^(core/)?(install|rebuild)\.php$ - [F,L]
+
+  # Fichiers texte de Drupal qui renseignent sur la version installée.
+  RewriteRule ^(core/)?(CHANGELOG|COPYRIGHT|INSTALL|INSTALL\.[a-z]+|LICENSE|MAINTAINERS|README|UPDATE|USAGE)\.txt$ - [F,L]
+
+  # R8 — Une seule adresse par page.
+  # www.test.kinshasa.cd répondait comme test.kinshasa.cd : redirection.
+  # (Pour le site de production, la règle sera fixée quand le choix entre
+  # kinshasa.cd et www.kinshasa.cd sera arrêté.)
+  RewriteCond %{HTTP_HOST} ^www\.(test\.kinshasa\.cd)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+  # /actualites/ répondait comme /actualites : la barre oblique finale est
+  # retirée, sauf pour les vrais dossiers.
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} ^(.+)/$
+  RewriteRule ^ %1 [L,R=301]
 
   # Pass all requests not referring directly to files in the filesystem to
   # index.php.
@@ -178,8 +196,31 @@ AddType image/webp .webp
   # header duplication, unset that one prior to setting in the 'always' table.
   # See "To circumvent this limitation..." in
   # https://httpd.apache.org/docs/current/mod/mod_headers.html.
-  Header onsuccess unset X-Content-Type-Options
+  #
+  # Gouvernorat : la directive d'origine « Header onsuccess unset
+  # X-Content-Type-Options » n'est pas comprise par LiteSpeed, qui renvoyait
+  # un en-tête malformé « ss: unset X-Content-Type-Options » (constat S9).
+  # « set » remplace de toute façon la valeur posée par Drupal.
   Header always set X-Content-Type-Options nosniff
   # Disable Proxy header, since it's an attack vector.
   RequestHeader unset Proxy
+
+  # S4 — En-têtes de sécurité.
+  # HTTPS imposé au navigateur pendant un an (le site redirige déjà en HTTPS).
+  Header always set Strict-Transport-Security "max-age=31536000"
+  # Les sites tiers ne reçoivent que le domaine d'origine, pas l'adresse.
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # Fonctions du navigateur dont le site n'a pas besoin.
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+  # Politique de contenu : ressources en HTTPS uniquement, pas de plugin, pas
+  # d'incrustation du site dans un autre, formulaires envoyés au site
+  # seulement. Les scripts et styles en ligne restent permis : Drupal et
+  # plusieurs modules en produisent. À resserrer une fois le site stabilisé.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https:; connect-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
+
+  # S5 — Ne pas annoncer les logiciels et leurs versions.
+  Header always unset X-Powered-By
+  Header unset X-Powered-By
+  Header always unset X-Generator
+  Header unset X-Generator
 </IfModule>

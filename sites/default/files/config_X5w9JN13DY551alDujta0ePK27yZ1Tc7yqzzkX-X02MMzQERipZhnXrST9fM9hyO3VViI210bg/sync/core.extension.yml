@@ -32,12 +32,12 @@ module:
   gouvernorat_accueil: 0
   gouvernorat_institutions: 0
   gouvernorat_partage: 0
+  gouvernorat_securite: 0
   gouvernorat_services: 0
   gouvernorat_videos: 0
   help: 0
   history: 0
   image: 0
-  jsonapi: 0
   language: 0
   link: 0
   locale: 0
