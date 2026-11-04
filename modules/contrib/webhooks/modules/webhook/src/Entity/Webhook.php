@@ -78,6 +78,81 @@ class Webhook extends ContentEntityBase implements WebhookInterface {
   /**
    * {@inheritdoc}
    */
+  public function isVerified() {
+    return (bool) $this->get('verified')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setVerified($verified) {
+    $this->set('verified', $verified);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getError() {
+    return (string) $this->get('error')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setError($error) {
+    $this->set('error', $error);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getWebhookConfigId() {
+    return (string) $this->get('webhook_config')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setWebhookConfigId($webhook_config_id) {
+    $this->set('webhook_config', $webhook_config_id);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getSignature() {
+    return (string) $this->get('signature')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setSignature($signature) {
+    $this->set('signature', $signature);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getPayloadLength() {
+    return (int) $this->get('payload_length')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setPayloadLength($payload_length) {
+    $this->set('payload_length', $payload_length);
+    return $this;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
 
     $fields = parent::baseFieldDefinitions($entity_type);
@@ -118,9 +193,26 @@ class Webhook extends ContentEntityBase implements WebhookInterface {
       ])
       ->setDisplayConfigurable('view', TRUE);
 
+    $fields['webhook_config'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Webhook config'))
+      ->setDescription(t('Machine name of the incoming webhook configuration.'))
+      ->setRequired(FALSE)
+      ->setSetting('max_length', 255)
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => -6,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => -6,
+      ])
+      ->setDisplayConfigurable('view', TRUE);
+
     $fields['payload'] = BaseFieldDefinition::create('string_long')
       ->setLabel(t('Payload'))
-      ->setDescription(t('The payload of the webhook entity.'))
+      ->setDescription(t('The posted request body (not re-encoded JSON).'))
       ->setRequired(FALSE)
       ->setDisplayOptions('form', [
         'type' => 'string_textarea',
@@ -131,9 +223,78 @@ class Webhook extends ContentEntityBase implements WebhookInterface {
       ])
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayOptions('view', [
-        'label' => 'hidden',
-        'type' => 'string',
+        'label' => 'above',
+        'type' => 'basic_string',
         'weight' => -5,
+      ])
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['payload_length'] = BaseFieldDefinition::create('integer')
+      ->setLabel(t('Payload length'))
+      ->setDescription(t('Byte length of the posted request body.'))
+      ->setRequired(FALSE)
+      ->setDefaultValue(0)
+      ->setDisplayOptions('form', [
+        'type' => 'number',
+        'weight' => -4,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'number_integer',
+        'weight' => -4,
+      ])
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['signature'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Signature'))
+      ->setDescription(t('HMAC value from the configured signature header.'))
+      ->setRequired(FALSE)
+      ->setSetting('max_length', 512)
+      ->setDisplayOptions('form', [
+        'type' => 'string_textfield',
+        'weight' => -3,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'string',
+        'weight' => -3,
+      ])
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['verified'] = BaseFieldDefinition::create('boolean')
+      ->setLabel(t('Verified'))
+      ->setDescription(t('Whether signature or token verification passed.'))
+      ->setDefaultValue(TRUE)
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'weight' => 15,
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'boolean',
+        'weight' => 15,
+      ])
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['error'] = BaseFieldDefinition::create('string_long')
+      ->setLabel(t('Error'))
+      ->setDescription(t('Verification error message, if any.'))
+      ->setRequired(FALSE)
+      ->setDisplayOptions('form', [
+        'type' => 'string_textarea',
+        'weight' => 16,
+        'settings' => [
+          'rows' => 4,
+        ],
+      ])
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayOptions('view', [
+        'label' => 'above',
+        'type' => 'basic_string',
+        'weight' => 16,
       ])
       ->setDisplayConfigurable('view', TRUE);
 

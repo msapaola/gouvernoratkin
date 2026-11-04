@@ -6,7 +6,9 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy;
 
 /**
  * Manages user sessions.
@@ -36,42 +38,50 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   protected $startedLazy;
 
   /**
-   * The write safe session handler.
-   *
-   * @var \Drupal\Core\Session\WriteSafeSessionHandlerInterface
-   *
-   * @todo This reference should be removed once all database queries
-   *   are removed from the session manager class.
+   * The user session repository.
    */
-  protected $writeSafeHandler;
+  protected UserSessionRepositoryInterface $sessionRepository;
 
   /**
    * Constructs a new session manager instance.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   The database connection.
+   * @param \Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy|\SessionHandlerInterface|null $handler
+   *   The object to register as a PHP session handler.
    * @param \Drupal\Core\Session\MetadataBag $metadata_bag
    *   The session metadata bag.
    * @param \Drupal\Core\Session\SessionConfigurationInterface $sessionConfiguration
    *   The session configuration interface.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
-   * @param \Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy|\SessionHandlerInterface|null $handler
-   *   The object to register as a PHP session handler.
+   * @param \Drupal\Core\Session\UserSessionRepositoryInterface $session_repository
+   *   The user session repository.
    *
    * @see \Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage::setSaveHandler()
    */
   public function __construct(
     protected RequestStack $requestStack,
-    protected Connection $connection,
+    Connection|AbstractProxy|\SessionHandlerInterface|null $handler,
     MetadataBag $metadata_bag,
     protected SessionConfigurationInterface $sessionConfiguration,
     protected TimeInterface $time,
-    $handler = NULL,
+    $session_repository = NULL,
   ) {
+    // The second parameter ($handler) used to be the database connection. And
+    // the last parameter ($session_repository) used to be $handler. Rearrange
+    // the parameters if constructor was called like this.
+    if ($handler instanceof Connection && !$session_repository instanceof UserSessionRepositoryInterface) {
+      @trigger_error('Calling ' . __METHOD__ . '() with a database $connection as the second argument is deprecated in drupal:11.4.0 and it will throw an error in drupal:12.0.0. See https://www.drupal.org/node/3570851', E_USER_DEPRECATED);
+      $handler = $session_repository;
+    }
     parent::__construct([], $handler, $metadata_bag);
+    if ($session_repository instanceof UserSessionRepositoryInterface) {
+      $this->sessionRepository = $session_repository;
+    }
+    else {
+      $this->sessionRepository = \Drupal::service(UserSessionRepositoryInterface::class);
+    }
   }
 
   /**
@@ -162,6 +172,16 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
       parent::save();
     }
 
+    $allowedKeys = array_map(
+      fn (SessionBagInterface $bag) => $bag->getStorageKey(),
+      $this->bags
+    );
+    $allowedKeys[] = $this->getMetadataBag()->getStorageKey();
+    $deprecatedKeys = array_diff(array_keys($_SESSION), $allowedKeys);
+    if (count($deprecatedKeys) > 0) {
+      @trigger_error(sprintf('Storing values directly in $_SESSION is deprecated in drupal:11.2.0 and will become unsupported in drupal:12.0.0. Use $request->getSession()->set() instead. Affected keys: %s. See https://www.drupal.org/node/3518527', implode(", ", $deprecatedKeys)), E_USER_DEPRECATED);
+    }
+
     $this->startedLazy = FALSE;
   }
 
@@ -195,18 +215,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    * {@inheritdoc}
    */
   public function delete($uid) {
-    // Nothing to do if we are not allowed to change the session.
-    if (!$this->writeSafeHandler->isSessionWritable() || $this->isCli()) {
-      return;
-    }
-    // The sessions table may not have been created yet.
-    try {
-      $this->connection->delete('sessions')
-        ->condition('uid', $uid)
-        ->execute();
-    }
-    catch (\Exception) {
-    }
+    $this->sessionRepository->deleteAll($uid);
   }
 
   /**
@@ -240,7 +249,6 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    * {@inheritdoc}
    */
   public function setWriteSafeHandler(WriteSafeSessionHandlerInterface $handler) {
-    $this->writeSafeHandler = $handler;
   }
 
   /**
@@ -249,6 +257,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    * Command line clients do not support cookies nor sessions.
    *
    * @return bool
+   *   TRUE if the current PHP process runs on CLI, otherwise FALSE>
    */
   protected function isCli() {
     return PHP_SAPI === 'cli';

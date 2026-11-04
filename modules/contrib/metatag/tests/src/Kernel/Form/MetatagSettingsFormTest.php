@@ -48,7 +48,8 @@ class MetatagSettingsFormTest extends KernelTestBase {
 
     $this->installConfig(static::$modules);
     $this->metatagSettingsForm = new MetatagSettingsForm(
-      $this->container->get('config.factory')
+      $this->container->get('config.factory'),
+      $this->container->get('config.typed')
     );
   }
 
@@ -61,7 +62,6 @@ class MetatagSettingsFormTest extends KernelTestBase {
     $this->assertEquals('metatag_admin_settings', $this->metatagSettingsForm->getFormId());
 
     $method = new \ReflectionMethod(MetatagSettingsForm::class, 'getEditableConfigNames');
-    $method->setAccessible(TRUE);
 
     $name = $method->invoke($this->metatagSettingsForm);
     $this->assertEquals(['metatag.settings'], $name);

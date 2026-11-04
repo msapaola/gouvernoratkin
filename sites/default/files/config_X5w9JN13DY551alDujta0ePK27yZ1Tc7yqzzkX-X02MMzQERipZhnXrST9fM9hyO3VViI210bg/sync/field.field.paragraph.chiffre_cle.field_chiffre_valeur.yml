@@ -9,7 +9,7 @@ id: paragraph.chiffre_cle.field_chiffre_valeur
 field_name: field_chiffre_valeur
 entity_type: paragraph
 bundle: chiffre_cle
-label: 'Valeur'
+label: Valeur
 description: "Le chiffre tel qu'il s'affiche en grand, par exemple « 17,7 M » ou « 90 % »."
 required: true
 translatable: false

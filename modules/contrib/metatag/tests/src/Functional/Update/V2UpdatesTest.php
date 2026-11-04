@@ -39,18 +39,39 @@ class V2UpdatesTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $defaultTheme = 'stark';
+
+  /**
+   * The database connection object.
+   *
+   * @var \Drupal\Core\Database\Connection|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $database;
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    $this->database = $this->container->get('database');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setDatabaseDumpFiles() {
-    // Drupal 9.5+ uses the 9.4.0 data dump, 9.4 uses the 9.3.0 data dump.
-    $core93 = static::getDrupalRoot() . '/core/modules/system/tests/fixtures/update/drupal-9.3.0.bare.standard.php.gz';
-    $core94 = static::getDrupalRoot() . '/core/modules/system/tests/fixtures/update/drupal-9.4.0.bare.standard.php.gz';
-    if (file_exists($core94)) {
+    // Drupal 10 uses the D9 core fixture, D11 uses the D10 fixture.
+    $core9 = static::getDrupalRoot() . '/core/modules/system/tests/fixtures/update/drupal-9.4.0.bare.standard.php.gz';
+    $core10 = static::getDrupalRoot() . '/core/modules/system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz';
+    if (file_exists($core9)) {
       $this->databaseDumpFiles = [
-        $core94,
+        $core9,
       ];
     }
     else {
       $this->databaseDumpFiles = [
-        $core93,
+        $core10,
       ];
     }
 
@@ -61,7 +82,7 @@ class V2UpdatesTest extends UpdatePathTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function doSelectionTest() {
+  protected function doSelectionTest(): void {
     parent::doSelectionTest();
 
     // Verify that the v2 post post-update script is present.
@@ -129,7 +150,7 @@ class V2UpdatesTest extends UpdatePathTestBase {
     // Perform these checks for both the main field and the revision field.
     foreach (['node__field_meta_tags', 'node_revision__field_meta_tags'] as $table_name) {
       // Confirm the data started as a serialized array.
-      $query = \Drupal::database()->select($table_name);
+      $query = $this->database->select($table_name);
       $query->addField($table_name, 'field_meta_tags_value');
       $result = $query->execute();
       $records = $result->fetchAll();
@@ -202,7 +223,7 @@ class V2UpdatesTest extends UpdatePathTestBase {
     // successfully converted to the new structure.
     // @see metatag_post_update_v2_01_change_fields_to_json()
     foreach (['node__field_meta_tags', 'node_revision__field_meta_tags'] as $table_name) {
-      $query = \Drupal::database()->select($table_name);
+      $query = $this->database->select($table_name);
       $query->addField($table_name, 'field_meta_tags_value');
       $result = $query->execute();
       $records = $result->fetchAll();

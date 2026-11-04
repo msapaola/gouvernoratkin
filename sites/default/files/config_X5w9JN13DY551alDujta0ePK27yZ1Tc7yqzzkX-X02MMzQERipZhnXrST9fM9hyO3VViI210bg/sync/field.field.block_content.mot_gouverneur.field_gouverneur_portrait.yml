@@ -11,8 +11,8 @@ id: block_content.mot_gouverneur.field_gouverneur_portrait
 field_name: field_gouverneur_portrait
 entity_type: block_content
 bundle: mot_gouverneur
-label: 'Portrait'
-description: "Photo du gouverneur, de préférence au format paysage (4:3), au moins 800 × 600 pixels. Elle est recadrée automatiquement."
+label: Portrait
+description: 'Photo du gouverneur, de préférence au format paysage (4:3), au moins 800 × 600 pixels. Elle est recadrée automatiquement.'
 required: true
 translatable: false
 default_value: {  }

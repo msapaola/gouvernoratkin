@@ -51,6 +51,7 @@ function tb_megamenu_theme($existing, $type, $theme, $path): array {
       'content' => NULL,
       'section' => 'frontend',
       'block_theme' => \Drupal::config('system.theme')->get('default'),
+      'menu_id' => NULL,
     ],
   ];
   $items['tb_megamenu_nav'] = [

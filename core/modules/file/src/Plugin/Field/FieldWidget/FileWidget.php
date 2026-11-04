@@ -12,9 +12,9 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Drupal\file\Element\ManagedFile;
 use Drupal\file\Entity\File;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
@@ -43,13 +43,6 @@ class FileWidget extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($plugin_id, $plugin_definition, $configuration['field_definition'], $configuration['settings'], $configuration['third_party_settings'], $container->get('element_info'));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public static function defaultSettings() {
     return [
       'progress_indicator' => 'throbber',
@@ -60,6 +53,15 @@ class FileWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element['notice'] = [
+      '#type' => 'container',
+      '#markup' => $this->t('The UploadProgress PHP extension must be enabled to configure the progress indicator. Check the <a href=":status">status report</a> for more information.', [':status' => Url::fromRoute('system.status')->toString()]),
+      '#weight' => 16,
+      '#access' => !extension_loaded('uploadprogress'),
+      '#attributes' => [
+        'role' => 'status',
+      ],
+    ];
     $element['progress_indicator'] = [
       '#type' => 'radios',
       '#title' => $this->t('Progress indicator'),
@@ -70,7 +72,7 @@ class FileWidget extends WidgetBase {
       '#default_value' => $this->getSetting('progress_indicator'),
       '#description' => $this->t('The throbber display does not show the status of uploads but takes up less space. The progress bar is helpful for monitoring progress on large uploads.'),
       '#weight' => 16,
-      '#access' => extension_loaded('uploadprogress'),
+      '#disabled' => !extension_loaded('uploadprogress'),
     ];
     return $element;
   }
@@ -541,9 +543,10 @@ class FileWidget extends WidgetBase {
   /**
    * Form submission handler for upload/remove button of formElement().
    *
-   * This runs in addition to and after file_managed_file_submit().
+   * This runs in addition to and after
+   * \Drupal\file\Element\ManagedFile::submit().
    *
-   * @see file_managed_file_submit()
+   * @see \Drupal\file\Element\ManagedFile::submit()
    */
   public static function submit($form, FormStateInterface $form_state) {
     // During the form rebuild, formElement() will create field item widget

@@ -8,15 +8,20 @@ use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Url;
+use Drupal\jsonapi\JsonApiSpec;
+use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "BlockContent" content entity type.
- *
- * @group jsonapi
  */
+#[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class BlockContentTest extends ResourceTestBase {
 
+  use BlockContentCreationTrait;
   use CommonCollectionFilterAccessTestPatternsTrait;
 
   /**
@@ -104,13 +109,11 @@ class BlockContentTest extends ResourceTestBase {
    */
   public function createEntity() {
     if (!BlockContentType::load('basic')) {
-      $block_content_type = BlockContentType::create([
+      $this->createBlockContentType([
         'id' => 'basic',
         'label' => 'basic',
         'revision' => TRUE,
-      ]);
-      $block_content_type->save();
-      block_content_add_body_field($block_content_type->id());
+      ], TRUE);
     }
 
     // Create a "Llama" content block.
@@ -140,10 +143,10 @@ class BlockContentTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
+            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
           ],
         ],
-        'version' => '1.0',
+        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
         'self' => ['href' => $base_url->toString()],
@@ -158,7 +161,6 @@ class BlockContentTest extends ResourceTestBase {
           'body' => [
             'value' => 'The name "llama" was adopted by European settlers from native Peruvians.',
             'format' => 'plain_text',
-            'summary' => NULL,
             'processed' => "<p>The name &quot;llama&quot; was adopted by European settlers from native Peruvians.</p>\n",
           ],
           'changed' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),
@@ -217,7 +219,7 @@ class BlockContentTest extends ResourceTestBase {
    */
   protected function getExpectedUnauthorizedAccessMessage($method) {
     return match ($method) {
-      'GET' => "The 'access block library' permission is required.",
+      'GET' => "The following permissions are required: 'access block library' OR 'view unpublished block content'.",
       'PATCH' => "The 'edit any basic block content' permission is required.",
       'POST' => "The following permissions are required: 'create basic block content' OR 'administer block content'.",
       'DELETE' => "The 'delete any basic block content' permission is required.",

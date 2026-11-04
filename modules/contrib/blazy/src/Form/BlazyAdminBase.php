@@ -7,9 +7,10 @@ use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Render\Element;
-use Drupal\blazy\Blazy;
+use Drupal\blazy\BlazyApi;
 use Drupal\blazy\BlazyDefault;
 use Drupal\blazy\BlazyManagerInterface;
+use Drupal\blazy\Internals\Internals;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -55,6 +56,20 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
   const STATE_IMAGE_RENDERED_ENABLED = 5;
 
   /**
+   * The Blazy manager service.
+   *
+   * @var \Drupal\blazy\BlazyManagerInterface
+   */
+  protected $blazyManager;
+
+  /**
+   * The Blazy manager for consistency with submodules and extra features.
+   *
+   * @var \Drupal\blazy\BlazyManagerInterface
+   */
+  protected $manager;
+
+  /**
    * Constructs a BlazyAdminBase object.
    *
    * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
@@ -76,6 +91,7 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
     $this->typedConfig             = $typed_config;
     $this->dateFormatter           = $date_formatter;
     $this->blazyManager            = $blazy_manager;
+    $this->manager                 = $blazy_manager;
   }
 
   /**
@@ -94,10 +110,8 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
    * {@inheritdoc}
    */
   public function openingForm(array &$form, array &$definition): void {
+    /** @var \Drupal\blazy\BlazySettings $scopes */
     $scopes = $this->toScopes($definition);
-
-    // @todo remove this failsafe after sub-module migrations done.
-    $this->checkScopes($scopes, $definition);
 
     $this->blazyManager
       ->moduleHandler()
@@ -114,18 +128,27 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
         '#enforced'     => TRUE,
         '#empty_option' => $this->t('- None -'),
         '#options'      => $this->blazyManager->getStyles(),
-        '#required'     => $scopes->is('grid_required'),
+        '#required'     => $scopes->is('grid_required', FALSE),
         '#weight'       => -112,
         '#wrapper_attributes' => $this->getTooltipClasses(['tooltip-wide']),
       ];
     }
 
-    if ($scopes->is('by_delta') && !$scopes->is('_views')) {
+    if ($scopes->is('by_delta')) {
       $form['by_delta'] = [
         '#type'   => 'textfield',
         '#title'  => $this->t('By delta'),
         '#weight' => -111,
         '#wrapper_attributes' => $this->getTooltipClasses(),
+      ];
+    }
+
+    // @todo deprecate and remove after sub-modules calls ::baseImageForm().
+    if ($scopes->is('background')) {
+      $form['background'] = [
+        '#type'   => 'checkbox',
+        '#title'  => $this->t('Use CSS background'),
+        '#weight' => -100,
       ];
     }
 
@@ -136,14 +159,6 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
         '#options'  => $this->toOptions($skins),
         '#enforced' => TRUE,
         '#weight'   => -109,
-      ];
-    }
-
-    if ($scopes->is('background')) {
-      $form['background'] = [
-        '#type'   => 'checkbox',
-        '#title'  => $this->t('Use CSS background'),
-        '#weight' => -100,
       ];
     }
 
@@ -182,6 +197,7 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
    * {@inheritdoc}
    */
   public function gridForm(array &$form, array $definition): void {
+    /** @var \Drupal\blazy\BlazySettings $scopes */
     $scopes    = $this->toScopes($definition);
     $required  = $scopes->is('grid_required');
     $multigrid = $this->isMultiBreakpoint($definition);
@@ -255,7 +271,7 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
     }
 
     // Add descriptions, if applicable.
-    foreach ($this->gridDescriptions($scopes) as $key => $description) {
+    foreach ($this->gridDescriptions() as $key => $description) {
       if (isset($form[$key])) {
         $form[$key]['#description'] = $description;
       }
@@ -275,6 +291,7 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
    * {@inheritdoc}
    */
   public function closingForm(array &$form, array $definition): void {
+    /** @var \Drupal\blazy\BlazySettings $scopes */
     $scopes = $this->toScopes($definition);
     $namespace = $scopes->get('namespace');
     $valid = $scopes->get('field') && $scopes->is('theme_field');
@@ -313,13 +330,9 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
    * {@inheritdoc}
    */
   public function baseForm(array &$definition): array {
-    $scopes = $this->toScopes($definition);
-
-    // Might be called directly without calling self::buildSettingsForm(), such
-    // as \Drupal\blazy\Plugin\views\field\BlazyViewsFieldPluginBase.
-    $this->checkScopes($scopes, $definition);
-
-    $blazies      = $definition['blazies'];
+    /** @var \Drupal\blazy\BlazySettings $scopes */
+    $scopes       = $this->toScopes($definition);
+    $blazies      = Internals::getBlazies($definition);
     $form         = [];
     $no_image     = $scopes->is('no_image_style');
     $disabled     = $scopes->is('no_view_mode');
@@ -340,11 +353,11 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
     }
 
     if ($scopes->form('image_style') || !$no_image) {
-      $this->baseImageForm($form, $definition, $scopes);
+      $this->baseImageForm($form, $definition);
     }
 
     // Add descriptions, if applicable.
-    foreach ($this->baseDescriptions($scopes) as $key => $description) {
+    foreach ($this->baseDescriptions() as $key => $description) {
       if (isset($form[$key])) {
         $form[$key]['#description'] = $description;
       }
@@ -357,8 +370,14 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
 
   /**
    * Provides basic image options.
+   *
+   * @param array $form
+   *   The form being modified.
+   * @param array $definition
+   *   The definition being passed.
    */
-  protected function baseImageForm(array &$form, array $definition, $scopes): void {
+  protected function baseImageForm(array &$form, array $definition): void {
+    $scopes = $this->scopes;
     $data = $scopes->get('data');
     $multimedia = $scopes->is('multimedia');
 
@@ -394,6 +413,23 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
       '#options' => $this->getEntityAsOptions('image_style'),
       '#weight'  => -106,
       '#wrapper_attributes' => $this->getTooltipClasses(),
+    ];
+
+    if ($scopes->is('responsive_image')) {
+      $options = $this->getResponsiveImageOptions();
+      $form['responsive_image_style'] = [
+        '#type'        => 'select',
+        '#title'       => $this->t('Responsive image'),
+        '#options'     => $options,
+        '#access'      => count($options) > 0,
+        '#weight'      => -105,
+      ];
+    }
+
+    $form['background'] = [
+      '#type'   => 'checkbox',
+      '#title'  => $this->t('Use CSS background'),
+      '#weight' => -100,
     ];
 
     if ($scopes->is('switch')) {
@@ -452,12 +488,20 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
     }
 
     $this->linkForm($form, $definition, $scopes);
+
+    // Add descriptions, if applicable.
+    foreach ($this->baseDescriptions() as $key => $description) {
+      if (isset($form[$key])) {
+        $form[$key]['#description'] = $description;
+      }
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   public function mediaSwitchForm(array &$form, array $definition): void {
+    /** @var \Drupal\blazy\BlazySettings $scopes */
     $scopes    = $this->toScopes($definition);
     $base_form = $this->baseForm($definition);
     $classes   = $this->getTitleClasses(['media-switch', 'hideable'], TRUE);
@@ -487,6 +531,7 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
    * {@inheritdoc}
    */
   public function finalizeForm(array &$form, array $definition): void {
+    /** @var \Drupal\blazy\BlazySettings $scopes */
     $scopes    = $this->toScopes($definition);
     $settings  = $definition['settings'] ?? [];
     $admin_css = $this->isAdminCss();
@@ -504,6 +549,13 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
     if (isset($form['grid'], $form['grid']['#description'])) {
       $description = $form['grid']['#description'];
       $form['grid']['#description'] = $description . $this->nativeGridDescription();
+    }
+
+    if ($scopes->is('_views')) {
+      $form['field_api_classes'] = [
+        '#type' => 'hidden',
+        '#value' => $scopes->is('field_api_classes'),
+      ];
     }
 
     // Accounts for hook_alter additions.
@@ -574,7 +626,7 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
       // Trying to be compact with gazillion options.
       if ($admin_css) {
         if ($gridsets) {
-          $blazy = $gridsets['blazies']->reset($gridsets);
+          $blazy = Internals::getBlazies($gridsets)->reset($gridsets);
           $blazy->set('delta', $delta);
         }
 
@@ -694,9 +746,16 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
 
   /**
    * Provides lightbox options.
+   *
+   * @param array $form
+   *   The form being modified.
+   * @param array $definition
+   *   The definition being passed.
+   * @param \Drupal\blazy\BlazySettings $scopes
+   *   The scopes being passed.
    */
   protected function lightboxForm(array &$form, array $definition, $scopes): void {
-    $blazies    = $definition['blazies'];
+    $blazies    = Internals::getBlazies($definition);
     $multimedia = $scopes->is('multimedia');
     $is_token   = $this->blazyManager->moduleExists('token');
 
@@ -729,35 +788,44 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
         ];
       }
 
-      // @todo remove check after another check.
+      // @todo deprecate and remove check after another check.
       // Was meant for Blazy Views fields lacking of field info needed here.
       if (!$scopes->is('no_box_captions')) {
+        $custom = !$scopes->is('no_box_caption_custom');
+        $options = $this->getLightboxCaptionOptions();
+
+        if (!$custom) {
+          unset($options['custom']);
+        }
+
         $form['box_caption'] = [
           '#type'    => 'select',
           '#title'   => $this->t('Lightbox caption'),
-          '#options' => $this->getLightboxCaptionOptions(),
+          '#options' => $options,
           '#weight'  => -95,
         ];
 
-        $form['box_caption_custom'] = [
-          '#title'  => $this->t('Lightbox custom caption'),
-          '#type'   => 'textfield',
-          '#weight' => -94,
-          '#states' => $this->getState(static::STATE_LIGHTBOX_CUSTOM, $scopes),
-        ];
+        if ($custom) {
+          $form['box_caption_custom'] = [
+            '#title'  => $this->t('Lightbox custom caption'),
+            '#type'   => 'textfield',
+            '#weight' => -94,
+            '#states' => $this->getState(static::STATE_LIGHTBOX_CUSTOM, $scopes),
+          ];
 
-        if ($is_token) {
-          $entity_type = $blazies->get('field.entity_type');
-          $target_type = $blazies->get('field.target_type');
-          $types = $entity_type ? [$entity_type] : [];
-          $types = $target_type ? array_merge($types, [$target_type]) : $types;
+          if ($is_token) {
+            $entity_type = $blazies->get('field.entity_type');
+            $target_type = $blazies->get('field.target_type');
+            $types = $entity_type ? [$entity_type] : [];
+            $types = $target_type ? array_merge($types, [$target_type]) : $types;
 
-          if ($types) {
-            $form['box_caption_custom']['#field_suffix'] = [
-              '#theme'       => 'token_tree_link',
-              '#text'        => $this->t('Tokens'),
-              '#token_types' => $types,
-            ];
+            if ($types) {
+              $form['box_caption_custom']['#field_suffix'] = [
+                '#theme'       => 'token_tree_link',
+                '#text'        => $this->t('Tokens'),
+                '#token_types' => $types,
+              ];
+            }
           }
         }
       }
@@ -774,10 +842,17 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
 
   /**
    * Provides link options serving plain image, fieldable and views ui.
+   *
+   * @param array $form
+   *   The form being modified.
+   * @param array $definition
+   *   The definition being passed.
+   * @param \Drupal\blazy\BlazySettings $scopes
+   *   The scopes being passed.
    */
   protected function linkForm(array &$form, array $definition, $scopes): void {
     $data = $scopes->get('data');
-    $description = $this->baseDescriptions($scopes);
+    $description = $this->baseDescriptions();
 
     if (isset($data['links'])) {
       $form['link'] = [
@@ -792,13 +867,18 @@ abstract class BlazyAdminBase implements BlazyAdminInterface {
 
   /**
    * Provides SVG options.
+   *
+   * @param array $form
+   *   The form being modified.
+   * @param array $definition
+   *   The definition being passed.
    */
-  protected function svgForm(array &$form, array $definition, $scopes): void {
+  protected function svgForm(array &$form, array $definition): void {
     foreach (BlazyDefault::svgSettings() as $key => $value) {
       $base  = str_replace('svg_', '', $key);
       $name  = str_replace('_', ' ', $base);
       $title = Unicode::ucfirst($name);
-      $exist = Blazy::svgSanitizerExists();
+      $exist = BlazyApi::svgSanitizerExists();
       $desc  = $this->svgDescriptions()[$base] ?? '';
 
       $form[$key] = [

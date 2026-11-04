@@ -15,25 +15,29 @@
   border: 0 !important;
 }
 
-.form-item--collapsidesc > div > details {
+details.b-details--description {
   margin-bottom: 0 !important;
   box-shadow: none !important;
 }
 
-.form-item--collapsidesc > div > details > summary {
+details.b-details--description > summary {
   display: block !important;
   text-align: right !important;
 }
 
-.form-item--collapsidesc > div > details > summary:focus {
-  outline-width: 0 !important;
-}
-
-.form-item--collapsidesc > div > details > summary::after {
+details.b-details--description > summary::before {
   display: none !important;
 }
 
-.form-item--collapsidesc details > div {
+details.b-details--description > summary:focus {
+  outline-width: 0 !important;
+}
+
+details.b-details--description > summary::after {
+  display: none !important;
+}
+
+details.b-details--description > div {
   padding-right: 0 !important;
   padding-left: 0 !important;
 }

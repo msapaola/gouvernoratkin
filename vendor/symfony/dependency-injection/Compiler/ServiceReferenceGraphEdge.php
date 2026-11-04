@@ -27,6 +27,8 @@ class ServiceReferenceGraphEdge
         private bool $lazy = false,
         private bool $weak = false,
         private bool $byConstructor = false,
+        private bool $byMultiUseArgument = false,
+        private bool $fromExpression = false,
     ) {
     }
 
@@ -76,5 +78,18 @@ class ServiceReferenceGraphEdge
     public function isReferencedByConstructor(): bool
     {
         return $this->byConstructor;
+    }
+
+    public function isFromMultiUseArgument(): bool
+    {
+        return $this->byMultiUseArgument;
+    }
+
+    /**
+     * Returns true if the edge comes from an expression, which compiles to a container lookup.
+     */
+    public function isFromExpression(): bool
+    {
+        return $this->fromExpression;
     }
 }

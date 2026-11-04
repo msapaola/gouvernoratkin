@@ -25,46 +25,32 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class MetatagDefaultsForm extends EntityForm {
 
   /**
-   * The Metatag defaults object being reverted.
-   *
-   * @var \Drupal\metatag\Entity\MetatagDefaults
-   */
-  protected $entity;
-
-  /**
    * The entity type bundle info service.
    *
    * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
    */
-  protected $entityTypeBundleInfo;
+  protected EntityTypeBundleInfoInterface $entityTypeBundleInfo;
 
   /**
    * The Metatag manager service.
    *
    * @var \Drupal\metatag\MetatagManagerInterface
    */
-  protected $metatagManager;
+  protected MetatagManagerInterface $metatagManager;
 
   /**
    * The Metatag token service.
    *
    * @var \Drupal\metatag\MetatagToken
    */
-  protected $metatagToken;
-
-  /**
-   * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
+  protected MetatagToken $metatagToken;
 
   /**
    * The Metatag tag plugin manager service.
    *
    * @var \Drupal\metatag\MetatagTagPluginManager
    */
-  protected $metatagPluginManager;
+  protected MetatagTagPluginManager $metatagPluginManager;
 
   /**
    * Constructs a new MetatagDefaultsForm.
@@ -106,6 +92,7 @@ class MetatagDefaultsForm extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
+    /** @var \Drupal\metatag\MetatagDefaultsInterface $metatag_defaults */
     $metatag_defaults = $this->entity;
 
     $form['#ajax_wrapper_id'] = 'metatag-defaults-form-ajax-wrapper';
@@ -174,7 +161,7 @@ class MetatagDefaultsForm extends EntityForm {
     }
 
     // See if there are requested groups for this entity type and bundle.
-    if (isset($entity_type) && !empty($entity_type_groups[$entity_type]) && !empty($entity_type_groups[$entity_type][$entity_bundle])) {
+    if (isset($entity_type) && !is_null($entity_bundle) && !empty($entity_type_groups[$entity_type]) && !empty($entity_type_groups[$entity_type][$entity_bundle])) {
       $form = $this->metatagManager->form($values, $form, [$entity_type], $entity_type_groups[$entity_type][$entity_bundle], NULL, TRUE);
     }
     // Otherwise, display all groups.
@@ -231,6 +218,7 @@ class MetatagDefaultsForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
+    /** @var \Drupal\metatag\MetatagDefaultsInterface $metatag_defaults */
     $metatag_defaults = $this->entity;
 
     $metatag_defaults->setStatus($form_state->getValue('status'));
@@ -267,7 +255,9 @@ class MetatagDefaultsForm extends EntityForm {
       }
 
       // Set the label to the config entity.
-      $this->entity->set('label', $entity_label);
+      /** @var \Drupal\metatag\MetatagDefaultsInterface $entity */
+      $entity = $this->entity;
+      $entity->set('label', $entity_label);
     }
 
     // Set tags within the Metatag entity.
@@ -353,8 +343,6 @@ class MetatagDefaultsForm extends EntityForm {
     $unsupported_types = [
       // Custom blocks.
       'block_content',
-      // Comments.
-      'comment',
       // Contact messages are the messages submitted on individual contact forms
       // so obviously shouldn't get meta tags.
       'contact_message',
@@ -374,7 +362,8 @@ class MetatagDefaultsForm extends EntityForm {
       'commerce_shipment',
       'commerce_shipping_method',
       'commerce_stock_location',
-      'commerce_store',
+      // Feeds.
+      'feeds_feed',
       // LinkChecker.
       'linkcheckerlink',
       // Redirect.
@@ -392,15 +381,38 @@ class MetatagDefaultsForm extends EntityForm {
         continue;
       }
 
-      // Identify supported entities.
-      if ($definition instanceof ContentEntityType) {
-        // Only work with entity types that have a list of links, i.e. publicly
-        // viewable.
-        $links = $definition->get('links');
-        if (!empty($links)) {
-          $entity_types[$entity_name] = static::getEntityTypeLabel($definition);
-        }
+      // Skip "internal" entity types; not sure what these might be?
+      if ($definition->isInternal()) {
+        continue;
       }
+
+      // Must be a content entity type.
+      // @todo Are there circumstances when these should be supported?
+      if (!($definition instanceof ContentEntityType)) {
+        continue;
+      }
+
+      // Don't support entity types that can't be cached, e.g. Paragraphs
+      // Library Items. Hopefully this doesn't cause problems for other entity
+      // types.
+      if (!$definition->isRenderCacheable()) {
+        continue;
+      }
+
+      // Only work with entity types that have a list of links, i.e. publicly
+      // viewable.
+      $links = $definition->get('links');
+      if (empty($links) || !isset($links['canonical'])) {
+        continue;
+      }
+
+      // If the 'edit' form has the same path as the display path, this is not
+      // an entity type intended for public visitors to see.
+      if (isset($links['edit-form']) && ($links['edit-form'] == $links['canonical'])) {
+        continue;
+      }
+
+      $entity_types[$entity_name] = static::getEntityTypeLabel($definition);
     }
 
     return $entity_types;

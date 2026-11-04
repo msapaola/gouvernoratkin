@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Argument;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -40,22 +39,22 @@ class LazyClosure
         }
 
         if (isset($this->initializer)) {
-            $this->service = ($this->initializer)();
+            if (\is_string($service = ($this->initializer)())) {
+                $service = (new \ReflectionClass($service))->newInstanceWithoutConstructor();
+            }
+            $this->service = $service;
             unset($this->initializer);
         }
 
         return $this->service;
     }
 
-    public static function getCode(string $initializer, array $callable, Definition $definition, ContainerBuilder $container, ?string $id): string
+    public static function getCode(string $initializer, array $callable, string $class, ContainerBuilder $container, ?string $id): string
     {
         $method = $callable[1];
-        $asClosure = 'Closure' === ($definition->getClass() ?: 'Closure');
 
-        if ($asClosure) {
+        if ($asClosure = 'Closure' === $class) {
             $class = ($callable[0] instanceof Reference ? $container->findDefinition($callable[0]) : $callable[0])->getClass();
-        } else {
-            $class = $definition->getClass();
         }
 
         $r = $container->getReflectionClass($class);
@@ -82,13 +81,19 @@ class LazyClosure
         $code = ProxyHelper::exportSignature($methodReflector, true, $args);
 
         if ($asClosure) {
-            $code = ' { '.preg_replace('/: static$/', ': \\'.$r->name, $code);
+            if ($methodReflector->isStatic()) {
+                $code = preg_replace('/ static /', ' ', $code, 1);
+            }
+            if (null !== $returnType = ProxyHelper::exportType($methodReflector)) {
+                $code = substr($code, 0, -\strlen($returnType)).preg_replace('/(?<![\w\\\\])static(?![\w\\\\])/', '\\'.$r->name, $returnType);
+            }
+            $code = ' { '.$code;
         } else {
             $code = ' implements \\'.$r->name.' { '.$code;
         }
 
         $code = 'new class('.$initializer.') extends \\'.self::class
-            .$code.' { '.($methodReflector->hasReturnType() && 'void' === (string) $methodReflector->getReturnType() ? '' : 'return ').'$this->service->'.$callable[1].'('.$args.'); } '
+            .$code.' { '.(\in_array((string) $methodReflector->getReturnType(), ['void', 'never'], true) ? '' : 'return ').'$this->service->'.$callable[1].'('.$args.'); } '
             .'}';
 
         return $asClosure ? '('.$code.')->'.$method.'(...)' : $code;

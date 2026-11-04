@@ -24,8 +24,6 @@ trait MetatagSeparator {
    *   The correct separator.
    */
   public function getSeparator(): string {
-    $separator = '';
-
     // Load the separator saved in configuration.
     $config = $this->configFactory->get('metatag.settings');
 

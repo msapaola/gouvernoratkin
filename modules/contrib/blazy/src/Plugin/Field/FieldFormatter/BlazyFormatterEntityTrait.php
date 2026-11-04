@@ -4,6 +4,8 @@ namespace Drupal\blazy\Plugin\Field\FieldFormatter;
 
 /**
  * A Trait common for all blazy entity formatters.
+ *
+ * @todo refactor to avoid nullable ::$manager.
  */
 trait BlazyFormatterEntityTrait {
 
@@ -17,11 +19,16 @@ trait BlazyFormatterEntityTrait {
     $target_type = '',
     $exclude = TRUE,
   ): array {
+    // Might not initialized at LB AJAX with Blazy Layout for some reason.
+    if (!$this->manager) {
+      return [];
+    }
+
     $options = [];
 
     // Fix for Views UI not recognizing Media bundles, unlike Formatters.
     if (empty($target_bundles)) {
-      if ($service = $this->formatter->service('entity_type.bundle.info')) {
+      if ($service = $this->manager->service('entity_type.bundle.info')) {
         $target_bundles = $service->getBundleInfo($entity_type);
       }
     }
@@ -30,7 +37,7 @@ trait BlazyFormatterEntityTrait {
     $excludes = $exclude ? $this->getExcludedFieldOptions() : [];
 
     foreach ($target_bundles as $bundle => $label) {
-      if ($fields = $this->formatter->loadByProperties([
+      if ($fields = $this->manager->loadByProperties([
         'entity_type' => $entity_type,
         'bundle' => $bundle,
       ], 'field_config', FALSE)) {
@@ -75,7 +82,10 @@ trait BlazyFormatterEntityTrait {
       $excludes['field_' . $exclude] = 'field_' . $exclude;
     }
 
-    $this->formatter->moduleHandler()->alter('blazy_excluded_field_options', $excludes);
+    // Might not initialized at LB AJAX with Blazy Layout for some reason.
+    if ($this->manager) {
+      $this->manager->moduleHandler()->alter('blazy_excluded_field_options', $excludes);
+    }
     return $excludes;
   }
 

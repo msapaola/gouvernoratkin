@@ -2,15 +2,19 @@
 
 namespace Drupal\metatag_views\Form;
 
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\metatag\MetatagManagerInterface;
 use Drupal\metatag\MetatagTagPluginManager;
 use Drupal\metatag\MetatagToken;
 use Drupal\metatag_views\MetatagViewsValuesCleanerTrait;
+use Drupal\views\ViewEntityInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -26,44 +30,44 @@ class MetatagViewsTranslationForm extends FormBase {
   /**
    * Drupal\metatag\MetatagManager definition.
    *
-   * @var \Drupal\metatag\MetatagManager
+   * @var \Drupal\metatag\MetatagManagerInterface
    */
-  protected $metatagManager;
+  protected MetatagManagerInterface $metatagManager;
 
   /**
    * The language manager.
    *
    * @var \Drupal\language\ConfigurableLanguageManagerInterface
    */
-  protected $languageManager;
+  protected ConfigurableLanguageManagerInterface $languageManager;
 
   /**
    * The Views manager.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $viewsManager;
+  protected EntityStorageInterface $viewsManager;
 
   /**
    * The Metatag token service.
    *
    * @var \Drupal\metatag\MetatagToken
    */
-  protected $tokenService;
+  protected MetatagToken $tokenService;
 
   /**
    * The Metatag tag plugin manager.
    *
    * @var \Drupal\metatag\MetatagTagPluginManager
    */
-  protected $tagPluginManager;
+  protected MetatagTagPluginManager $tagPluginManager;
 
   /**
    * The View entity object.
    *
    * @var \Drupal\views\ViewEntityInterface
    */
-  protected $view;
+  protected ViewEntityInterface $view;
 
   /**
    * View ID.
@@ -84,14 +88,14 @@ class MetatagViewsTranslationForm extends FormBase {
    *
    * @var \Drupal\Core\Language\LanguageInterface
    */
-  protected $language;
+  protected LanguageInterface $language;
 
   /**
    * The language of the translation source.
    *
    * @var \Drupal\Core\Language\LanguageInterface
    */
-  protected $sourceLanguage;
+  protected LanguageInterface $sourceLanguage;
 
   /**
    * An array of base language data.
@@ -101,14 +105,22 @@ class MetatagViewsTranslationForm extends FormBase {
   protected $baseData = [];
 
   /**
+   * Handles interactions with enabled modules.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected ModuleHandlerInterface $moduleHandler;
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct(MetatagManagerInterface $metatag_manager, EntityTypeManagerInterface $entity_type_manager, MetatagToken $token, MetatagTagPluginManager $tagPluginManager, ConfigurableLanguageManagerInterface $language_manager) {
+  public function __construct(MetatagManagerInterface $metatag_manager, EntityTypeManagerInterface $entity_type_manager, MetatagToken $token, MetatagTagPluginManager $tagPluginManager, ConfigurableLanguageManagerInterface $language_manager, ModuleHandlerInterface $moduleHandler) {
     $this->metatagManager = $metatag_manager;
     $this->viewsManager = $entity_type_manager->getStorage('view');
     $this->tokenService = $token;
     $this->tagPluginManager = $tagPluginManager;
     $this->languageManager = $language_manager;
+    $this->moduleHandler = $moduleHandler;
   }
 
   /**
@@ -120,7 +132,8 @@ class MetatagViewsTranslationForm extends FormBase {
       $container->get('entity_type.manager'),
       $container->get('metatag.token'),
       $container->get('plugin.manager.metatag.tag'),
-      $container->get('language_manager')
+      $container->get('language_manager'),
+      $container->get('module_handler')
     );
   }
 
@@ -170,7 +183,11 @@ class MetatagViewsTranslationForm extends FormBase {
 
     // Get meta tags from the view entity.
     $form['#tree'] = TRUE;
-    $form['#attached']['library'][] = 'config_translation/drupal.config_translation.admin';
+    if ($this->moduleHandler->moduleExists('config_translation')) {
+      // Only add the config_translation/drupal.config_translation.admin if the
+      // module is enabled.
+      $form['#attached']['library'][] = 'config_translation/drupal.config_translation.admin';
+    }
 
     $form['#title'] = $this->t('Edit @language translation for %view: %display metatags', [
       '%view' => $this->view->label(),

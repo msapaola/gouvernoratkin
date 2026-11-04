@@ -22,12 +22,12 @@ class NodewordsFieldInstance extends DrupalSqlBase {
    *
    * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
    */
-  protected $entityTypeBundleInfo;
+  protected EntityTypeBundleInfoInterface $entityTypeBundleInfo;
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration = NULL) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     /** @var static $source */
     $source = parent::create($container, $configuration, $plugin_id, $plugin_definition, $migration);
     $source->setEntityTypeBundleInfo($container->get('entity_type.bundle.info'));
@@ -120,7 +120,7 @@ class NodewordsFieldInstance extends DrupalSqlBase {
   /**
    * {@inheritdoc}
    */
-  public function count($refresh = FALSE) {
+  public function count($refresh = FALSE): int {
     /** @var \ArrayIterator $items */
     $items = $this->initializeIterator();
     return $items->count();

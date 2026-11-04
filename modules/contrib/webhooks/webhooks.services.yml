@@ -1,4 +1,27 @@
 services:
   webhooks.service:
     class: Drupal\webhooks\WebhooksService
-    arguments: ['@http_client', '@logger.factory','@request_stack', '@event_dispatcher', '@entity_type.manager', '@serializer', '@uuid', '@config.factory', '@queue']
+    arguments:
+      [
+        '@http_client',
+        '@logger.factory',
+        '@request_stack',
+        '@event_dispatcher',
+        '@entity_type.manager',
+        '@serializer',
+        '@uuid',
+        '@config.factory',
+        '@queue',
+      ]
+  webhooks.encoder.form:
+    class: Drupal\webhooks\Encoder\FormEncoder
+    tags:
+      - { name: encoder, format: form }
+  webhooks.encoder.urlencoded:
+    class: Drupal\webhooks\Encoder\FormEncoder
+    tags:
+      - { name: encoder, format: x-www-form-urlencoded }
+  webhooks.encoder.yaml:
+    class: Symfony\Component\Serializer\Encoder\YamlEncoder
+    tags:
+      - { name: encoder, format: yaml }

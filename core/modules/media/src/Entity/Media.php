@@ -66,6 +66,10 @@ use Drupal\user\EntityOwnerTrait;
       'html' => MediaRouteProvider::class,
       'revision' => RevisionHtmlRouteProvider::class,
     ],
+    'link_target' => [
+      'view' => MediaLinkTargetStandaloneWhenAvailable::class,
+      'download' => MediaLinkTarget::class,
+    ],
   ],
   links: [
     'add-page' => '/media/add',
@@ -344,7 +348,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    */
   protected function hasSourceFieldChanged() {
     $source = $this->getSource();
-    return isset($this->original) && $source->getSourceFieldValue($this) !== $source->getSourceFieldValue($this->original);
+    return $this->getOriginal() && $source->getSourceFieldValue($this) !== $source->getSourceFieldValue($this->getOriginal());
   }
 
   /**
@@ -400,13 +404,13 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
   public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record) {
     parent::preSaveRevision($storage, $record);
 
-    if (!$this->isNewRevision() && isset($this->original) && empty($record->revision_log_message)) {
+    if (!$this->isNewRevision() && $this->getOriginal() && empty($record->revision_log_message)) {
       // If we are updating an existing media item without adding a
       // new revision, we need to make sure $entity->revision_log_message is
       // reset whenever it is empty.
       // Therefore, this code allows us to avoid clobbering an existing log
       // entry with an empty one.
-      $this->setRevisionLogMessage($this->original->getRevisionLogMessage());
+      $this->setRevisionLogMessage($this->getOriginal()->getRevisionLogMessage());
     }
   }
 
@@ -429,13 +433,14 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
     // operations during entity save. See
     // https://www.drupal.org/project/drupal/issues/2976875 for more.
 
-    // In order for metadata to be mapped correctly, $this->original must be
+    // In order for metadata to be mapped correctly, the original entity must be
     // set. However, that is only set once parent::save() is called, so work
     // around that by setting it here.
-    if (!isset($this->original) && $id = $this->id()) {
-      $this->original = $this->entityTypeManager()
+    if (!$this->getOriginal() && $id = $this->id()) {
+      $this->setOriginal($this->entityTypeManager()
         ->getStorage('media')
-        ->loadUnchanged($id);
+        ->loadUnchanged($id)
+      );
     }
 
     $media_source = $this->getSource();
@@ -444,10 +449,31 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
         $translation = $this->getTranslation($langcode);
         // Try to set fields provided by the media source and mapped in
         // media type config.
+        $original = $this->getOriginal();
         foreach ($translation->bundle->entity->getFieldMap() as $metadata_attribute_name => $entity_field_name) {
-          // Only save value in the entity if the field is empty or if the
-          // source field changed.
-          if ($translation->hasField($entity_field_name) && ($translation->get($entity_field_name)->isEmpty() || $translation->hasSourceFieldChanged())) {
+          if (!$translation->hasField($entity_field_name)) {
+            continue;
+          }
+          $set_metadata = FALSE;
+          // Only save value in the entity if the field is empty, or if the
+          // source field changed from one non-empty value to another non-empty
+          // value.
+          // 1st scenario: field is empty, safely store metadata there.
+          if ($translation->get($entity_field_name)->isEmpty()) {
+            $set_metadata = TRUE;
+          }
+          else {
+            // 2nd scenario: field is not empty, but the source field has
+            // changed between two non-empty values.
+            $original_source_field_empty = ($original instanceof MediaInterface) && $media_source->getSourceFieldValue($original) === NULL;
+            $new_source_field_empty = $media_source->getSourceFieldValue($translation) === NULL;
+            if (!$original_source_field_empty &&
+                !$new_source_field_empty &&
+                $translation->hasSourceFieldChanged()) {
+              $set_metadata = TRUE;
+            }
+          }
+          if ($set_metadata) {
             $translation->set($entity_field_name, $media_source->getMetadata($translation, $metadata_attribute_name));
           }
         }
@@ -473,13 +499,19 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
 
     if ($media_source instanceof MediaSourceEntityConstraintsInterface) {
       $entity_constraints = $media_source->getEntityConstraints();
-      $this->getTypedData()->getDataDefinition()->setConstraints($entity_constraints);
+      $dataDefinition = $this->getTypedData()->getDataDefinition();
+      foreach ($entity_constraints as $constraint_id => $constraint_options) {
+        $dataDefinition->addConstraint($constraint_id, $constraint_options);
+      }
     }
 
     if ($media_source instanceof MediaSourceFieldConstraintsInterface) {
       $source_field_name = $media_source->getConfiguration()['source_field'];
       $source_field_constraints = $media_source->getSourceFieldConstraints();
-      $this->get($source_field_name)->getDataDefinition()->setConstraints($source_field_constraints);
+      $fieldDefinition = $this->get($source_field_name)->getDataDefinition();
+      foreach ($source_field_constraints as $constraint_id => $constraint_options) {
+        $fieldDefinition->addConstraint($constraint_id, $constraint_options);
+      }
     }
 
     return parent::validate();

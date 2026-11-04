@@ -14,7 +14,7 @@ provider: null
 plugin: system_messages_block
 settings:
   id: system_messages_block
-  label: 'Messages d''état'
+  label: "Messages d'état"
   label_display: '0'
   provider: system
 visibility: {  }

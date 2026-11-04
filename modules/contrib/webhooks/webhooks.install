@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Webhooks module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\webhooks\Entity\WebhookConfig;
+
+/**
+ * Set default signature header and algorithm on webhooks that have a secret.
+ */
+function webhooks_update_10001(): void {
+  $storage = \Drupal::entityTypeManager()->getStorage('webhook_config');
+  $ids = $storage->getQuery()->accessCheck(FALSE)->execute();
+  foreach ($ids as $id) {
+    $config = \Drupal::configFactory()->getEditable('webhooks.webhook.' . $id);
+    $secret = $config->get('secret');
+    if (empty($secret)) {
+      continue;
+    }
+    $changed = FALSE;
+    if (empty($config->get('signature_header'))) {
+      $config->set(
+        'signature_header',
+        WebhookConfig::DEFAULT_SIGNATURE_HEADER
+      );
+      $changed = TRUE;
+    }
+    if (empty($config->get('signature_algorithm'))) {
+      $config->set(
+        'signature_algorithm',
+        WebhookConfig::DEFAULT_SIGNATURE_ALGORITHM
+      );
+      $changed = TRUE;
+    }
+    if ($changed) {
+      $config->save();
+    }
+  }
+}

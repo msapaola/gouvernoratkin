@@ -122,7 +122,7 @@ display:
           plugin_id: text_custom
           label: ''
           empty: true
-          content: "<div class=\"services-no-results\"><div class=\"no-results-icon\" aria-hidden=\"true\"><i class=\"fas fa-search\"></i></div><h3>Aucune démarche trouvée</h3><p>Essayez un autre mot dans la recherche, ou choisissez une autre rubrique.</p><a href=\"/services-aux-citoyens\" class=\"btn-reset-search\"><i class=\"fas fa-arrow-left me-2\" aria-hidden=\"true\"></i>Voir toutes les démarches</a></div>"
+          content: '<div class="services-no-results"><div class="no-results-icon" aria-hidden="true"><i class="fas fa-search"></i></div><h3>Aucune démarche trouvée</h3><p>Essayez un autre mot dans la recherche, ou choisissez une autre rubrique.</p><a href="/services-aux-citoyens" class="btn-reset-search"><i class="fas fa-arrow-left me-2" aria-hidden="true"></i>Voir toutes les démarches</a></div>'
           tokenize: false
       sorts:
         created:
@@ -227,9 +227,6 @@ display:
             multiple: false
             remember_roles:
               authenticated: authenticated
-              anonymous: '0'
-              content_editor: '0'
-              administrator: '0'
             placeholder: ''
           is_grouped: false
           group_info:
@@ -277,6 +274,7 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
+        - url.query_args
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }
@@ -295,6 +293,7 @@ display:
         - 'languages:language_content'
         - 'languages:language_interface'
         - url
+        - url.query_args
         - 'user.node_grants:view'
         - user.permissions
       tags: {  }

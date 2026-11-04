@@ -9,8 +9,8 @@ id: block_content.mot_gouverneur.field_gouverneur_fonction
 field_name: field_gouverneur_fonction
 entity_type: block_content
 bundle: mot_gouverneur
-label: 'Fonction'
-description: "Affichée sous le nom, par exemple « Gouverneur de la Ville-Province de Kinshasa »."
+label: Fonction
+description: 'Affichée sous le nom, par exemple « Gouverneur de la Ville-Province de Kinshasa ».'
 required: false
 translatable: false
 default_value: {  }

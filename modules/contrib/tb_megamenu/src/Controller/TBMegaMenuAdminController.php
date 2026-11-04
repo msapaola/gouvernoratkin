@@ -251,7 +251,7 @@ class TBMegaMenuAdminController extends ControllerBase {
    * @return string
    *   An error message displayed to the user.
    */
-  public function saveError(string $event, string $menu_name = NULL, string $theme = NULL, array $block_config = NULL, array $menu_config = NULL): string {
+  public function saveError(string $event, ?string $menu_name = NULL, ?string $theme = NULL, ?array $block_config = NULL, ?array $menu_config = NULL): string {
     $msg = $this->t("TB MegaMenu error:");
 
     switch ($event) {

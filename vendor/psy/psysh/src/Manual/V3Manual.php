@@ -3,7 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
- * (c) 2012-2025 Justin Hileman
+ * (c) 2012-2026 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -84,6 +84,20 @@ class V3Manual implements ManualInterface
     public function get(string $id)
     {
         return $this->data->get($id);
+    }
+
+    /**
+     * Get all available manual IDs when supported by the loaded manual file.
+     *
+     * @return string[]
+     */
+    public function getIds(): array
+    {
+        if (!\method_exists($this->data, 'getIds')) {
+            return [];
+        }
+
+        return $this->data->getIds();
     }
 
     /**

@@ -125,8 +125,8 @@ function template_preprocess_tb_megamenu_subnav(array &$vars): void {
       continue;
     }
 
-    $weight = $item->link->getWeight();
-    $title = $item->link->getTitle();
+    $weight = (int) $item->link->getWeight();
+    $title = (string) $item->link->getTitle();
     $vars['lis'][$weight][$title] = [
       '#theme' => 'tb_megamenu_item',
       '#menu_name' => $vars['menu_name'],
@@ -155,9 +155,6 @@ function template_preprocess_tb_megamenu_subnav(array &$vars): void {
   $vars['attributes']['class'][] = 'tbm-subnav';
   $vars['attributes']['class'][] = "level-" . $level;
   $vars['attributes']['class'][] = "items-" . count($col);
-
-  // Add a11y attributes.
-  $vars['attributes']['role'] = 'list';
 }
 
 /**
@@ -213,9 +210,6 @@ function template_preprocess_tb_megamenu_submenu(array &$vars): void {
     $vars['attributes']['class'][] = 'tbm-has-width';
     $vars['attributes']['style'] = "width: " . $submenu_config['width'] . "px;";
   }
-
-  // Add a11y attributes.
-  $vars['attributes']['role'] = 'list';
 }
 
 /**
@@ -226,7 +220,7 @@ function template_preprocess_tb_megamenu_submenu(array &$vars): void {
  */
 function template_preprocess_tb_megamenu(array &$vars): void {
   $menu_name = $vars['menu_name'];
-  $menu_id = "tbm-" . str_replace('_', '-', $menu_name);
+  $menu_id = $vars['menu_id'];
   $theme = $vars['block_theme'];
   $vars['#attached']['drupalSettings']['TBMegaMenu']['theme'] = $theme;
 
@@ -401,8 +395,8 @@ function template_preprocess_tb_megamenu_nav(array &$vars): void {
   $vars['lis'] = [];
   foreach ($items as $item) {
     if ($item->link->isEnabled()) {
-      $weight = $item->link->getWeight();
-      $title = $item->link->getTitle();
+      $weight = (int) $item->link->getWeight();
+      $title = (string) $item->link->getTitle();
       $vars['lis'][$weight][$title] = [
         '#theme' => 'tb_megamenu_item',
         '#menu_name' => $vars['menu_name'],
@@ -433,9 +427,6 @@ function template_preprocess_tb_megamenu_nav(array &$vars): void {
   $vars['attributes']['class'][] = "tbm-nav";
   $vars['attributes']['class'][] = "level-" . $level;
   $vars['attributes']['class'][] = "items-" . count($items);
-
-  // Add a11y attributes to unordered list tag.
-  $vars['attributes']['role'] = 'list';
 }
 
 /**

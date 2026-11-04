@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\metatag\Functional;
 
+use Drupal\Core\Utility\Token;
 use Drupal\metatag\Entity\MetatagDefaults;
 use Drupal\metatag\MetatagManager;
 use Drupal\Tests\BrowserTestBase;
@@ -25,7 +26,6 @@ class MetatagAdminTest extends BrowserTestBase {
     // @see testAvailableConfigEntities
     'block',
     'block_content',
-    'comment',
     'contact',
     'field_ui',
     'menu_link_content',
@@ -51,10 +51,19 @@ class MetatagAdminTest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
+   * Token service.
+   *
+   * @var \Drupal\Core\Utility\Token
+   */
+  protected Token $tokenService;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
+
+    $this->tokenService = $this->container->get('token');
 
     // Use the test page as the front page.
     $this->config('system.site')->set('page.front', '/test-page')->save();
@@ -75,7 +84,7 @@ class MetatagAdminTest extends BrowserTestBase {
    */
   public function testDefaults() {
     // Save the default title to test the Revert operation at the end.
-    $metatag_defaults = \Drupal::config('metatag.metatag_defaults.global');
+    $metatag_defaults = $this->config('metatag.metatag_defaults.global');
     $default_title = $metatag_defaults->get('tags')['title'];
 
     // Initiate session with a user who can manage metatags.
@@ -100,6 +109,8 @@ class MetatagAdminTest extends BrowserTestBase {
     $this->drupalGet('admin/config/search/metatag/global');
     $session->statusCodeEquals(200);
     $this->assertSession()->fieldExists('edit-title', $metatag_defaults->get('title'));
+    // Check that the tag descriptions are shown.
+    $session->pageTextContains('The text to display in the title bar');
     // Update the Global defaults and test them.
     $this->drupalGet('admin/config/search/metatag/global');
     $session->statusCodeEquals(200);
@@ -128,7 +139,7 @@ class MetatagAdminTest extends BrowserTestBase {
     $this->drupalGet('hit-a-404');
     $session->statusCodeEquals(404);
     foreach ($values as $value) {
-      $processed_value = \Drupal::token()->replace($value);
+      $processed_value = $this->tokenService->replace($value);
       $session->responseContains($processed_value);
     }
 
@@ -190,7 +201,6 @@ class MetatagAdminTest extends BrowserTestBase {
     // Check through the values that are in the 'select' list, make sure that
     // unwanted items are not present.
     $this->assertArrayNotHasKey('block_content', $types, 'Custom block entities are not supported.');
-    $this->assertArrayNotHasKey('comment', $types, 'Comment entities are not supported.');
     $this->assertArrayNotHasKey('menu_link_content', $types, 'Menu link entities are not supported.');
     $this->assertArrayNotHasKey('shortcut', $types, 'Shortcut entities are not supported.');
     $this->assertArrayHasKey('node__page', $types, 'Nodes are supported.');
@@ -355,6 +365,29 @@ class MetatagAdminTest extends BrowserTestBase {
     $session->statusCodeEquals(200);
     $this->submitForm([], 'Delete');
     $session->pageTextContains('Deleted Content: Article defaults.');
+  }
+
+  /**
+   * Test that you cannot set the cardinality of a Metatag field.
+   */
+  public function testCardinalitySettingIsHidden() {
+    // Initiate session with a user who can manage meta tags and content type
+    // fields.
+    $permissions = [
+      'administer site configuration',
+      'administer node fields',
+      'administer nodes',
+    ];
+    $account = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($account);
+
+    // Add a Metatag field to the Article content type.
+    $this->fieldUIAddNewField('admin/structure/types/manage/article', 'meta_tags', 'Metatag', 'metatag');
+
+    $this->drupalGet('admin/structure/types/manage/article/fields/node.article.field_meta_tags');
+    $this->assertSession()->pageTextContains('Field storage');
+    $this->assertSession()->pageTextNotContains('Allowed number of values');
+    $this->assertSession()->fieldNotExists('field_storage[subform][cardinality_number]');
   }
 
   /**
@@ -530,6 +563,27 @@ class MetatagAdminTest extends BrowserTestBase {
     $session->titleEquals('my wonderful');
     $session->elementAttributeContains('css', 'meta[name=description]', 'content', 'Drupal');
     $session->elementAttributeContains('css', 'meta[name=abstract]', 'content', 'my wonderful');
+  }
+
+  /**
+   * Tests the defaults page in maintenance mode.
+   */
+  public function testDefaultsMaintenanceMode() {
+    $permissions = [
+      'administer site configuration',
+      'administer meta tags',
+      'access site in maintenance mode',
+    ];
+    $account = $this->drupalCreateUser($permissions);
+    $this->drupalLogin($account);
+
+    \Drupal::state()->set('system.maintenance_mode', TRUE);
+
+    $this->drupalGet('admin/config/search/metatag');
+    $session = $this->assertSession();
+    $session->statusCodeEquals(200);
+    $session->pageTextContains('Please note that while the site is in maintenance mode none of the usual meta tags will be output.');
+    $session->linkByHrefExists('admin/config/search/metatag/global');
   }
 
 }

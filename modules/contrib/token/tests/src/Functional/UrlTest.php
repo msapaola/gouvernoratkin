@@ -7,12 +7,16 @@ use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests URL tokens.
  *
  * @group token
  */
+#[Group('token')]
+#[RunTestsInSeparateProcesses]
 class UrlTest extends BrowserTestBase {
 
   use AssertPageCacheContextsAndTagsTrait;
@@ -126,6 +130,10 @@ class UrlTest extends BrowserTestBase {
     // Can't do this test in the for loop above, it's too different.
     $block->getPlugin()->setConfigurationValue('label', 'prefix_[current-page:query:unicorns]_suffix');
     $block->save();
+
+    // Workaround due to VariationCache detecting an invalid cache redirect,
+    // refreshing static caches does not seem to be sufficient.
+    \Drupal::cache('render')->deleteAll();
 
     // Test the parameter token.
     $this->drupalGet($node1_url->setOption('query', ['unicorns' => 'fluffy']));

@@ -4,10 +4,13 @@ namespace Drupal\metatag;
 
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Core\Render\BubbleableMetadata;
@@ -32,70 +35,70 @@ class MetatagManager implements MetatagManagerInterface {
    *
    * @var \Drupal\metatag\MetatagGroupPluginManager
    */
-  protected $groupPluginManager;
+  protected MetatagGroupPluginManager $groupPluginManager;
 
   /**
    * The tag plugin manager.
    *
    * @var \Drupal\metatag\MetatagTagPluginManager
    */
-  protected $tagPluginManager;
+  protected MetatagTagPluginManager $tagPluginManager;
 
   /**
-   * The Metatag defaults.
+   * The Metatag defaults storage system.
    *
-   * @var \Drupal\metatag\Entity\MetatagDefaults
+   * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected $metatagDefaults;
+  protected EntityStorageInterface $metatagDefaults;
 
   /**
    * The Metatag token.
    *
    * @var \Drupal\metatag\MetatagToken
    */
-  protected $tokenService;
+  protected MetatagToken $tokenService;
 
   /**
    * Config factory.
    *
-   * @var Drupal\Core\Config\ConfigFactoryInterface
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  protected $configFactory;
+  protected ConfigFactoryInterface $configFactory;
 
   /**
    * The Metatag logging channel.
    *
    * @var \Drupal\Core\Logger\LoggerChannelInterface
    */
-  protected $logger;
+  protected LoggerChannelInterface $logger;
 
   /**
    * The path matcher.
    *
    * @var \Drupal\Core\Path\PathMatcherInterface
    */
-  protected $pathMatcher;
+  protected PathMatcherInterface $pathMatcher;
 
   /**
    * The route match.
    *
    * @var \Drupal\Core\Routing\RouteMatchInterface
    */
-  protected $routeMatch;
+  protected RouteMatchInterface $routeMatch;
 
   /**
    * The request stack.
    *
    * @var \Symfony\Component\HttpFoundation\RequestStack
    */
-  protected $requestStack;
+  protected RequestStack $requestStack;
 
   /**
    * The language manager.
    *
    * @var \Drupal\Core\Language\LanguageManagerInterface
    */
-  protected $languageManager;
+  protected LanguageManagerInterface $languageManager;
 
   /**
    * Caches processed strings, keyed by tag name.
@@ -103,6 +106,20 @@ class MetatagManager implements MetatagManagerInterface {
    * @var array
    */
   protected $processedTokenCache = [];
+
+  /**
+   * Cache for sorted groups.
+   *
+   * @var array|null
+   */
+  protected $sortedGroupsCache = NULL;
+
+  /**
+   * Cache for sorted tags.
+   *
+   * @var array|null
+   */
+  protected $sortedTagsCache = NULL;
 
   /**
    * Constructor for MetatagManager.
@@ -242,6 +259,11 @@ class MetatagManager implements MetatagManagerInterface {
    * {@inheritdoc}
    */
   public function sortedGroups(): array {
+    // Return cached result if available.
+    if ($this->sortedGroupsCache !== NULL) {
+      return $this->sortedGroupsCache;
+    }
+
     $metatag_groups = $this->groupDefinitions();
 
     // Pull the data from the definitions into a new array.
@@ -258,6 +280,9 @@ class MetatagManager implements MetatagManagerInterface {
       'sortByWeightElement',
     ]);
 
+    // Cache the sorted groups.
+    $this->sortedGroupsCache = $groups;
+
     return $groups;
   }
 
@@ -265,6 +290,11 @@ class MetatagManager implements MetatagManagerInterface {
    * {@inheritdoc}
    */
   public function sortedTags(): array {
+    // Return cached result if available.
+    if ($this->sortedTagsCache !== NULL) {
+      return $this->sortedTagsCache;
+    }
+
     $metatag_tags = $this->tagDefinitions();
 
     // Pull the data from the definitions into a new array.
@@ -279,17 +309,28 @@ class MetatagManager implements MetatagManagerInterface {
     foreach ($this->sortedGroups() as $group_name => $group) {
       $tag_weight = $group['weight'] * 100;
 
-      // First, sort the tags within the group according to the original sort
-      // order provided by the tag's definition.
-      uasort($tags[$group_name], [
-        'Drupal\Component\Utility\SortArray',
-        'sortByWeightElement',
-      ]);
-      foreach ($tags[$group_name] as $tag_name => $tag_info) {
-        $tag_info['weight'] = $tag_weight++;
-        $sorted_tags[$tag_name] = $tag_info;
+      // Make sure the tag group is in the correct structure.
+      if (isset($tags[$group_name]) && is_array($tags[$group_name])) {
+        // First, sort the tags within the group according to the original sort
+        // order provided by the tag's definition.
+        uasort($tags[$group_name], [
+          'Drupal\Component\Utility\SortArray',
+          'sortByWeightElement',
+        ]);
+        foreach ($tags[$group_name] as $tag_name => $tag_info) {
+          $tag_info['weight'] = $tag_weight++;
+          $sorted_tags[$tag_name] = $tag_info;
+        }
+      }
+
+      // Log an error message because this shouldn't happen.
+      else {
+        $this->logger->error('Expected an array but got null or other type for group: @group_name', ['@group_name' => $group_name]);
       }
     }
+
+    // Cache the sorted tags.
+    $this->sortedTagsCache = $sorted_tags;
 
     return $sorted_tags;
   }
@@ -324,7 +365,7 @@ class MetatagManager implements MetatagManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function form(array $values, array $element, array $token_types = [], array $included_groups = NULL, array $included_tags = NULL, $verbose_help = FALSE): array {
+  public function form(array $values, array $element, array $token_types = [], ?array $included_groups = NULL, ?array $included_tags = NULL, $verbose_help = FALSE): array {
     // Add the outer fieldset.
     $element += [
       '#type' => 'details',
@@ -449,13 +490,13 @@ class MetatagManager implements MetatagManagerInterface {
   /**
    * Returns default meta tags for an entity.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param \Drupal\Core\Entity\ContentEntityInterface|null $entity
    *   The entity to work on.
    *
    * @return array
    *   The default meta tags appropriate for this entity.
    */
-  public function getDefaultMetatags(ContentEntityInterface $entity = NULL): array {
+  public function getDefaultMetatags(?ContentEntityInterface $entity = NULL): array {
     // Get general global metatags.
     $metatags = $this->getGlobalMetatags();
     // If that is empty something went wrong.
@@ -497,6 +538,7 @@ class MetatagManager implements MetatagManagerInterface {
    *   The global meta tags or NULL.
    */
   public function getGlobalMetatags(): MetatagDefaults|NULL {
+    /** @var \Drupal\metatag\Entity\MetatagDefaults $metatags */
     $metatags = $this->metatagDefaults->load('global');
     return (!empty($metatags) && $metatags->status()) ? $metatags : NULL;
   }
@@ -520,6 +562,7 @@ class MetatagManager implements MetatagManagerInterface {
       $metatags = $this->metatagDefaults->load('404');
     }
 
+    /** @var \Drupal\metatag\Entity\MetatagDefaults $metatags */
     if ($metatags && !$metatags->status()) {
       // Do not return disabled special metatags.
       return NULL;
@@ -579,16 +622,22 @@ class MetatagManager implements MetatagManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function generateRawElements(array $tags, $entity = NULL, BubbleableMetadata $cache = NULL): array {
+  public function generateRawElements(array $tags, $entity = NULL, ?BubbleableMetadata $cache = NULL): array {
     // Ignore the update.php path.
     $request = $this->requestStack->getCurrentRequest();
     if ($request->getBaseUrl() == '/update.php') {
       return [];
     }
 
+    // Use the entity's language code, if one is defined. Views should probably
+    // get the current language instead of the configuration object language.
+    $langcode = NULL;
     // Prepare any tokens that might exist.
     $token_replacements = [];
     if ($entity) {
+      if (!$entity instanceof ConfigEntityInterface) {
+        $langcode = $entity->language()->getId();
+      }
       // @todo This needs a better way of discovering the context.
       if ($entity instanceof ViewEntityInterface) {
         // Views tokens require the ViewExecutable, not the config entity.
@@ -598,12 +647,6 @@ class MetatagManager implements MetatagManagerInterface {
       elseif ($entity instanceof ContentEntityInterface) {
         $token_replacements = [$entity->getEntityTypeId() => $entity];
       }
-    }
-
-    // Use the entity's language code, if one is defined.
-    $langcode = NULL;
-    if ($entity) {
-      $langcode = $entity->language()->getId();
     }
 
     $definitions = $this->sortedTags();
@@ -673,9 +716,12 @@ class MetatagManager implements MetatagManagerInterface {
     }
 
     $entity_identifier = '_none';
-    if ($entity) {
-      $entity_identifier = $entity->getEntityTypeId() . ':' . ($entity->uuid() ?? $entity->id()) . ':' . $entity->language()
-        ->getId();
+    // Use the entity's language code, if one is defined. Config objects should
+    // get the current language instead of the configuration object language.
+    $langcode = NULL;
+    if ($entity && !$entity instanceof ConfigEntityInterface) {
+      $langcode = $entity->language()->getId();
+      $entity_identifier = $entity->getEntityTypeId() . ':' . ($entity->uuid() ?? $entity->id()) . ':' . $langcode;
     }
 
     if (!isset($this->processedTokenCache[$entity_identifier])) {
@@ -702,7 +748,7 @@ class MetatagManager implements MetatagManagerInterface {
               $token_replacements = [$entity->getEntityTypeId() => $entity];
             }
           }
-          $processed_value = $this->processTagValue($tag, $value, $token_replacements, TRUE);
+          $processed_value = $this->processTagValue($tag, $value, $token_replacements, TRUE, $langcode);
           $this->processedTokenCache[$entity_identifier][$tag_name] = $tag->multiple() ? explode($tag->getSeparator(), $processed_value) : $processed_value;
         }
       }

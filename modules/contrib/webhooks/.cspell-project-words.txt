@@ -1,0 +1,12 @@
+baselevel
+codehilite
+hexdigest
+inlinehilite
+linenums
+pygments
+pymdownx
+reencoded
+reencoding
+startinline
+superfences
+woocommerce

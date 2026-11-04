@@ -1,0 +1,89 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the Webhook module.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Add verified and error fields to webhook entities.
+ */
+function webhook_update_10001(): void {
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+
+  $verified = BaseFieldDefinition::create('boolean')
+    ->setLabel(t('Verified'))
+    ->setDescription(t('Whether signature or token verification passed.'))
+    ->setDefaultValue(TRUE);
+  $update_manager->installFieldStorageDefinition(
+    'verified',
+    'webhook',
+    'webhook',
+    $verified
+  );
+
+  $error = BaseFieldDefinition::create('string_long')
+    ->setLabel(t('Error'))
+    ->setDescription(t('Verification error message, if any.'))
+    ->setRequired(FALSE);
+  $update_manager->installFieldStorageDefinition(
+    'error',
+    'webhook',
+    'webhook',
+    $error
+  );
+}
+
+/**
+ * Add webhook_config field to webhook entities.
+ */
+function webhook_update_10002(): void {
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+
+  $webhook_config = BaseFieldDefinition::create('string')
+    ->setLabel(t('Webhook config'))
+    ->setDescription(t('Machine name of the incoming webhook configuration.'))
+    ->setRequired(FALSE)
+    ->setSetting('max_length', 255);
+  $update_manager->installFieldStorageDefinition(
+    'webhook_config',
+    'webhook',
+    'webhook',
+    $webhook_config
+  );
+}
+
+/**
+ * Add signature and payload_length fields to webhook entities.
+ */
+function webhook_update_10003(): void {
+  $update_manager = \Drupal::entityDefinitionUpdateManager();
+
+  $signature = BaseFieldDefinition::create('string')
+    ->setLabel(t('Signature'))
+    ->setDescription(t('HMAC value from the configured signature header.'))
+    ->setRequired(FALSE)
+    ->setSetting('max_length', 512);
+  $update_manager->installFieldStorageDefinition(
+    'signature',
+    'webhook',
+    'webhook',
+    $signature
+  );
+
+  $payload_length = BaseFieldDefinition::create('integer')
+    ->setLabel(t('Payload length'))
+    ->setDescription(t('Byte length of the posted request body.'))
+    ->setRequired(FALSE)
+    ->setDefaultValue(0);
+  $update_manager->installFieldStorageDefinition(
+    'payload_length',
+    'webhook',
+    'webhook',
+    $payload_length
+  );
+}

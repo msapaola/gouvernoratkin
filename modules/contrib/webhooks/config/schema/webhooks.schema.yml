@@ -42,6 +42,12 @@ webhooks.webhook.*:
     secret:
       type: string
       label: 'Secret'
+    signature_header:
+      type: string
+      label: 'Signature header'
+    signature_algorithm:
+      type: string
+      label: 'Signature algorithm'
     content_type:
       type: string
       label: 'Content Type'

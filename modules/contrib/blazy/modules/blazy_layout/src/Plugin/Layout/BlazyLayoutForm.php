@@ -3,15 +3,19 @@
 namespace Drupal\blazy_layout\Plugin\Layout;
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\blazy\Utility\Type;
 use Drupal\blazy_layout\BlazyLayoutDefault as Defaults;
 
 /**
  * Provides a BlazyLayoutForm class for Layout plugins.
  */
 abstract class BlazyLayoutForm extends BlazyLayoutBase {
+
+  use TraitLayoutDescriptions;
 
   /**
    * {@inheritdoc}
@@ -28,20 +32,51 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
 
     $settings = $form_state->getValue('settings');
     $count = (int) $settings['count'];
+    $hero = (int) $settings['hero'];
+    $semantic_layout = Type::normalizeBool($settings['semantic_layout']);
+    $bg = Type::normalizeBool($settings['background']);
+    $remove_bg = Type::normalizeBool($settings['remove_bg']);
 
-    // Yes, stupid, but satisfying stupidity is harmless.
+    // @todo figure out a better way like blazy.schema than overriding it here.
     if ($count < 1) {
       $count = 1;
     }
+
+    if ($styles = $settings['styles'] ?? []) {
+      if (isset($styles['media']['background'])) {
+        $bg = Type::normalizeBool($styles['media']['background']);
+      }
+    }
+
     $form_state->setValue(['settings', 'count'], $count);
+    $form_state->setValue(['settings', 'hero'], $hero);
+    $form_state->setValue(['settings', 'background'], $bg);
+    $form_state->setValue(['settings', 'remove_bg'], $remove_bg);
+    $form_state->setValue(['settings', 'semantic_layout'], $semantic_layout);
 
     if (empty($settings['id'])) {
       $id = Crypt::randomBytesBase64(8);
       $form_state->setValue(['settings', 'id'], strtolower($id));
     }
 
-    // The main background styles.
-    $this->validateStyles($form_state);
+    // Not crucial, just minor correction.
+    $styles = Defaults::sharedSettings()['styles'];
+    $styleset = array_keys($styles);
+    foreach ($settings as $key => $value) {
+      if ($key == 'styles') {
+        foreach ($styleset as $sk) {
+          foreach ($value[$sk] as $ssk => $ssv) {
+            if (is_bool($styles[$sk][$ssk])) {
+              $bool = Type::normalizeBool($settings['styles'][$sk][$ssk]);
+              $form_state->setValue(['settings', 'styles', $sk, $ssk], $bool);
+            }
+          }
+        }
+      }
+    }
+
+    // The main background color styles.
+    $this->validateColors($form_state);
 
     if ($regions = $form_state->getValue('regions')) {
       foreach ($regions as $name => $region) {
@@ -49,7 +84,7 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
           if ($key == 'settings') {
             foreach (array_keys($value) as $k) {
               if ($k == 'styles') {
-                $this->validateStyles($form_state, ['regions', $name, 'settings', 'styles', 'colors']);
+                $this->validateColors($form_state, ['regions', $name, 'settings', 'styles', 'colors']);
               }
             }
           }
@@ -64,6 +99,7 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
 
+    $styleset = array_keys(Defaults::sharedSettings()['styles']);
     $regions = [];
     if ($values = $form_state->getValue('regions')) {
       foreach ($values as $name => $region) {
@@ -74,7 +110,7 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
           else {
             foreach ($value as $sk => $sv) {
               if ($sk == 'styles') {
-                foreach (['colors', 'layouts'] as $ssk) {
+                foreach ($styleset as $ssk) {
                   foreach ($sv[$ssk] as $sssk => $sssv) {
                     $regions[$name][$key][$sk][$ssk][$sssk] = $sssv;
                   }
@@ -93,12 +129,11 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
     if ($settings = $form_state->getValue('settings')) {
       foreach ($settings as $key => $value) {
         if ($key == 'styles') {
-          foreach (['colors', 'layouts'] as $sk) {
+          foreach ($styleset as $sk) {
             foreach ($value[$sk] as $ssk => $ssv) {
               $this->configuration[$key][$sk][$ssk] = $ssv;
             }
           }
-
         }
         else {
           $this->configuration[$key] = is_string($value) ? trim($value) : $value;
@@ -118,17 +153,40 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
       ? $form_state->getCompleteFormState()
       : $form_state;
 
-    $form       = parent::buildConfigurationForm($form, $form_state2);
-    $config     = $this->getConfiguration();
-    $definition = $this->pluginDefinition;
-    $settings   = [];
+    $form        = parent::buildConfigurationForm($form, $form_state2);
+    $config      = $this->getConfiguration();
+    $definition  = $this->pluginDefinition;
+    $settings    = [];
+    $styleset    = array_keys(Defaults::sharedSettings()['styles']);
+    $entity_form = isset($form_state2->getBuildInfo()['callback_object']) ? $form_state2->getFormObject() : NULL;
+    $extras      = $entity_form ? $this->getEntityData($entity_form) : [];
+    $url         = '/admin/config/media/blazy';
+    $help        = '/admin/help/blazy_ui';
+    $bl_help     = '/admin/help/blazy_layout';
+
+    if ($this->manager->moduleExists('blazy_ui')) {
+      $url = Url::fromUri('internal:/admin/config/media/blazy')->toString();
+      $help = Url::fromUri('internal:/admin/help/blazy_ui')->toString();
+      $bl_help = Url::fromUri('internal:/admin/help/blazy_layout')->toString();
+    }
+
+    $use_custom_css = $this->manager->config('use_custom_css');
+    $scopes = [
+      'bl_help' => $bl_help,
+      'blazy_help' => $help,
+      'blazy_ui' => $url,
+      'css_scope' => $this->manager->config('css_scope'),
+      'use_custom_css' => $use_custom_css,
+    ];
+
+    $scopes['blazy_help'] = $help;
 
     $form['settings'] = [
       '#type'        => 'details',
       '#tree'        => TRUE,
       '#open'        => TRUE,
       '#title'       => $this->t('Global settings'),
-      '#description' => $this->t('Use Blazy Image/ Media formatters to have background or even nested grids when creating blocks. Reload the page if some options do not update CSS/preview after saving this modal form.'),
+      '#description' => $this->description()['settings'],
       '#parents'     => ['layout_settings', 'settings'],
       '#attributes'  => ['class' => ['form-wrapper--b-layout']],
     ];
@@ -136,7 +194,7 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
     // The main grid setttings.
     foreach (Defaults::layoutSettings() as $key => $value) {
       if ($key == 'styles') {
-        foreach (['colors', 'layouts'] as $sk) {
+        foreach ($styleset as $sk) {
           foreach ($value[$sk] as $ssk => $ssv) {
             $default = $config[$key][$sk][$ssk] ?? $ssv;
             $settings[$key][$sk][$ssk] = $this->configuration[$key][$sk][$ssk] ?? $default;
@@ -152,11 +210,16 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
     // @todo enable:row_classes.
     $excludes = ['regions', 'attributes', 'row_classes'];
     $excludes = array_combine($excludes, $excludes);
-    $this->admin->formBase($form['settings'], $settings, $excludes);
-    $this->admin->formSettings($form['settings'], $settings, $excludes);
-    $this->admin->formStyles($form['settings'], $settings['styles']);
+
+    $options = ['excludes' => $excludes, 'extras' => $extras];
+    $this->admin->formBase($form['settings'], $settings, $options);
+    $this->admin->formSettings($form['settings'], $settings, $options);
+
+    $options = ['excludes' => [], 'extras' => $extras];
+    $this->admin->formStyles($form['settings'], $settings['styles'], $options);
 
     $arguments = [
+      'namespace' => 'blazy',
       'grid_simple' => TRUE,
       'grid_required' => TRUE,
       'no_grid_header' => TRUE,
@@ -180,11 +243,11 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
 
     foreach (Element::children($form['settings']) as $key) {
       if ($key == 'styles') {
-        foreach (['colors', 'layouts'] as $sk) {
-          if ($subform = $form['settings'][$key][$sk] ?? []) {
+        foreach ($styleset as $sk) {
+          if ($subform = $form['settings'][$key][$sk]['tabs_content'] ?? []) {
             foreach (Element::children($subform) as $ssk) {
-              $parents = ['layout_settings', 'settings', $key, $sk];
-              $this->admin->themeDescription($form['settings'][$key][$sk][$ssk], $parents);
+              $parents = ['layout_settings', 'settings', $key, $sk, 'tabs_content'];
+              $this->admin->themeDescription($form['settings'][$key][$sk]['tabs_content'][$ssk], $parents);
             }
           }
         }
@@ -199,6 +262,43 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
       }
     }
 
+    $form['settings']['semantic_layout'] = [
+      '#type'          => 'checkbox',
+      '#title'         => $this->t('Semantic layout'),
+      '#description'   => $this->description($scopes)['semantic_layout'],
+      '#default_value' => $settings['semantic_layout'],
+      '#weight'        => 27,
+    ];
+
+    $form['settings']['remove_bg'] = [
+      '#type'          => 'checkbox',
+      '#title'         => $this->t('Remove main Background region'),
+      '#description'   => $this->description($scopes)['remove_bg'],
+      '#default_value' => $settings['remove_bg'],
+      '#weight'        => 28,
+    ];
+
+    $form['settings']['hero'] = [
+      '#type'          => 'textfield',
+      '#title'         => $this->t('Hero region'),
+      '#description'   => $this->description($scopes)['hero'],
+      '#default_value' => $settings['hero'],
+      '#weight'        => 29,
+    ];
+
+    $form['settings']['custom_css'] = [
+      '#type'          => 'textarea',
+      '#title'         => $this->t('Custom CSS (advanced)'),
+      '#description'   => $this->description($scopes)['custom_css'],
+      '#default_value' => $settings['custom_css'],
+      '#disabled'      => !$use_custom_css,
+      '#weight'        => 30,
+    ];
+
+    foreach (array_keys(Defaults::heroSettings()) as $key) {
+      $this->admin->themeDescription($form['settings'][$key]);
+    }
+
     // AJAX element.
     $form['settings']['count']['#ajax'] = [
       'callback' => [$this, 'countCallback'],
@@ -208,16 +308,13 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
 
     // Add some information to the form state for easier form altering.
     $region_count = $form_state2->getValue('layout_settings')['settings']['count'] ?? $settings['count'];
-    $form_state2->setValue('region_count', $region_count);
     $user_input = $form_state2->getUserInput();
     $region_input = $region_count;
     if ($value = $user_input['layout_settings']['settings']['count'] ?? NULL) {
       $region_input = (int) $value;
     }
 
-    if ($region_input && ($region_input != $region_count)) {
-      $form_state2->setValue('region_count', $region_input);
-    }
+    $form_state2->setValue('region_count', $region_input);
 
     $state_count = $form_state2->getValue('region_count');
     $count = $state_count ?: $settings['count'];
@@ -251,7 +348,7 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
         else {
           foreach ($value as $sk => $sv) {
             if ($sk == 'styles') {
-              foreach (['colors', 'layouts'] as $ssk) {
+              foreach ($styleset as $ssk) {
                 foreach ($sv[$ssk] as $sssk => $sssv) {
                   $default = $config['regions'][$region][$key][$sk][$ssk][$sssk] ?? $sssv;
                   $subsets['regions'][$region][$key][$sk][$ssk][$sssk] = $default;
@@ -284,7 +381,7 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
         '#type'          => 'textfield',
         '#title'         => $this->t('Region name'),
         '#default_value' => $subsets2['label'],
-        '#description'   => $this->t('The human-readable region name for theming.'),
+        '#description'   => $this->description()['label'],
       ];
 
       $form['regions'][$region]['settings'] = [
@@ -298,20 +395,22 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
       $regform = &$form['regions'][$region]['settings'];
       $subsets3 = $subsets2['settings'];
       $subsets3['rid'] = $region;
-      $this->admin->formWrappers($regform, $subsets3, [], FALSE);
+      $options = ['excludes' => [], 'extras' => $extras];
+      $this->admin->formWrappers($regform, $subsets3, $options, FALSE);
 
       $subsets4 = $subsets3['styles'];
       $subsets4['rid'] = $region;
       $excludes = ['ete', 'gapless', 'max_width'];
-      $this->admin->formStyles($regform, $subsets4, $excludes);
+      $options = ['excludes' => $excludes, 'extras' => $extras];
+      $this->admin->formStyles($regform, $subsets4, $options);
 
       foreach (Element::children($regform) as $key) {
         if ($key == 'styles') {
-          foreach (['colors', 'layouts'] as $sk) {
-            if ($subform = $regform[$key][$sk] ?? []) {
+          foreach ($styleset as $sk) {
+            if ($subform = $regform[$key][$sk]['tabs_content'] ?? []) {
               foreach (Element::children($subform) as $ssk) {
-                $parents = ['layout_settings', 'regions', $region, 'settings', $key, $sk];
-                $this->admin->themeDescription($regform[$key][$sk][$ssk], $parents);
+                $parents = ['layout_settings', 'regions', $region, 'settings', $key, $sk, 'tabs_content'];
+                $this->admin->themeDescription($regform[$key][$sk]['tabs_content'][$ssk], $parents);
               }
             }
           }
@@ -323,7 +422,7 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
       }
     }
 
-    $form['settings']['#attached']['library'][] = 'blazy_layout/modal';
+    $form['#attached']['library'][] = 'blazy_layout/modal';
     return $form;
   }
 
@@ -337,7 +436,7 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
   /**
    * Validate form styles.
    */
-  protected function validateStyles(
+  protected function validateColors(
     FormStateInterface $form_state,
     array $keys = ['settings', 'styles', 'colors'],
   ): void {
@@ -347,8 +446,55 @@ abstract class BlazyLayoutForm extends BlazyLayoutBase {
           $style = '';
         }
       }
-      $form_state->setValue($keys, array_filter($styles));
+      $form_state->setValue($keys, $styles);
     }
+  }
+
+  /**
+   * Extract data from the entity form.
+   *
+   * @todo remove if Link field is a Media field, or no further use or change.
+   */
+  private function getEntityData($entity_form): array {
+    $id     = NULL;
+    $bundle = NULL;
+    $entity = NULL;
+    $target = NULL;
+    $mode   = NULL;
+
+    /** @var \Drupal\layout_builder\Form\ConfigureSectionForm $entity_form */
+    if (method_exists($entity_form, 'getSectionStorage') && ($storage = $entity_form->getSectionStorage())) {
+      $contexts = $storage->getContextValues();
+      if ($entity = $contexts['entity'] ?? NULL) {
+        $id     = $entity->id();
+        $bundle = $entity->bundle();
+        $target = $entity->getEntityTypeId();
+        $mode   = $contexts['view_mode'] ?? '';
+      }
+      elseif ($display = $contexts['display'] ?? NULL) {
+        $id     = $display->id();
+        $bundle = $display->getTargetBundle();
+        $target = $display->getTargetEntityTypeId();
+        $mode   = $contexts['view_mode'] ?? '';
+      }
+    }
+
+    /** @var \Drupal\Core\Entity\Display\EntityDisplayInterface $entity_form */
+    elseif (method_exists($entity_form, 'getEntity')
+      && $entity = $entity_form->getEntity()) {
+      $id     = $entity->id();
+      $bundle = $entity->getTargetBundle();
+      $target = $entity->getTargetEntityTypeId();
+      $mode   = $entity->getMode();
+    }
+
+    return $bundle ? [
+      'entity'         => $entity,
+      'bundle'         => $bundle,
+      'entity_id'      => $id,
+      'entity_type_id' => $target,
+      'view_mode'      => $mode,
+    ] : [];
   }
 
 }

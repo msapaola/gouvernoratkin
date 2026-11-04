@@ -20,6 +20,7 @@
   var PREFIX_HEADING = 'heading_';
   var PREFIX_LINK = 'link_';
   var PREFIX_LINK_HOVER = 'link_hover_';
+  var TRANSPARENT = 'transparent';
 
   // See https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/addRule
   // See https://developer.mozilla.org/en-US/docs/Web/API/CSSStyleSheet/insertRule
@@ -40,11 +41,17 @@
       var selector = selectors[key];
 
       if (selector) {
-        id = '.blazy.' + id;
-        selector = id + ' ' + selector;
+        if (selector === 'SEMANTIC_BG') {
+          id = id.replace('b-layout--', '');
+          selector = '.b-semantic.b-layout-wrapper--' + id + ' > .region--bg';
+        }
+        else {
+          id = '.blazy.' + id;
+          selector = id + ' ' + selector;
 
-        if ($.contains(selector, ',')) {
-          selector = selector.replaceAll(',', ', ' + id);
+          if ($.contains(selector, ',')) {
+            selector = selector.replaceAll(',', ', ' + id);
+          }
         }
       }
 
@@ -56,12 +63,11 @@
   function toRgba(color, alpha) {
     if (!$.isUnd(alpha)) {
       if (Math.abs(alpha) === 0) {
-        return 'transparent';
+        return TRANSPARENT;
       }
       else if (Math.abs(alpha) === 1) {
-        return color;
+        return color === '#000000' || color === '#000' ? TRANSPARENT : color;
       }
-
       return 'rgba(' + parseInt(color.slice(-6, -4), 16) + ',' + parseInt(color.slice(-4, -2), 16) + ',' + parseInt(color.slice(-2), 16) + ',' + alpha + ')';
     }
     return color;
@@ -177,6 +183,7 @@
       var rid;
       var formRegion;
       var layout;
+      var wrapper;
       var id;
 
       updateValue(el);
@@ -189,10 +196,11 @@
           return;
         }
 
+        wrapper = layout.parentNode;
         id = layout.id;
         if (formRegion) {
           rid = formRegion.dataset.bRegion;
-          region = $.find(layout, '[data-region="' + rid + '"]');
+          region = $.find(wrapper, '[data-region="' + rid + '"]');
 
           if (region) {
             updateStyle(id, el, region);

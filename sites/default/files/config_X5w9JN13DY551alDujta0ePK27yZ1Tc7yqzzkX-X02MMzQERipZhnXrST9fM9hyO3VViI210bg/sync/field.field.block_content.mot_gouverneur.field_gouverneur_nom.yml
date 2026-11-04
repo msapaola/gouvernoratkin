@@ -9,7 +9,7 @@ id: block_content.mot_gouverneur.field_gouverneur_nom
 field_name: field_gouverneur_nom
 entity_type: block_content
 bundle: mot_gouverneur
-label: 'Nom'
+label: Nom
 description: "Prénom et nom du gouverneur, tels qu'ils apparaissent en titre de la section."
 required: true
 translatable: false

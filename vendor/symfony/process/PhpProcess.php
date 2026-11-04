@@ -42,7 +42,12 @@ class PhpProcess extends Process
         if ('phpdbg' === \PHP_SAPI) {
             $file = tempnam(sys_get_temp_dir(), 'dbg');
             file_put_contents($file, $script);
-            register_shutdown_function('unlink', $file);
+            $pid = getmypid();
+            register_shutdown_function(static function () use ($file, $pid) {
+                if ($pid === getmypid()) {
+                    unlink($file);
+                }
+            });
             $php[] = $file;
             $script = null;
         }
@@ -55,6 +60,9 @@ class PhpProcess extends Process
         throw new LogicException(\sprintf('The "%s()" method cannot be called when using "%s".', __METHOD__, self::class));
     }
 
+    /**
+     * @param (callable('out'|'err', string):void)|null $callback
+     */
     public function start(?callable $callback = null, array $env = []): void
     {
         if (null === $this->getCommandLine()) {

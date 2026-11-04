@@ -7,12 +7,14 @@ namespace Drupal\Tests\file\Kernel\Formatter;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the default file formatter.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FileEntityFormatterTest extends KernelTestBase {
 
   /**
@@ -106,11 +108,17 @@ class FileEntityFormatterTest extends KernelTestBase {
 
     $entity_display->setComponent('uri', ['type' => 'file_uri', 'settings' => ['file_download_path' => TRUE]]);
     $build = $entity_display->buildMultiple($this->files)[0]['uri'][0];
-    $this->assertEquals($this->fileUrlGenerator->generateString('public://file.png'), $build['#markup']);
+    $this->assertEquals($this->fileUrlGenerator->generateAbsoluteString('public://file.png'), $build['#markup']);
 
-    $entity_display->setComponent('uri', ['type' => 'file_uri', 'settings' => ['file_download_path' => TRUE, 'link_to_file' => TRUE]]);
+    $entity_display->setComponent(
+      'uri',
+      [
+        'type' => 'file_uri',
+        'settings' => ['file_download_path' => TRUE, 'link_to_file' => TRUE],
+      ]
+    );
     $build = $entity_display->buildMultiple($this->files)[0]['uri'][0];
-    $this->assertEquals($this->fileUrlGenerator->generateString('public://file.png'), $build['#title']);
+    $this->assertEquals($this->fileUrlGenerator->generateAbsoluteString('public://file.png'), $build['#title']);
     $this->assertEquals($this->fileUrlGenerator->generate('public://file.png'), $build['#url']);
   }
 
@@ -130,7 +138,12 @@ class FileEntityFormatterTest extends KernelTestBase {
       $this->assertEquals($expected[$i], $build['filename'][0]['#markup']);
     }
 
-    $entity_display->setComponent('filename', ['type' => 'file_extension', 'settings' => ['extension_detect_tar' => TRUE]]);
+    $entity_display->setComponent(
+      'filename',
+      [
+        'type' => 'file_extension',
+        'settings' => ['extension_detect_tar' => TRUE],
+      ]);
 
     $expected = ['png', 'tar', 'tar.gz', ''];
     foreach (array_values($this->files) as $i => $file) {
@@ -181,7 +194,9 @@ class FileEntityFormatterTest extends KernelTestBase {
       'uri' => 'dummy-external-readonly://file-query-string?foo=bar',
       'filename' => 'file-query-string',
     ]);
+    $file->set('filemime', NULL);
     $file->save();
+    $this->assertNull($file->get('filemime')->value);
     $file_link = [
       '#theme' => 'file_link',
       '#file' => $file,
@@ -189,6 +204,8 @@ class FileEntityFormatterTest extends KernelTestBase {
 
     $output = (string) \Drupal::service('renderer')->renderRoot($file_link);
     $this->assertStringContainsString($this->fileUrlGenerator->generate('dummy-external-readonly://file-query-string?foo=bar')->toUriString(), $output);
+    $this->assertStringContainsString('file--mime-application-octet-stream', $output);
+    $this->assertStringContainsString('type="application/octet-stream"', $output);
   }
 
 }

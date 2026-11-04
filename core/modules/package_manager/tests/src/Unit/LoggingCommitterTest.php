@@ -11,22 +11,28 @@ use Drupal\package_manager\ProcessOutputCallback;
 use Drupal\Tests\UnitTestCase;
 use PhpTuf\ComposerStager\API\Core\CommitterInterface;
 use PhpTuf\ComposerStager\API\Path\Value\PathInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @covers \Drupal\package_manager\LoggingCommitter
- * @group package_manager
+ * Tests Logging Committer.
  */
+#[Group('package_manager')]
+#[CoversClass(LoggingCommitter::class)]
 class LoggingCommitterTest extends UnitTestCase {
 
+  /**
+   * Tests the output of LoggingCommitter().
+   */
   public function testDecoratedCommitterIsCalled(): void {
     $decorated = $this->createMock(CommitterInterface::class);
 
-    $stagingDir = $this->createMock(PathInterface::class);
-    $stagingDir->expects($this->any())
+    $stagingDir = $this->createStub(PathInterface::class);
+    $stagingDir
       ->method('absolute')
       ->willReturn('staging-dir');
-    $activeDir = $this->createMock(PathInterface::class);
-    $activeDir->expects($this->any())
+    $activeDir = $this->createStub(PathInterface::class);
+    $activeDir
       ->method('absolute')
       ->willReturn('active-dir');
 

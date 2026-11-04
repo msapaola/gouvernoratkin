@@ -122,6 +122,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    * Gets the cache ID.
    *
    * @return string
+   *   The cache ID.
    */
   protected function getCid() {
     return $this->cid;
@@ -310,6 +311,7 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    */
   public function destruct() {
     $this->updateCache();
+    $this->reset();
   }
 
   /**

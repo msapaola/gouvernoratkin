@@ -73,7 +73,12 @@ trait ValidationTestTrait {
     }
     $subject = str_replace(
       ['<PROJECT_ROOT>', '<VENDOR_DIR>', '<STAGE_ROOT>', '<STAGE_ROOT_PARENT>'],
-      [$path_locator->getProjectRoot(), $path_locator->getVendorDirectory(), $path_locator->getStagingRoot(), dirname($path_locator->getStagingRoot())],
+      [
+        $path_locator->getProjectRoot(),
+        $path_locator->getVendorDirectory(),
+        $path_locator->getStagingRoot(),
+        dirname($path_locator->getStagingRoot()),
+      ],
       $subject
     );
     if ($stage_dir) {
@@ -109,6 +114,7 @@ trait ValidationTestTrait {
       $messages = array_map(static function ($message) use ($string_translation_stub): string {
         // Support data providers in unit tests using TranslatableMarkup.
         if ($message instanceof TranslatableMarkup && is_a(get_called_class(), UnitTestCase::class, TRUE)) {
+          // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
           $message = new TranslatableMarkup($message->getUntranslatedString(), $message->getArguments(), $message->getOptions(), $string_translation_stub);
         }
         return (string) $message;

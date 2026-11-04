@@ -12,7 +12,7 @@ field_name: field_youtube_url
 entity_type: node
 bundle: video
 label: 'Adresse YouTube'
-description: "Adresse de la vidéo sur YouTube, par exemple https://www.youtube.com/watch?v=… ou https://youtu.be/…"
+description: 'Adresse de la vidéo sur YouTube, par exemple https://www.youtube.com/watch?v=… ou https://youtu.be/…'
 required: true
 translatable: false
 default_value: {  }

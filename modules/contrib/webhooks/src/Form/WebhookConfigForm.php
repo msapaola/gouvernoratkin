@@ -2,6 +2,7 @@
 
 namespace Drupal\webhooks\Form;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -37,6 +38,13 @@ final class WebhookConfigForm extends EntityForm {
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityTypeManager;
+
+  /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
 
   /**
    * The events.
@@ -80,11 +88,19 @@ final class WebhookConfigForm extends EntityForm {
    *   The module handler service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   The config factory.
    */
-  public function __construct(WebhooksService $webhookService, ModuleHandlerInterface $moduleHandler, EntityTypeManagerInterface $entityTypeManager) {
+  public function __construct(
+    WebhooksService $webhookService,
+    ModuleHandlerInterface $moduleHandler,
+    EntityTypeManagerInterface $entityTypeManager,
+    ConfigFactoryInterface $configFactory,
+  ) {
     $this->webhookService = $webhookService;
     $this->moduleHandler = $moduleHandler;
     $this->entityTypeManager = $entityTypeManager;
+    $this->configFactory = $configFactory;
   }
 
   /**
@@ -94,7 +110,8 @@ final class WebhookConfigForm extends EntityForm {
     return new self(
       $container->get('webhooks.service'),
       $container->get('module_handler'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('config.factory')
     );
   }
 
@@ -141,10 +158,14 @@ final class WebhookConfigForm extends EntityForm {
       '#options' => [
         WebhookConfig::CONTENT_TYPE_JSON => $this->t('application/json'),
         WebhookConfig::CONTENT_TYPE_XML => $this->t('application/xml'),
+        WebhookConfig::CONTENT_TYPE_WWW_FORM_URLENCODED => $this->t('application/x-www-form-urlencoded'),
+        WebhookConfig::CONTENT_TYPE_YAML => $this->t('application/yaml'),
       ],
       '#default_value' => $webhook_config->getContentType(),
     ];
 
+    $stored_secret = $this->getStoredSecret();
+    $secret_overridden = $this->isSecretOverridden();
     $form['secret'] = [
       '#type' => 'textfield',
       '#attributes' => [
@@ -152,8 +173,44 @@ final class WebhookConfigForm extends EntityForm {
       ],
       '#title' => $this->t('Secret'),
       '#maxlength' => 255,
-      '#description' => $this->t('For <strong>incoming webhooks</strong> this secret is provided by the remote website. For <strong>outgoing webhooks</strong> this secret should be used for the incoming hook configuration on the remote website.'),
-      '#default_value' => $webhook_config->getSecret(),
+      '#description' => $secret_overridden
+        ? $this->t('This secret is provided by a configuration override and is not stored in the database.')
+        : $this->t('Optional. Leave empty to supply the secret as a settings.php override of %name. For <strong>incoming webhooks</strong> this secret is provided by the remote website. For <strong>outgoing webhooks</strong> this secret should be used for the incoming hook configuration on the remote website.', [
+          '%name' => 'webhooks.webhook.' . ($webhook_config->id() ?: 'MACHINE_NAME'),
+        ]),
+      '#default_value' => $stored_secret,
+      '#disabled' => $secret_overridden,
+    ];
+    $signature_header = $webhook_config->getSignatureHeader();
+    if ($signature_header === '' && $stored_secret !== '') {
+      $signature_header = WebhookConfig::DEFAULT_SIGNATURE_HEADER;
+    }
+    $form['signature_header'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Signature header'),
+      '#maxlength' => 255,
+      '#description' => $this->t('HTTP header that holds the HMAC generated with the secret (for example %hub or %woo).', [
+        '%hub' => WebhookConfig::DEFAULT_SIGNATURE_HEADER,
+        '%woo' => 'X-WC-Webhook-Signature',
+      ]),
+      '#default_value' => $signature_header,
+    ];
+    $form['signature_algorithm'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Signature algorithm'),
+      '#options' => [
+        'sha256' => $this->t('SHA-256'),
+        'sha1' => $this->t('SHA-1'),
+        'sha384' => $this->t('SHA-384'),
+        'sha512' => $this->t('SHA-512'),
+      ],
+      '#description' => $this->t(
+        'Hash used when the signature is a raw HMAC (for example WooCommerce). Hub-style values such as %example still take the algorithm from the header. WooCommerce defaults to SHA-256 unless a filter changes it.',
+        [
+          '%example' => 'sha256=<hex>',
+        ]
+      ),
+      '#default_value' => $webhook_config->getSignatureAlgorithm(),
     ];
     $form['token'] = [
       '#type' => 'textfield',
@@ -278,6 +335,27 @@ final class WebhookConfigForm extends EntityForm {
       $form_state->setErrorByName('events', $this->t('Outgoing webhooks require one or more events to operate.'));
     }
 
+    $form_state->setValue(
+      'secret',
+      trim((string) $form_state->getValue('secret'))
+    );
+    $form_state->setValue(
+      'signature_header',
+      trim((string) $form_state->getValue('signature_header'))
+    );
+    $form_state->setValue(
+      'signature_algorithm',
+      strtolower(trim((string) $form_state->getValue('signature_algorithm')))
+    );
+    $allowed_algorithms = ['sha256', 'sha1', 'sha384', 'sha512'];
+    $algorithm = $form_state->getValue('signature_algorithm');
+    if ($algorithm !== '' && !in_array($algorithm, $allowed_algorithms, TRUE)) {
+      $form_state->setErrorByName(
+        'signature_algorithm',
+        $this->t('Select a valid signature algorithm.')
+      );
+    }
+
     parent::validateForm($form, $form_state);
   }
 
@@ -287,9 +365,10 @@ final class WebhookConfigForm extends EntityForm {
   public function save(array $form, FormStateInterface $form_state) {
     /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
     $webhook_config = $this->entity;
-    // Keep the old secret if no new one has been given.
-    if (empty($form_state->getValue('secret'))) {
-      $webhook_config->set('secret', $form['secret']['#default_value']);
+    // Keep the stored secret when the field is empty or overridden so a
+    // settings.php secret is not written to active configuration.
+    if ($this->isSecretOverridden() || $form_state->isValueEmpty('secret')) {
+      $webhook_config->set('secret', $this->getStoredSecret());
     }
     $status = $webhook_config->save();
 
@@ -347,6 +426,43 @@ final class WebhookConfigForm extends EntityForm {
 
     $this->moduleHandler->alter('webhooks_event_info', $options);
     return $options;
+  }
+
+  /**
+   * Secret stored in config, ignoring settings.php overrides.
+   *
+   * @return string
+   *   The override-free secret, or an empty string.
+   */
+  protected function getStoredSecret() {
+    $id = $this->entity->id();
+    if ($this->entity->isNew() || !$id) {
+      return '';
+    }
+    /** @var \Drupal\webhooks\Entity\WebhookConfig|null $stored */
+    $stored = $this->entityTypeManager
+      ->getStorage('webhook_config')
+      ->loadOverrideFree($id);
+    if (!$stored) {
+      return '';
+    }
+    return (string) $stored->get('secret');
+  }
+
+  /**
+   * Whether the secret is provided by a configuration override.
+   *
+   * @return bool
+   *   TRUE when webhooks.webhook.{id} has a secret override.
+   */
+  protected function isSecretOverridden() {
+    $id = $this->entity->id();
+    if (!$id) {
+      return FALSE;
+    }
+    return $this->configFactory
+      ->get('webhooks.webhook.' . $id)
+      ->hasOverrides('secret');
   }
 
   /**

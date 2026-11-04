@@ -1,0 +1,22 @@
+uuid: bda6f7f3-2765-446c-a596-56b9297c2ed4
+langcode: fr
+status: true
+dependencies:
+  config:
+    - node.type.service_au_citoyen
+id: node.service_au_citoyen.promote
+field_name: promote
+entity_type: node
+bundle: service_au_citoyen
+label: "Promu en page d'accueil"
+description: ''
+required: false
+translatable: true
+default_value:
+  -
+    value: 1
+default_value_callback: ''
+settings:
+  on_label: Activé
+  off_label: Désactivé
+field_type: boolean

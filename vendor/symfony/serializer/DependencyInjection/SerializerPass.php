@@ -12,13 +12,18 @@
 namespace Symfony\Component\Serializer\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Debug\TraceableNormalizer;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -54,27 +59,41 @@ class SerializerPass implements CompilerPassInterface
             throw new RuntimeException('You must tag at least one service as "serializer.encoder" to use the "serializer" service.');
         }
 
+        $defaultContext = [];
         if ($container->hasParameter('serializer.default_context')) {
             $defaultContext = $container->getParameter('serializer.default_context');
-            $this->bindDefaultContext($container, array_merge($normalizers, $encoders), $defaultContext);
             $container->getParameterBag()->remove('serializer.default_context');
             $container->getDefinition('serializer')->setArgument('$defaultContext', $defaultContext);
         }
 
+        /** @var ?string $circularReferenceHandler */
+        $circularReferenceHandler = $container->hasParameter('.serializer.circular_reference_handler')
+            ? $container->getParameter('.serializer.circular_reference_handler') : null;
+
+        /** @var ?string $maxDepthHandler */
+        $maxDepthHandler = $container->hasParameter('.serializer.max_depth_handler')
+            ? $container->getParameter('.serializer.max_depth_handler') : null;
+
+        $this->bindDefaultContext($container, array_merge($normalizers, $encoders), $defaultContext, $circularReferenceHandler, $maxDepthHandler);
+
         $this->configureSerializer($container, 'serializer', $normalizers, $encoders, 'default');
 
         if ($namedSerializers) {
-            $this->configureNamedSerializers($container);
+            $this->configureNamedSerializers($container, $circularReferenceHandler, $maxDepthHandler);
         }
     }
 
     private function createNamedSerializerTags(ContainerBuilder $container, string $tagName, string $configName, array $namedSerializers): void
     {
         $serializerNames = array_keys($namedSerializers);
-        $withBuiltIn = array_filter($serializerNames, fn (string $name) => $namedSerializers[$name][$configName] ?? false);
+        $withBuiltIn = array_filter($serializerNames, static fn (string $name) => $namedSerializers[$name][$configName] ?? false);
 
         foreach ($container->findTaggedServiceIds($tagName) as $serviceId => $tags) {
             $definition = $container->getDefinition($serviceId);
+
+            if (array_any($tags, $closure = static fn (array $tag) => (bool) $tag)) {
+                $tags = array_filter($tags, $closure);
+            }
 
             foreach ($tags as $tag) {
                 $names = (array) ($tag['serializer'] ?? []);
@@ -98,11 +117,22 @@ class SerializerPass implements CompilerPassInterface
         }
     }
 
-    private function bindDefaultContext(ContainerBuilder $container, array $services, array $defaultContext): void
+    private function bindDefaultContext(ContainerBuilder $container, array $services, array $defaultContext, ?string $circularReferenceHandler, ?string $maxDepthHandler): void
     {
         foreach ($services as $id) {
             $definition = $container->getDefinition((string) $id);
-            $definition->setBindings(['array $defaultContext' => new BoundArgument($defaultContext, false)] + $definition->getBindings());
+
+            $context = $defaultContext;
+            if (is_a($this->resolveClass($container, (string) $id), ObjectNormalizer::class, true)) {
+                if (null !== $circularReferenceHandler) {
+                    $context += ['circular_reference_handler' => new Reference($circularReferenceHandler)];
+                }
+                if (null !== $maxDepthHandler) {
+                    $context += ['max_depth_handler' => new Reference($maxDepthHandler)];
+                }
+            }
+
+            $definition->setBindings(['array $defaultContext' => new BoundArgument($context, false)] + $definition->getBindings());
         }
     }
 
@@ -125,10 +155,11 @@ class SerializerPass implements CompilerPassInterface
         $serializerDefinition->replaceArgument(1, $encoders);
     }
 
-    private function configureNamedSerializers(ContainerBuilder $container): void
+    private function configureNamedSerializers(ContainerBuilder $container, ?string $circularReferenceHandler, ?string $maxDepthHandler): void
     {
         $defaultSerializerNameConverter = $container->hasParameter('.serializer.name_converter')
             ? $container->getParameter('.serializer.name_converter') : null;
+        $nestedNormalizers = [];
 
         foreach ($container->getParameter('.serializer.named_serializers') as $serializerName => $config) {
             $config += ['default_context' => [], 'name_converter' => null];
@@ -146,23 +177,43 @@ class SerializerPass implements CompilerPassInterface
                 ? $this->buildChildNameConverterDefinition($container, $config['name_converter'])
                 : self::NAME_CONVERTER_METADATA_AWARE_ID;
 
-            $normalizers = $this->buildChildDefinitions($container, $serializerName, $normalizers, $config);
-            $encoders = $this->buildChildDefinitions($container, $serializerName, $encoders, $config);
+            $debug = $container->getParameter('kernel.debug') && $container->hasDefinition('debug.serializer');
+            $children = [];
+            $normalizers = $this->buildChildDefinitions($container, $serializerName, $normalizers, $config, $children);
+            $encoders = $this->buildChildDefinitions($container, $serializerName, $encoders, $config, $children);
 
-            $this->bindDefaultContext($container, array_merge($normalizers, $encoders), $config['default_context']);
+            $this->bindDefaultContext($container, $children, $config['default_context'], $circularReferenceHandler, $maxDepthHandler);
+
+            $nestedNormalizers[$serializerName] = [
+                'serializer' => $debug ? 'debug.'.$serializerId.'.inner' : $serializerId,
+                'name_converter' => $config['name_converter'],
+                'default_context' => $config['default_context'],
+                'children' => array_map('strval', $children),
+            ];
 
             $container->registerChild($serializerId, 'serializer')->setArgument('$defaultContext', $config['default_context']);
             $container->registerAliasForArgument($serializerId, SerializerInterface::class, $serializerName.'.serializer');
+            $container->registerAliasForArgument($serializerId, SerializerInterface::class, $serializerName);
+            $container->registerAliasForArgument($serializerId, NormalizerInterface::class, $serializerName.'.normalizer');
+            $container->registerAliasForArgument($serializerId, NormalizerInterface::class, $serializerName);
+            $container->registerAliasForArgument($serializerId, DenormalizerInterface::class, $serializerName.'.denormalizer');
+            $container->registerAliasForArgument($serializerId, DenormalizerInterface::class, $serializerName);
 
             $this->configureSerializer($container, $serializerId, $normalizers, $encoders, $serializerName);
 
-            if ($container->getParameter('kernel.debug') && $container->hasDefinition('debug.serializer')) {
+            if ($debug) {
                 $container->registerChild($debugId = 'debug.'.$serializerId, 'debug.serializer')
                     ->setDecoratedService($serializerId)
                     ->replaceArgument(0, new Reference($debugId.'.inner'))
                     ->replaceArgument(2, $serializerName);
             }
         }
+
+        $container->setParameter('.serializer.nested_normalizers', [
+            'circular_reference_handler' => $circularReferenceHandler,
+            'max_depth_handler' => $maxDepthHandler,
+            'named_serializers' => $nestedNormalizers,
+        ]);
     }
 
     private function buildChildNameConverterDefinition(ContainerBuilder $container, ?string $nameConverter): ?string
@@ -179,31 +230,91 @@ class SerializerPass implements CompilerPassInterface
         return $childId;
     }
 
-    private function buildChildDefinitions(ContainerBuilder $container, string $serializerName, array $services, array $config): array
+    /**
+     * @param array<string, Reference> $children
+     */
+    private function buildChildDefinitions(ContainerBuilder $container, string $serializerName, array $services, array $config, array &$children): array
     {
         foreach ($services as &$id) {
-            $childId = $id.'.'.$serializerName;
-
-            $definition = $container->registerChild($childId, (string) $id);
-
-            if (null !== $nameConverterIndex = $this->findNameConverterIndex($container, (string) $id)) {
-                $definition->replaceArgument($nameConverterIndex, new Reference($config['name_converter']));
-            }
-
-            $id = new Reference($childId);
+            $id = $this->buildChildDefinition($container, $serializerName, (string) $id, $config, $children);
         }
 
         return $services;
     }
 
-    private function findNameConverterIndex(ContainerBuilder $container, string $id): int|string|null
+    /**
+     * @param array<string, Reference> $children
+     */
+    private function buildChildDefinition(ContainerBuilder $container, string $serializerName, string $id, array $config, array &$children): Reference
     {
-        foreach ($container->getDefinition($id)->getArguments() as $index => $argument) {
-            if ($argument instanceof Reference && self::NAME_CONVERTER_METADATA_AWARE_ID === (string) $argument) {
-                return $index;
+        if (isset($children[$id])) {
+            return $children[$id];
+        }
+
+        $childId = $id.'.'.$serializerName;
+        $children[$id] = new Reference($childId);
+
+        $definition = $container->registerChild($childId, $id);
+
+        foreach ($this->resolveArguments($container, $id) as $index => $argument) {
+            if (!$argument instanceof Reference) {
+                continue;
+            }
+
+            if (self::NAME_CONVERTER_METADATA_AWARE_ID === (string) $argument) {
+                $definition->replaceArgument($index, new Reference($config['name_converter']));
+            }
+        }
+
+        return $children[$id];
+    }
+
+    private function resolveArguments(ContainerBuilder $container, string $id): array
+    {
+        $arguments = [];
+
+        foreach (array_reverse($this->getDefinitionAndParents($container, $id)) as $definition) {
+            if (!$definition instanceof ChildDefinition) {
+                $arguments = $definition->getArguments();
+                continue;
+            }
+
+            foreach ($definition->getArguments() as $index => $argument) {
+                if (\is_int($index)) {
+                    $arguments[] = $argument;
+                } elseif (str_starts_with($index, 'index_')) {
+                    $arguments[(int) substr($index, 6)] = $argument;
+                } else {
+                    $arguments[$index] = $argument;
+                }
+            }
+        }
+
+        return $arguments;
+    }
+
+    private function resolveClass(ContainerBuilder $container, string $id): ?string
+    {
+        foreach ($this->getDefinitionAndParents($container, $id) as $definition) {
+            if (null !== $class = $definition->getClass()) {
+                return $class;
             }
         }
 
         return null;
+    }
+
+    /**
+     * @return Definition[]
+     */
+    private function getDefinitionAndParents(ContainerBuilder $container, string $id): array
+    {
+        $definitions = [$id => $definition = $container->getDefinition($id)];
+
+        while ($definition instanceof ChildDefinition && $container->has($id = $definition->getParent()) && !isset($definitions[$id])) {
+            $definitions[$id] = $definition = $container->findDefinition($id);
+        }
+
+        return $definitions;
     }
 }

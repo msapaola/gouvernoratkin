@@ -12,7 +12,7 @@ id: block_content.chiffres_cles.field_chiffres
 field_name: field_chiffres
 entity_type: block_content
 bundle: chiffres_cles
-label: 'Chiffres'
+label: Chiffres
 description: "Un chiffre par ligne : la valeur (ex. « 17,7 M ») et son libellé (ex. « habitants dans l'aire urbaine »). Quatre chiffres remplissent une rangée."
 required: true
 translatable: false

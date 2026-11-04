@@ -1,0 +1,96 @@
+site_name: Webhooks Documentation
+repo_url: https://git.drupalcode.org/project/webhooks
+site_url: https://project.pages.drupalcode.org/webhooks
+
+theme:
+  logo: logo.png
+  name: material
+  palette:
+    - media: '(prefers-color-scheme: light)'
+      scheme: default
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: '(prefers-color-scheme: dark)'
+      scheme: slate
+      primary: blue
+      accent: light blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - content.code.copy
+    - content.code.select
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.path
+    - navigation.tracking
+    - navigation.top
+    - navigation.edit
+    - content.tooltips
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - codehilite:
+      linenums: true
+  - def_list
+  - footnotes
+  - md_in_html
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji ''
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg ''
+  - pymdownx.highlight:
+      linenums: true
+      extend_pygments_lang:
+        - name: php
+          lang: php
+          options:
+            startinline: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format ''
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - tables
+  - toc:
+      permalink: '#'
+      baselevel: 1
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/drupal
+      link: https://www.drupal.org/project/webhooks
+      name: Drupal.org Project Page
+    - icon: fontawesome/brands/gitlab
+      link: https://git.drupalcode.org/project/webhooks
+      name: GitLab Repository
+
+extra_css:
+  - css/extra.css
+
+nav:
+  - Home: index.md
+  - Site Builder Guide:
+      - Site Builder Guide: site-builder.md
+      - Incoming Webhooks: incoming-webhooks.md
+  - Developer Guide:
+      - Developer Guide: developer.md
+      - Process Incoming Webhooks: process-incoming-webhooks.md

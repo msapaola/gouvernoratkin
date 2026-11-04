@@ -45,7 +45,7 @@ interface WebhookConfigInterface extends ConfigEntityInterface {
    * Get the content type.
    *
    * @return string
-   *   The content type string, eg. json, xml
+   *   The content type string, eg. 'json', 'xml' or 'x-www-form-urlencoded'.
    */
   public function getContentType();
 
@@ -88,6 +88,22 @@ interface WebhookConfigInterface extends ConfigEntityInterface {
    *   The secret string.
    */
   public function getSecret();
+
+  /**
+   * Get the signature header name.
+   *
+   * @return string
+   *   The HTTP header that carries the HMAC signature.
+   */
+  public function getSignatureHeader();
+
+  /**
+   * Get the HMAC algorithm for unprefixed signatures.
+   *
+   * @return string
+   *   The hash_hmac() algorithm name, e.g. sha256.
+   */
+  public function getSignatureAlgorithm();
 
   /**
    * Is non-blocking?

@@ -2,6 +2,8 @@ uuid: 8623835f-0670-40f6-b242-64e12913aa52
 langcode: fr
 status: true
 dependencies:
+  config:
+    - node.type.video
   module:
     - node
 id: motif_video
@@ -12,7 +14,6 @@ selection_criteria:
   1eadfb17-1782-45a9-b269-16c04eb61280:
     id: 'entity_bundle:node'
     negate: false
-    uuid: 1eadfb17-1782-45a9-b269-16c04eb61280
     context_mapping:
       node: node
     bundles:

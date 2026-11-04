@@ -185,7 +185,6 @@ code: |-
      (style.css, section « Zone systeme »). Ils y sont uniformes sur tout
      le site et respectent les seuils de contraste : le fond vert plein
      avec texte blanc utilise ici ne tenait que 3,09:1. */
-
 media: all
 preprocess: true
 conditions:

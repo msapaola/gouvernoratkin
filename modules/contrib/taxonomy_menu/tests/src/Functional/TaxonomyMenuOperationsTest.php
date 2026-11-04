@@ -238,4 +238,70 @@ class TaxonomyMenuOperationsTest extends BrowserTestBase {
     $this->assertSession()->checkboxNotChecked('links[menu_plugin_id:taxonomy_menu.menu_link:taxonomy_menu.menu_link.test_tax_menu.3][enabled]');
   }
 
+  /**
+   * Tests that top-level terms are placed under a configured menu parent item.
+   *
+   * Ensures that when menu_parent points to an existing menu link (not just the
+   * menu root), top-level taxonomy terms are created as children of that link,
+   * while child terms still follow the taxonomy hierarchy.
+   */
+  public function testMenuParentItemPlacement() {
+    // Create a "Products" menu link in the test menu.
+    $this->drupalGet('admin/structure/menu/manage/test-menu/add');
+    $edit = [
+      'title[0][value]' => 'Products',
+      'link[0][uri]' => '<front>',
+    ];
+    $this->submitForm($edit, 'Save');
+
+    // Get the menu link content entity to determine its plugin ID.
+    $menu_link_content_storage = \Drupal::entityTypeManager()
+      ->getStorage('menu_link_content');
+    $menu_links = $menu_link_content_storage->loadByProperties([
+      'title' => 'Products',
+      'menu_name' => 'test-menu',
+    ]);
+    $products_link = reset($menu_links);
+    $products_plugin_id = 'menu_link_content:' . $products_link->uuid();
+
+    // Delete the existing taxonomy menu (created in setUp with root parent).
+    $this->drupalGet('admin/structure/taxonomy_menu/test_tax_menu/delete');
+    $this->submitForm([], 'Delete');
+
+    // Create a new taxonomy menu with menu_parent set to the Products link.
+    $this->drupalGet('admin/structure/taxonomy_menu/add');
+    $edit = [
+      'id' => 'test_tax_menu_parent',
+      'label' => 'test tax menu with parent',
+      'vocabulary' => 'test_tax_vocab',
+      'menu' => 'test-menu',
+      'expanded' => 1,
+      'depth' => '1',
+      'menu_parent' => 'test-menu:' . $products_plugin_id,
+    ];
+    $this->submitForm($edit, 'Save');
+
+    // Verify top-level term 1 ("test term 1") has Products as its parent.
+    $this->drupalGet('admin/structure/menu/link/taxonomy_menu.menu_link:taxonomy_menu.menu_link.test_tax_menu_parent.1/edit');
+    $this->assertSession()->fieldValueEquals(
+      'menu_parent',
+      'test-menu:' . $products_plugin_id
+    );
+
+    // Verify top-level term 3 ("test term 2") has Products as its parent.
+    $this->drupalGet('admin/structure/menu/link/taxonomy_menu.menu_link:taxonomy_menu.menu_link.test_tax_menu_parent.3/edit');
+    $this->assertSession()->fieldValueEquals(
+      'menu_parent',
+      'test-menu:' . $products_plugin_id
+    );
+
+    // Verify child term 2 ("test term 1-A", child of term 1) still has term 1
+    // as its parent, not the configured menu_parent.
+    $this->drupalGet('admin/structure/menu/link/taxonomy_menu.menu_link:taxonomy_menu.menu_link.test_tax_menu_parent.2/edit');
+    $this->assertSession()->fieldValueEquals(
+      'menu_parent',
+      'test-menu:taxonomy_menu.menu_link:taxonomy_menu.menu_link.test_tax_menu_parent.1'
+    );
+  }
+
 }

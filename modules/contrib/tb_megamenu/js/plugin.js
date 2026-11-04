@@ -12,6 +12,8 @@ export class TBMegaMenu {
       : 0;
 
     this.mm_timeout = mm_duration ? 100 + mm_duration : 500;
+
+    this.isOpen = false;
   }
 
   // We have to define this as a getter because it can change as the browser resizes.
@@ -254,26 +256,12 @@ export class TBMegaMenu {
       }
     });
 
-    // Anytime there's a click outside the menu, close the menu.
-    document.addEventListener('click', (event) => {
-      if (
-        !event.target.closest('.tbm') &&
-        _this.navParent.classList.contains('tbm--mobile-show')
-      ) {
-        _this.closeMenu();
-      }
-    });
-
-    // When focus lands outside the menu close the menu.
-    document.addEventListener('focusin', (event) => {
-      if (!event.target.closest('.tbm')) {
-        _this.closeMenu();
-      }
-    });
   }
 
   // Close Mega Menu
   closeMenu() {
+    this.isOpen = false;
+
     this.navParent.classList.remove('tbm--mobile-show');
     this.navParent
       .querySelector('.tbm-button')
@@ -295,13 +283,6 @@ export class TBMegaMenu {
           toggle.setAttribute('aria-expanded', value);
         });
     };
-
-    // Anytime there's a click outside a desktop menu that has arrows, close the menu.
-    document.addEventListener('click', event => {
-      if (!event.target.closest('.tbm') && !this.isMobile && this.hasArrows) {
-        this.closeMenu();
-      }
-    });
 
     this.navParent.querySelectorAll('.tbm-item').forEach((element) => {
       if (element.classList.contains('tbm-group')) {
@@ -338,6 +319,7 @@ export class TBMegaMenu {
 
   showMenu(listItem, mm_timeout) {
     const _this = this;
+    this.isOpen = true;
 
     if (listItem.classList.contains('level-1')) {
       listItem.classList.add('animating');
@@ -392,7 +374,7 @@ export class TBMegaMenu {
     const _this = this;
 
     // Open and close the menu when the hamburger is clicked.
-    document.querySelectorAll('.tbm-button').forEach((element) => {
+    this.navParent.querySelectorAll('.tbm-button').forEach((element) => {
       element.addEventListener('click', (event) => {
         // If the menu is currently open, collapse all open dropdowns before
         // hiding the menu.
@@ -402,8 +384,23 @@ export class TBMegaMenu {
           // Toggle the menu visibility.
           _this.navParent.classList.add('tbm--mobile-show');
           event.currentTarget.setAttribute('aria-expanded', 'true');
+          _this.isOpen = true;
         }
       });
+    });
+
+    // Anytime there's a click outside the menu, close the menu.
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('.tbm') && _this.isOpen) {
+        _this.closeMenu();
+      }
+    });
+
+    // When focus lands outside the menu close the menu.
+    document.addEventListener('focusin', (event) => {
+      if (!event.target.closest('.tbm') && _this.isOpen) {
+        _this.closeMenu();
+      }
     });
 
     if (!this.isTouch) {
@@ -422,7 +419,7 @@ export class TBMegaMenu {
         });
       });
 
-      // Show dropdwons and flyouts on focus.
+      // Show dropdowns and flyouts on focus.
       this.navParent.querySelectorAll('.tbm-toggle').forEach((element) => {
         element.addEventListener('focus', (event) => {
           if (!_this.isMobile && !_this.hasArrows) {

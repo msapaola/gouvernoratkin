@@ -28,6 +28,13 @@ class Webhook {
   protected $payload;
 
   /**
+   * The raw HTTP body that was signed.
+   *
+   * @var string
+   */
+  protected $body = '';
+
+  /**
    * The unique id.
    *
    * @var string
@@ -163,6 +170,30 @@ class Webhook {
   }
 
   /**
+   * Get the raw request body.
+   *
+   * @return string
+   *   The posted body string, or an empty string.
+   */
+  public function getBody() {
+    return (string) $this->body;
+  }
+
+  /**
+   * Set the raw request body.
+   *
+   * @param string $body
+   *   The exact bytes posted by the sender.
+   *
+   * @return Webhook
+   *   The webhook.
+   */
+  public function setBody($body) {
+    $this->body = (string) $body;
+    return $this;
+  }
+
+  /**
    * Add to the payload.
    *
    * @param array $payload
@@ -201,7 +232,15 @@ class Webhook {
    */
   public function setUuid($uuid) {
     $this->uuid = $uuid;
+    // Remove both names, regardless of casing, before setting delivery IDs.
+    foreach (array_keys($this->headers) as $name) {
+      if (in_array(strtolower($name), ['webhook-delivery-id', 'x-drupal-delivery'], TRUE)) {
+        unset($this->headers[$name]);
+      }
+    }
     $this->addHeaders([
+      'Webhook-Delivery-Id' => $uuid,
+      // Deprecated compatibility alias; 4.0.x only sends the new name.
       'X-Drupal-Delivery' => $uuid,
     ]);
     return $this;
@@ -229,7 +268,14 @@ class Webhook {
    */
   public function setEvent($event) {
     $this->event = $event;
+    foreach (array_keys($this->headers) as $name) {
+      if (in_array(strtolower($name), ['webhook-event', 'x-drupal-event'], TRUE)) {
+        unset($this->headers[$name]);
+      }
+    }
     $this->addHeaders([
+      'Webhook-Event' => $event,
+      // Deprecated compatibility alias for existing receivers.
       'X-Drupal-Event' => $event,
     ]);
     return $this;
@@ -269,7 +315,8 @@ class Webhook {
    * Set the content type.
    *
    * @param string $content_type
-   *   A content type string, e.g. 'application/json' or 'application/xml'.
+   *   A content type string, e.g. 'application/json' , 'application/xml' or
+   *   'application/x-www-form-urlencoded'.
    *
    * @return Webhook
    *   The webhook.
@@ -331,22 +378,62 @@ class Webhook {
   }
 
   /**
+   * Normalize an HTTP header name for case-insensitive lookup.
+   *
+   * Converts ASCII letters to lowercase and underscores to hyphens so
+   * CGI-style names match canonical header names.
+   *
+   * @param string $name
+   *   The header name.
+   *
+   * @return string
+   *   The normalized header name.
+   */
+  public static function normalizeHeaderName($name) {
+    return strtr(
+      trim((string) $name),
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZ_',
+      'abcdefghijklmnopqrstuvwxyz-'
+    );
+  }
+
+  /**
    * Get the payload signature from headers.
+   *
+   * @param string $header
+   *   Optional HTTP header name that carries the HMAC. When empty, Hub
+   *   signature headers are used as a fallback.
    *
    * @return string
    *   The signature string, e.g.
    *   sha1=de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9 or
    *   sha256=e7835683d84a9bf0e44befd318eaf78ad631a820c4a17a8b916f5f79bed30901
    */
-  public function getSignature() {
-    $headers = $this->getHeaders();
-    $headers = array_change_key_case($headers, CASE_LOWER);
-    // Use the more secure SHA256 hash if available.
-    if (isset($headers['x-hub-signature-256'])) {
+  public function getSignature($header = '') {
+    $headers = [];
+    foreach ($this->getHeaders() as $name => $value) {
+      if (is_array($value)) {
+        $value = reset($value);
+      }
+      $headers[self::normalizeHeaderName((string) $name)] = trim((string) $value);
+    }
+
+    $header = trim((string) $header);
+    if ($header !== '') {
+      $value = $headers[self::normalizeHeaderName($header)] ?? '';
+      if ($value !== '') {
+        return $value;
+      }
+      $hub_headers = ['x-hub-signature-256', 'x-hub-signature'];
+      if (!in_array(self::normalizeHeaderName($header), $hub_headers, TRUE)) {
+        return '';
+      }
+    }
+    // Prefer SHA-256 Hub signatures, then legacy SHA-1.
+    if (!empty($headers['x-hub-signature-256'])) {
       return $headers['x-hub-signature-256'];
     }
-    // Otherwise use the legacy SHA1 hash for backwards compatibility.
-    elseif (isset($headers['x-hub-signature'])) {
+    if (!empty($headers['x-hub-signature'])) {
       return $headers['x-hub-signature'];
     }
     return '';
@@ -392,9 +479,12 @@ class Webhook {
    * @param string $secret
    *   The webhook secret.
    * @param string $payload
-   *   The raw webhook payload.
+   *   The exact HTTP body string. Do not pass json_encode() of a
+   *   decoded array; WooCommerce signs trim(wp_json_encode($payload)).
    * @param string $signature
    *   The webhook signature.
+   * @param string $algorithm
+   *   HMAC algorithm for unprefixed (raw base64) signatures.
    *
    * @return bool
    *   Boolean TRUE for success.
@@ -402,13 +492,87 @@ class Webhook {
    * @throws \Drupal\webhooks\Exception\WebhookMismatchSignatureException
    *   Throws exception if signatures do not match.
    */
-  public static function verify($secret, $payload, $signature) {
-    [$algorithm, $user_string] = explode('=', $signature);
-    $known_string = hash_hmac($algorithm, $payload, $secret);
-    if (!hash_equals($known_string, $user_string)) {
-      throw new WebhookMismatchSignatureException($user_string, $algorithm . '=' . $known_string, $payload);
+  public static function verify($secret, $payload, $signature, $algorithm = 'sha256') {
+    if (is_array($signature)) {
+      $signature = reset($signature);
     }
-    return TRUE;
+    $signature = trim((string) $signature);
+    $payload = (string) $payload;
+    $payload_length = strlen($payload);
+    $wc_payload = trim($payload);
+    $secret_raw = trim((string) $secret);
+    $secret_decoded = htmlspecialchars_decode($secret_raw, ENT_QUOTES);
+    $algorithm = strtolower(trim((string) $algorithm));
+    if ($algorithm === '') {
+      $algorithm = 'sha256';
+    }
+
+    if ($signature !== '' && $secret_raw === '') {
+      throw new WebhookMismatchSignatureException(
+        $signature,
+        '',
+        $payload_length,
+        'A signature was received but no secret is configured.'
+      );
+    }
+
+    if ($signature === '') {
+      throw new WebhookMismatchSignatureException(
+        $signature,
+        'algorithm=hexdigest',
+        $payload_length
+      );
+    }
+
+    $secrets = [$secret_decoded];
+    if ($secret_decoded !== $secret_raw) {
+      $secrets[] = $secret_raw;
+    }
+
+    if (preg_match('/^(sha1|sha256|sha384|sha512|md5)=([0-9a-f]+)$/i', $signature, $matches)) {
+      $hub_algorithm = strtolower($matches[1]);
+      $user_string = $matches[2];
+      $known_string = '';
+      foreach ($secrets as $try_secret) {
+        try {
+          $known_string = hash_hmac($hub_algorithm, $payload, $try_secret);
+        }
+        catch (\ValueError $e) {
+          throw new WebhookMismatchSignatureException(
+            $signature,
+            $algorithm . '=' . hash_hmac($algorithm, $payload, $try_secret),
+            $payload_length
+          );
+        }
+        if (hash_equals($known_string, $user_string)) {
+          return TRUE;
+        }
+      }
+      throw new WebhookMismatchSignatureException(
+        $user_string,
+        $hub_algorithm . '=' . $known_string,
+        $payload_length
+      );
+    }
+
+    $generated = '';
+    $payload_length = strlen($wc_payload);
+    foreach ($secrets as $try_secret) {
+      try {
+        $generated = base64_encode(hash_hmac($algorithm, $wc_payload, $try_secret, TRUE));
+      }
+      catch (\ValueError $e) {
+        $generated = base64_encode(hash_hmac('sha256', $wc_payload, $try_secret, TRUE));
+      }
+      if (hash_equals($generated, $signature)) {
+        return TRUE;
+      }
+    }
+    throw new WebhookMismatchSignatureException(
+      $signature,
+      $generated,
+      $payload_length
+    );
   }
 
   /**

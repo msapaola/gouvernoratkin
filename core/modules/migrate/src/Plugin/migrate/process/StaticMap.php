@@ -90,7 +90,7 @@ use Drupal\migrate\MigrateSkipRowException;
  *
  * A default value can be defined for all values that are not included in the
  * map. See the example below. If the value of the source property 'foo' is
- * 'yet_another' (a value that is not in the map), 'bar' will be returned.
+ * 'yet_another' (a value that is not in the map), 'fallback' will be returned.
  * @code
  * process:
  *   bar:
@@ -99,7 +99,7 @@ use Drupal\migrate\MigrateSkipRowException;
  *     map:
  *       from: to
  *       this: that
- *     default_value: bar
+ *     default_value: fallback
  * @endcode
  *
  * If your source data has boolean values as strings, you need to use single
@@ -113,23 +113,11 @@ use Drupal\migrate\MigrateSkipRowException;
  *       'TRUE': to
  * @endcode
  *
- * A NULL can be mapped. If the value of the source property 'foo' is NULL then
- * the value of the destination property bar will be 'to'.
- *
- * @code
- * process:
- *   bar:
- *     plugin: static_map
- *     source: foo
- *     map:
- *       NULL: to
- * @endcode
- *
  * If your source data contains booleans, the boolean is treated as a numeric 0
  * or 1. If the value of the source property 'foo' is TRUE then the value of the
- * destination property bar will be 'bar'. And if the value of the source
+ * destination property bar will be 'quux'. And if the value of the source
  * property 'foo' is FALSE then the value of the destination property bar will
- * be 'bar'.
+ * be 'baz'.
  *
  * @code
  * process:
@@ -137,9 +125,13 @@ use Drupal\migrate\MigrateSkipRowException;
  *     plugin: static_map
  *     source: foo
  *     map:
- *       0: foo
- *       1: bar
+ *       0: baz
+ *       1: quux
  * @endcode
+ *
+ * Note you cannot map NULL to a value. Use the default_value or bypass setting
+ * instead. If you need to differentiate between NULL and empty strings,
+ * then use the bypass setting and a custom process plugin.
  *
  * @see https://www.drupal.org/project/drupal/issues/2827897
  * @see \Drupal\migrate\Plugin\MigrateProcessInterface
@@ -151,6 +143,25 @@ class StaticMap extends ProcessPluginBase {
    * {@inheritdoc}
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
+    if ($value === NULL) {
+      if (array_key_exists('', $this->configuration['map'])) {
+        if (array_key_exists('default_value', $this->configuration) && $this->configuration['default_value'] === $this->configuration['map']['']) {
+          return $this->configuration['default_value'];
+        }
+        @trigger_error('Relying on mapping NULL values via an empty string map key in ' . __CLASS__ . '::transform() is deprecated in drupal:11.3.0 and will trigger a Drupal\migrate\MigrateSkipRowException from drupal:12.0.0. Set the empty string map value as the "default_value" in the plugin configuration. See https://www.drupal.org/node/3557003', E_USER_DEPRECATED);
+        // Preserve the current behavior of returning the value mapped to an
+        // empty string for NULL.
+        return $this->configuration['map'][''];
+      }
+      if (array_key_exists('default_value', $this->configuration)) {
+        return $this->configuration['default_value'];
+      }
+      if (!empty($this->configuration['bypass'])) {
+        return NULL;
+      }
+      throw new MigrateSkipRowException(sprintf("No static mapping possible for NULL and no default value provided for destination '%s'.", $destination_property));
+    }
+
     $new_value = $value;
     if (is_array($value)) {
       if (!$value) {

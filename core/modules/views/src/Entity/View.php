@@ -3,6 +3,7 @@
 namespace Drupal\views\Entity;
 
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
@@ -44,6 +45,8 @@ use Drupal\views\ViewEntityInterface;
   ],
 )]
 class View extends ConfigEntityBase implements ViewEntityInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The name of the base table this view will use.
@@ -150,10 +153,10 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
       return FALSE;
     }
 
-    $plugin = Views::pluginManager('display')->getDefinition($plugin_id);
+    $plugin = \Drupal::service('plugin.manager.views.display')->getDefinition($plugin_id);
 
     if (empty($plugin)) {
-      $plugin['title'] = t('Broken');
+      $plugin['title'] = $this->t('Broken');
     }
 
     if (empty($id)) {
@@ -201,6 +204,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
    *   Which plugin should be used for the new display ID.
    *
    * @return string
+   *   The generated display ID.
    */
   protected function generateDisplayId($plugin_id) {
     // 'default' is singular and is unique, so just go with 'default'
@@ -297,7 +301,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
     // Calculating the cacheability metadata is only needed when the view is
     // saved through the UI or API. It should not be done when we are syncing
     // configuration or installing modules.
-    if (!$this->isSyncing() && !$this->hasTrustedData()) {
+    if (!$this->isSyncing()) {
       $this->addCacheMetadata();
     }
   }
@@ -349,7 +353,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
     $this->invalidateCaches();
 
     // Rebuild the router if this is a new view, or its status changed.
-    if (!isset($this->original) || ($this->status() != $this->original->status())) {
+    if (!$this->getOriginal() || ($this->status() != $this->getOriginal()->status())) {
       \Drupal::service('router.builder')->setRebuildNeeded();
     }
   }
@@ -477,7 +481,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
    * {@inheritdoc}
    */
   public function onDependencyRemoval(array $dependencies) {
-    $changed = FALSE;
+    $changed = parent::onDependencyRemoval($dependencies);
 
     // Don't intervene if the views module is removed.
     if (isset($dependencies['module']) && in_array('views', $dependencies['module'])) {

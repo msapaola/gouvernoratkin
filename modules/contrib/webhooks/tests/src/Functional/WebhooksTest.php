@@ -29,6 +29,14 @@ class WebhooksTest extends BrowserTestBase {
 
   const WEBHOOK_ID_INCOMING_XML = 'webhook_id_incoming_xml';
 
+  const WEBHOOK_ID_OUTGOING_WWW_FORM_URLENCODED = 'webhook_id_outgoing_www_form_urlencoded';
+
+  const WEBHOOK_ID_INCOMING_WWW_FORM_URLENCODED = 'webhook_id_incoming_www_form_urlencoded';
+
+  const WEBHOOK_ID_OUTGOING_YAML = 'webhook_id_outgoing_yaml';
+
+  const WEBHOOK_ID_INCOMING_YAML = 'webhook_id_incoming_yaml';
+
   /**
    * {@inheritdoc}
    */
@@ -124,6 +132,7 @@ class WebhooksTest extends BrowserTestBase {
       'events' => [],
       'content_type' => WebhookConfig::CONTENT_TYPE_JSON,
       'secret' => self::WEBHOOK_SECRET,
+      'signature_header' => WebhookConfig::DEFAULT_SIGNATURE_HEADER,
       'status' => 1,
     ])->save();
 
@@ -137,6 +146,7 @@ class WebhooksTest extends BrowserTestBase {
       'events' => [],
       'content_type' => WebhookConfig::CONTENT_TYPE_JSON,
       'secret' => self::WEBHOOK_SECRET,
+      'signature_header' => WebhookConfig::DEFAULT_SIGNATURE_HEADER,
       'status' => 1,
     ])->save();
 
@@ -162,6 +172,58 @@ class WebhooksTest extends BrowserTestBase {
       'type' => 'outgoing',
       'events' => [],
       'content_type' => WebhookConfig::CONTENT_TYPE_XML,
+      'secret' => '',
+      'status' => 1,
+    ])->save();
+
+    // Create an incoming webhook.
+    WebhookConfig::create([
+      'id' => self::WEBHOOK_ID_INCOMING_WWW_FORM_URLENCODED,
+      'label' => 'Webhook Incoming WWW-FORM-URLENCODED',
+      'uuid' => $this->uuid->generate(),
+      'payload_url' => '',
+      'type' => 'incoming',
+      'events' => [],
+      'content_type' => WebhookConfig::CONTENT_TYPE_WWW_FORM_URLENCODED,
+      'secret' => '',
+      'status' => 1,
+    ])->save();
+
+    // Create an outgoing webhook.
+    WebhookConfig::create([
+      'id' => self::WEBHOOK_ID_OUTGOING_WWW_FORM_URLENCODED,
+      'label' => 'Webhook Outgoing WWW-FORM-URLENCODED',
+      'uuid' => $this->uuid->generate(),
+      'payload_url' => Url::fromRoute('webhooks.webhook_receive', ['incoming_webhook_name' => self::WEBHOOK_ID_INCOMING_WWW_FORM_URLENCODED])->setAbsolute(TRUE)->toString(),
+      'type' => 'outgoing',
+      'events' => [],
+      'content_type' => WebhookConfig::CONTENT_TYPE_WWW_FORM_URLENCODED,
+      'secret' => '',
+      'status' => 1,
+    ])->save();
+
+    // Create an incoming webhook.
+    WebhookConfig::create([
+      'id' => self::WEBHOOK_ID_INCOMING_YAML,
+      'label' => 'Webhook Incoming YAML',
+      'uuid' => $this->uuid->generate(),
+      'payload_url' => '',
+      'type' => 'incoming',
+      'events' => [],
+      'content_type' => WebhookConfig::CONTENT_TYPE_YAML,
+      'secret' => '',
+      'status' => 1,
+    ])->save();
+
+    // Create an outgoing webhook.
+    WebhookConfig::create([
+      'id' => self::WEBHOOK_ID_OUTGOING_YAML,
+      'label' => 'Webhook Outgoing YAML',
+      'uuid' => $this->uuid->generate(),
+      'payload_url' => Url::fromRoute('webhooks.webhook_receive', ['incoming_webhook_name' => self::WEBHOOK_ID_INCOMING_YAML])->setAbsolute(TRUE)->toString(),
+      'type' => 'outgoing',
+      'events' => [],
+      'content_type' => WebhookConfig::CONTENT_TYPE_YAML,
       'secret' => '',
       'status' => 1,
     ])->save();
@@ -229,6 +291,36 @@ class WebhooksTest extends BrowserTestBase {
   }
 
   /**
+   * Headers added via the webhook.send event reach the remote endpoint.
+   *
+   * Proves that a site-specific event subscriber (e.g. one that injects a
+   * third-party API key can add custom outbound headers by calling
+   * $event->getWebhook()->addHeaders() during WebhookEvents::SEND, and those
+   * headers will be present in the request received by the remote host.
+   */
+  public function testSendEventCustomHeaders() {
+    $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING);
+    $webhook        = new Webhook($this->payload);
+
+    $this->webhookService->send($webhook_config, $webhook);
+
+    /** @var \Drupal\webhooks\Webhook $webhook_received */
+    $webhook_received = $this->state->get('onWebhookReceive_webhook');
+    $headers_received = $webhook_received->getHeaders();
+
+    // The WebhooksTestSubscriber::onWebhookSend() injects this header.
+    $this->assertArrayHasKey(
+      'x-custom-test-header',
+      $headers_received,
+      'Custom header injected in WebhookEvents::SEND appears in the received request.'
+    );
+    $this->assertEquals(
+      'custom-test-value',
+      $headers_received['x-custom-test-header']
+    );
+  }
+
+  /**
    * Test webhook headers.
    */
   public function testHeaders() {
@@ -244,11 +336,13 @@ class WebhooksTest extends BrowserTestBase {
     $intersection = array_intersect($headers_received, $this->headers);
     $this->assertEquals($intersection, $this->headers);
 
-    // Check for X-Drupal-Delivery header.
-    $this->assertEquals($headers_received['x-drupal-delivery'], $webhook->getUuid());
+    // Check for the canonical delivery ID header.
+    $this->assertEquals($headers_received['webhook-delivery-id'], $webhook->getUuid());
+    $this->assertSame($headers_received['webhook-delivery-id'], $headers_received['x-drupal-delivery']);
 
-    // Check for X-Drupal-Event header.
-    $this->assertEquals($headers_received['x-drupal-event'], $webhook->getEvent());
+    // Check for the canonical event type header.
+    $this->assertEquals($headers_received['webhook-event'], $webhook->getEvent());
+    $this->assertSame($headers_received['webhook-event'], $headers_received['x-drupal-event']);
   }
 
   /**
@@ -290,6 +384,47 @@ class WebhooksTest extends BrowserTestBase {
   }
 
   /**
+   * Test webhook content type WWW-FORM-URLENCODED.
+   *
+   * @group specification
+   */
+  public function testContentTypeWwwFormUrlencoded() {
+    $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING_WWW_FORM_URLENCODED);
+    $webhook = new Webhook($this->payload);
+    $webhook->setContentType(WebhookConfig::CONTENT_TYPE_WWW_FORM_URLENCODED);
+
+    $this->webhookService->send($webhook_config, $webhook);
+
+    /** @var \Drupal\webhooks\Webhook $webhook_received */
+    $webhook_received = $this->state->get('onWebhookReceive_webhook');
+    $this->assertEquals(WebhookConfig::CONTENT_TYPE_WWW_FORM_URLENCODED, $webhook_received->getContentType());
+    $this->assertEquals(
+      ['payload' => '{"payload":"attribute"}'],
+      $webhook_received->getPayload()
+    );
+  }
+
+  /**
+   * Test WooCommerce activation ping returns 200 without RECEIVE.
+   */
+  public function testIncomingFormUrlencodedPing() {
+    $url = Url::fromRoute('webhooks.webhook_receive', [
+      'incoming_webhook_name' => self::WEBHOOK_ID_INCOMING,
+    ])->toString();
+
+    $this->getSession()->getDriver()->getClient()->request(
+      'POST',
+      $url,
+      ['webhook_id' => '1'],
+      [],
+      ['CONTENT_TYPE' => 'application/x-www-form-urlencoded']
+    );
+
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertNull($this->state->get('onWebhookReceive'));
+  }
+
+  /**
    * Test webhook content type XML.
    */
   public function testContentTypeXml() {
@@ -305,6 +440,21 @@ class WebhooksTest extends BrowserTestBase {
   }
 
   /**
+   * Test webhook content type YAML.
+   */
+  public function testContentTypeYaml() {
+    $webhook_config = WebhookConfig::load(self::WEBHOOK_ID_OUTGOING_YAML);
+    $webhook = new Webhook($this->payload);
+    $webhook->setContentType(WebhookConfig::CONTENT_TYPE_YAML);
+
+    $this->webhookService->send($webhook_config, $webhook);
+
+    /** @var \Drupal\webhooks\Webhook $webhook_received */
+    $webhook_received = $this->state->get('onWebhookReceive_webhook');
+    $this->assertEquals($webhook_received->getContentType(), WebhookConfig::CONTENT_TYPE_YAML);
+  }
+
+  /**
    * Test webhook delivery id matches uuid.
    */
   public function testDeliveryIdUuid() {
@@ -316,6 +466,39 @@ class WebhooksTest extends BrowserTestBase {
     /** @var \Drupal\webhooks\Webhook $webhook_received */
     $webhook_received = $this->state->get('onWebhookReceive_webhook');
     $this->assertEquals($webhook_received->getUuid(), $webhook->getUuid());
+  }
+
+  /**
+   * Test webhook content type serialization.
+   *
+   * @group serialization
+   */
+  public function testContentTypeSerialization() {
+    $serializer = \Drupal::service('serializer');
+
+    $encoded = $serializer->encode($this->payload, 'json');
+    $this->assertEquals('{"payload":"attribute"}', $encoded);
+
+    $decoded = $serializer->decode($encoded, 'json');
+    $this->assertEquals($this->payload, $decoded);
+
+    $encoded = $serializer->encode($this->payload, 'xml');
+    $this->assertEquals("<?xml version=\"1.0\"?>\n<response><payload>attribute</payload></response>\n", $encoded);
+
+    $decoded = $serializer->decode($encoded, 'xml');
+    $this->assertEquals($this->payload, $decoded);
+
+    $encoded = $serializer->encode($this->payload, 'form');
+    $this->assertEquals('payload=%7B%22payload%22%3A%22attribute%22%7D', $encoded);
+
+    $decoded = $serializer->decode($encoded, 'form');
+    $this->assertEquals($this->payload, $decoded);
+
+    $encoded = $serializer->encode($this->payload, 'yaml');
+    $this->assertEquals('{ payload: attribute }', $encoded);
+
+    $decoded = $serializer->decode($encoded, 'yaml');
+    $this->assertEquals($this->payload, $decoded);
   }
 
 }

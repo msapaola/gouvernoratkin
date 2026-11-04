@@ -2,7 +2,10 @@
 
 namespace Drupal\Tests\metatag\Functional;
 
+use Drupal\Component\Utility\DeprecationHelper;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Random;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
@@ -64,7 +67,7 @@ trait MetatagHelperTrait {
       'body' => [
         [
           'value' => $body,
-          'format' => filter_default_format(),
+          'format' => DeprecationHelper::backwardsCompatibleCall(\Drupal::VERSION, '11.4.0', fn() => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(), fn() => filter_default_format()),
         ],
       ],
       'title' => $title,
@@ -122,7 +125,7 @@ trait MetatagHelperTrait {
       'description' => [
         [
           'value' => $this->randomMachineName(32),
-          'format' => filter_default_format(),
+          'format' => DeprecationHelper::backwardsCompatibleCall(\Drupal::VERSION, '11.4.0', fn() => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(), fn() => filter_default_format()),
         ],
       ],
       'name' => $this->randomMachineName(8),
@@ -133,6 +136,28 @@ trait MetatagHelperTrait {
     $this->assertSame($status, SAVED_NEW, (new FormattableMarkup('Created term %name.', ['%name' => $term->label()]))->__toString());
 
     return $term;
+  }
+
+  /**
+   * Generate a random title containing a certain number of words.
+   *
+   * @param int $length
+   *   The number of words in the title.
+   *
+   * @return string
+   *   The random title.
+   *
+   * @see randomString()
+   */
+  public function randomTitle($length = 2) {
+    $random = new Random();
+
+    $words = [];
+    for ($x = 0; $x < $length; $x++) {
+      $words[] = $random->name();
+    }
+
+    return implode('', $words);
   }
 
 }

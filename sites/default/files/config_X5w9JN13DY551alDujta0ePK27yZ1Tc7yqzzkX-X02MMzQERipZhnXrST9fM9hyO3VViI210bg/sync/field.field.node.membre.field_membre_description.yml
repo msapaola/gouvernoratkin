@@ -9,8 +9,8 @@ id: node.membre.field_membre_description
 field_name: field_membre_description
 entity_type: node
 bundle: membre
-label: 'Description'
-description: "Le rôle de la personne en une ou deux phrases. Facultatif."
+label: Description
+description: 'Le rôle de la personne en une ou deux phrases. Facultatif.'
 required: false
 translatable: false
 default_value: {  }

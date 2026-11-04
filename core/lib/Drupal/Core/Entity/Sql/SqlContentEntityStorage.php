@@ -6,7 +6,10 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\SchemaException;
+use Drupal\Core\Database\Statement\FetchAs;
+use Drupal\Core\Database\TransactionOutOfOrderException;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\ContentEntityStorageBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -40,6 +43,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @ingroup entity_api
  */
 class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEntityStorageInterface, DynamicallyFieldableEntityStorageSchemaInterface, EntityBundleListenerInterface {
+
+  /**
+   * The minimum chunk size for field loading.
+   *
+   * This avoids running into database join limits.
+   *
+   * @see https://dev.mysql.com/doc/refman/9.7/en/join.html
+   * @see https://sqlite.org/limits.html#max_sql_length
+   *
+   * When calculating the chunks, the last chunk is appended to the previous one
+   * so that the maximum fields to load at once is double this number. This
+   * ensures that 26 fields are loaded as a single group of 26, instead of 26
+   * and 1, or that 51 fields are loaded in groups of 25 and 26.
+   */
+  protected const int FIELD_MINIMUM_CHUNK_SIZE = 25;
 
   /**
    * The entity type's field storage definitions.
@@ -451,10 +469,17 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
     // Get the names of the fields that are stored in the base table and, if
     // applicable, the revision table. Other entity data will be loaded in
-    // loadFromSharedTables() and loadFromDedicatedTables().
+    // loadFromDedicatedTables().
     $field_names = $this->tableMapping->getFieldNames($this->baseTable);
     if ($this->revisionTable) {
       $field_names = array_unique(array_merge($field_names, $this->tableMapping->getFieldNames($this->revisionTable)));
+    }
+
+    $field_columns = [];
+    $definition_columns = [];
+    foreach ($field_names as $field_name) {
+      $field_columns[$field_name] = $this->tableMapping->getColumnNames($field_name);
+      $definition_columns[$field_name] = $this->fieldStorageDefinitions[$field_name]->getColumns();
     }
 
     $values = [];
@@ -464,24 +489,22 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       // field assign the value as suiting. This avoids unnecessary array
       // hierarchies and saves memory here.
       foreach ($field_names as $field_name) {
-        $field_columns = $this->tableMapping->getColumnNames($field_name);
         // Handle field types that store several properties.
-        if (count($field_columns) > 1) {
-          $definition_columns = $this->fieldStorageDefinitions[$field_name]->getColumns();
-          foreach ($field_columns as $property_name => $column_name) {
+        if (count($field_columns[$field_name]) > 1) {
+          foreach ($field_columns[$field_name] as $property_name => $column_name) {
             if (property_exists($record, $column_name)) {
-              $values[$id][$field_name][LanguageInterface::LANGCODE_DEFAULT][$property_name] = !empty($definition_columns[$property_name]['serialize']) ? unserialize($record->{$column_name}) : $record->{$column_name};
+              $values[$id][$field_name][LanguageInterface::LANGCODE_DEFAULT][$property_name] = !empty($definition_columns[$field_name][$property_name]['serialize']) ? $this->handleNullableFieldUnserialize($record->{$column_name}) : $record->{$column_name};
               unset($record->{$column_name});
             }
           }
         }
         // Handle field types that store only one property.
         else {
-          $column_name = reset($field_columns);
+          $column_name = reset($field_columns[$field_name]);
           if (property_exists($record, $column_name)) {
-            $columns = $this->fieldStorageDefinitions[$field_name]->getColumns();
+            $columns = $definition_columns[$field_name];
             $column = reset($columns);
-            $values[$id][$field_name][LanguageInterface::LANGCODE_DEFAULT] = !empty($column['serialize']) ? unserialize($record->{$column_name}) : $record->{$column_name};
+            $values[$id][$field_name][LanguageInterface::LANGCODE_DEFAULT] = !empty($column['serialize']) ? $this->handleNullableFieldUnserialize($record->{$column_name}) : $record->{$column_name};
             unset($record->{$column_name});
           }
         }
@@ -498,8 +521,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $translations = array_fill_keys(array_keys($values), []);
 
     // Load values from shared and dedicated tables.
-    $this->loadFromSharedTables($values, $translations, $load_from_revision);
-    $this->loadFromDedicatedTables($values, $load_from_revision);
+    $this->loadFromDedicatedTables($values, $load_from_revision, $translations);
 
     $entities = [];
     foreach ($values as $id => $entity_values) {
@@ -522,15 +544,20 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    *   List of translations, keyed on the entity ID.
    * @param bool $load_from_revision
    *   Flag to indicate whether revisions should be loaded or not.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no
+   * replacement.
+   * @see https://www.drupal.org/node/3586362
    */
   protected function loadFromSharedTables(array &$values, array &$translations, $load_from_revision) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3586362');
     $record_key = !$load_from_revision ? $this->idKey : $this->revisionKey;
     if ($this->dataTable) {
       // If a revision table is available, we need all the properties of the
       // latest revision. Otherwise we fall back to the data table.
       $table = $this->revisionDataTable ?: $this->dataTable;
       $alias = $this->revisionDataTable ? 'revision' : 'data';
-      $query = $this->database->select($table, $alias, ['fetch' => \PDO::FETCH_ASSOC])
+      $query = $this->database->select($table, $alias, ['fetch' => FetchAs::Associative])
         ->fields($alias)
         ->condition($alias . '.' . $record_key, array_keys($values), 'IN')
         ->orderBy($alias . '.' . $record_key);
@@ -578,6 +605,15 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       }
 
       $result = $query->execute();
+
+      $field_definition_columns = [];
+      $field_columns = [];
+
+      foreach ($all_fields as $field_name) {
+        $field_definition_columns[$field_name] = $this->fieldStorageDefinitions[$field_name]->getColumns();
+        $field_columns[$field_name] = $table_mapping->getColumnNames($field_name);
+      }
+
       foreach ($result as $row) {
         $id = $row[$record_key];
 
@@ -588,19 +624,18 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         $translations[$id][$langcode] = TRUE;
 
         foreach ($all_fields as $field_name) {
-          $storage_definition = $this->fieldStorageDefinitions[$field_name];
-          $definition_columns = $storage_definition->getColumns();
-          $columns = $table_mapping->getColumnNames($field_name);
+          $definition_columns = $field_definition_columns[$field_name];
+          $columns = $field_columns[$field_name];
           // Do not key single-column fields by property name.
           if (count($columns) == 1) {
             $column_name = reset($columns);
             $column_attributes = $definition_columns[key($columns)];
-            $values[$id][$field_name][$langcode] = (!empty($column_attributes['serialize'])) ? unserialize($row[$column_name]) : $row[$column_name];
+            $values[$id][$field_name][$langcode] = (!empty($column_attributes['serialize'])) ? $this->handleNullableFieldUnserialize($row[$column_name]) : $row[$column_name];
           }
           else {
             foreach ($columns as $property_name => $column_name) {
               $column_attributes = $definition_columns[$property_name];
-              $values[$id][$field_name][$langcode][$property_name] = (!empty($column_attributes['serialize'])) ? unserialize($row[$column_name]) : $row[$column_name];
+              $values[$id][$field_name][$langcode][$property_name] = (!empty($column_attributes['serialize'])) ? $this->handleNullableFieldUnserialize($row[$column_name]) : $row[$column_name];
             }
           }
         }
@@ -750,13 +785,19 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     try {
       $transaction = $this->database->startTransaction();
       parent::delete($entities);
+      $transaction->commitOrRelease();
 
       // Ignore replica server temporarily.
       \Drupal::service('database.replica_kill_switch')->trigger();
     }
     catch (\Exception $e) {
       if (isset($transaction)) {
-        $transaction->rollBack();
+        try {
+          $transaction->rollBack();
+        }
+        catch (TransactionOutOfOrderException $rollbackException) {
+          Error::logException(\Drupal::logger($this->entityTypeId), $rollbackException);
+        }
       }
       Error::logException(\Drupal::logger($this->entityTypeId), $e);
       throw new EntityStorageException($e->getMessage(), $e->getCode(), $e);
@@ -791,9 +832,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         ->execute();
     }
 
-    foreach ($entities as $entity) {
-      $this->deleteFromDedicatedTables($entity);
-    }
+    $this->deleteFromDedicatedTables($ids);
   }
 
   /**
@@ -803,6 +842,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     try {
       $transaction = $this->database->startTransaction();
       $return = parent::save($entity);
+      $transaction->commitOrRelease();
 
       // Ignore replica server temporarily.
       \Drupal::service('database.replica_kill_switch')->trigger();
@@ -810,7 +850,12 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     }
     catch (\Exception $e) {
       if (isset($transaction)) {
-        $transaction->rollBack();
+        try {
+          $transaction->rollBack();
+        }
+        catch (TransactionOutOfOrderException $rollbackException) {
+          Error::logException(\Drupal::logger($this->entityTypeId), $rollbackException);
+        }
       }
       Error::logException(\Drupal::logger($this->entityTypeId), $e);
       throw new EntityStorageException($e->getMessage(), $e->getCode(), $e);
@@ -854,12 +899,19 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       // Insert the entity data in the dedicated tables.
       $this->saveToDedicatedTables($entity, FALSE, []);
 
+      $transaction->commitOrRelease();
+
       // Ignore replica server temporarily.
       \Drupal::service('database.replica_kill_switch')->trigger();
     }
     catch (\Exception $e) {
       if (isset($transaction)) {
-        $transaction->rollBack();
+        try {
+          $transaction->rollBack();
+        }
+        catch (TransactionOutOfOrderException $rollbackException) {
+          Error::logException(\Drupal::logger($this->entityTypeId), $rollbackException);
+        }
       }
       Error::logException(\Drupal::logger($this->entityTypeId), $e);
       throw new EntityStorageException($e->getMessage(), $e->getCode(), $e);
@@ -944,8 +996,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
           ->fields((array) $record)
           ->execute();
         // Even if this is a new entity the ID key might have been set, in which
-        // case we should not override the provided ID. An ID key that is not set
-        // to any value is interpreted as NULL (or DEFAULT) and thus overridden.
+        // case we should not override the provided ID. An ID key that is not
+        // set to any value is interpreted as NULL (or DEFAULT) and thus
+        // overridden.
         if (!isset($record->{$this->idKey})) {
           $record->{$this->idKey} = $insert_id;
         }
@@ -1084,9 +1137,9 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Checks whether a field column should be treated as serial.
    *
-   * @param $table_name
+   * @param string $table_name
    *   The name of the table the field column belongs to.
-   * @param $schema_name
+   * @param string $schema_name
    *   The schema name of the field column.
    *
    * @return bool
@@ -1188,8 +1241,10 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    *   An array of values keyed by entity ID.
    * @param bool $load_from_revision
    *   Flag to indicate whether revisions should be loaded or not.
+   * @param array &$translations
+   *   List of translations, keyed on the entity ID.
    */
-  protected function loadFromDedicatedTables(array &$values, $load_from_revision) {
+  protected function loadFromDedicatedTables(array &$values, $load_from_revision, &$translations) {
     if (empty($values)) {
       return;
     }
@@ -1220,33 +1275,238 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       }
     }
 
-    // Load field data.
-    $langcodes = array_keys($this->languageManager->getLanguages(LanguageInterface::STATE_ALL));
+    $single_cardinality_fields = [];
+    $multiple_cardinality_fields = [];
+    $field_definition_columns = [];
+    $field_columns = [];
+
     foreach ($storage_definitions as $field_name => $storage_definition) {
-      $table = !$load_from_revision ? $table_mapping->getDedicatedDataTableName($storage_definition) : $table_mapping->getDedicatedRevisionTableName($storage_definition);
+      $field_columns[$field_name] = $this->tableMapping->getColumnNames($field_name);
+      $field_definition_columns[$field_name] = $storage_definition->getColumns();
+      if ($storage_definition->getCardinality() === 1) {
+        $single_cardinality_fields[$field_name] = $storage_definition;
+      }
+      else {
+        $multiple_cardinality_fields[$field_name] = $storage_definition;
+      }
+    }
 
-      // Ensure that only values having valid languages are retrieved. Since we
-      // are loading values for multiple entities, we cannot limit the query to
-      // the available translations.
-      $results = $this->database->select($table, 't')
-        ->fields('t')
-        ->condition(!$load_from_revision ? 'entity_id' : 'revision_id', $ids, 'IN')
-        ->condition('deleted', 0)
-        ->condition('langcode', $langcodes, 'IN')
-        ->orderBy('delta')
-        ->execute();
+    $id_key = !$load_from_revision ? 'entity_id' : 'revision_id';
+    // Because any field could potentially have no data, we need to begin
+    // the query from a table that will reliably exist, which means the base,
+    // data, or revision table.
+    $base_table = $load_from_revision ? ($this->revisionDataTable ?? $this->revisionTable) : $this->dataTable ?? $this->baseTable;
+    $base_id_key = !$load_from_revision ? $this->idKey : $this->revisionKey;
+    $base_query = $this->database->select($base_table, $base_table)
+      ->fields($base_table)
+      ->condition("[$base_table].[$base_id_key]", $ids, 'IN');
 
-      foreach ($results as $row) {
-        $bundle = $row->bundle;
+    // Alias the base langcode field so that it does not get overwritten by
+    // results from field tables.
+    $base_langcode_alias = '';
+    if ($this->langcodeKey) {
+      $base_langcode_alias = $base_table . '__' . $this->langcodeKey;
+      $base_query->addField($base_table, $this->langcodeKey, $base_langcode_alias);
+    }
 
-        $value_key = !$load_from_revision ? $row->entity_id : $row->revision_id;
-        // Field values in default language are stored with
-        // LanguageInterface::LANGCODE_DEFAULT as key.
-        $langcode = LanguageInterface::LANGCODE_DEFAULT;
-        if ($this->langcodeKey && isset($default_langcodes[$value_key]) && $row->langcode != $default_langcodes[$value_key]) {
-          $langcode = $row->langcode;
+    // When the number of fields exceeds the chunk size, split the fields to
+    // load into chunks. The SQL limits for table joins are over 60, so always
+    // combine the last two chunks. This means that 26 fields end up in a single
+    // chunk of 26, instead of chunks of 25 and 1.
+    $load_shared_table_fields = TRUE;
+    $chunks = [];
+    if (count($single_cardinality_fields) > static::FIELD_MINIMUM_CHUNK_SIZE) {
+      $chunks = array_chunk($single_cardinality_fields, static::FIELD_MINIMUM_CHUNK_SIZE, TRUE);
+      $last_chunk = array_pop($chunks);
+      $last_key = array_key_last($chunks);
+      $chunks[$last_key] = array_merge($chunks[$last_key], $last_chunk);
+    }
+    // If there are no fields, no data table and no revision tables, there
+    // is nothing additional to load, the empty chunks array will skip the loop
+    // below.
+    elseif ($single_cardinality_fields || $this->dataTable || $this->revisionTable || $this->revisionDataTable) {
+      $chunks = [$single_cardinality_fields];
+    }
+    foreach ($chunks as $fields) {
+      $this->loadSingleCardinalityFields($values, $base_query, $base_table, $id_key, $base_id_key, $base_langcode_alias, $load_from_revision, $fields, $definitions, $field_columns, $field_definition_columns, $default_langcodes, $load_shared_table_fields, $translations);
+      $load_shared_table_fields = FALSE;
+    }
+
+    if ($multiple_cardinality_fields) {
+      // Load several multiple cardinality fields in a single query, using the
+      // same chunking as single cardinality fields to stay within the SQL join
+      // limit.
+      if (count($multiple_cardinality_fields) > static::FIELD_MINIMUM_CHUNK_SIZE) {
+        $chunks = array_chunk($multiple_cardinality_fields, static::FIELD_MINIMUM_CHUNK_SIZE, TRUE);
+        $last_chunk = array_pop($chunks);
+        $last_key = array_key_last($chunks);
+        $chunks[$last_key] = array_merge($chunks[$last_key], $last_chunk);
+      }
+      else {
+        $chunks = [$multiple_cardinality_fields];
+      }
+      foreach ($chunks as $fields) {
+        $this->loadMultipleCardinalityFields($values, $base_table, $base_id_key, $id_key, $load_from_revision, $fields, $definitions, $field_columns, $field_definition_columns, $default_langcodes, $ids);
+      }
+    }
+  }
+
+  /**
+   * Load single cardinality fields.
+   *
+   * @param array &$values
+   *   The entity values populated so far.
+   * @param \Drupal\Core\Database\Query\SelectInterface $base_query
+   *   The base database query.
+   * @param string $base_table
+   *   The base table used in the query.
+   * @param string $id_key
+   *   The ID key depending on whether regular entities or revisions are being
+   *   loaded.
+   * @param string $base_id_key
+   *   The base ID key depending on whether regular entities or revisions are
+   *   being loaded.
+   * @param string $base_langcode_alias
+   *   The base langcode alias.
+   * @param bool $load_from_revision
+   *   Whether we're loading from revisions.
+   * @param array $single_cardinality_fields
+   *   The single cardinality fields to load.
+   * @param array $definitions
+   *   The field definitions.
+   * @param array $field_columns
+   *   The field columns.
+   * @param array $field_definition_columns
+   *   The field definition columns.
+   * @param array $default_langcodes
+   *   The default langcodes.
+   * @param bool $load_shared_table_fields
+   *   Whether to also load fields from the shared data/revision data tables.
+   *   Should be TRUE only on the first chunk iteration to avoid overwriting
+   *   shared field values.
+   * @param array $translations
+   *   The translations array, keyed by entity ID and langcode.
+   */
+  private function loadSingleCardinalityFields(
+    array &$values,
+    SelectInterface $base_query,
+    string $base_table,
+    string $id_key,
+    string $base_id_key,
+    string $base_langcode_alias,
+    bool $load_from_revision,
+    array $single_cardinality_fields,
+    array $definitions,
+    array $field_columns,
+    array $field_definition_columns,
+    array $default_langcodes,
+    bool $load_shared_table_fields = TRUE,
+    array &$translations = [],
+  ): void {
+    $query = clone $base_query;
+    $shared_fields = [];
+    $table_mapping = $this->getTableMapping();
+    if ($load_shared_table_fields) {
+      if ($this->revisionDataTable) {
+        // Find revisioned fields that are not entity keys. Exclude the langcode
+        // key as the base table holds only the default language.
+        $base_fields = array_diff($table_mapping->getFieldNames($this->baseTable), [$this->langcodeKey]);
+        $revisioned_fields = array_diff($table_mapping->getFieldNames($this->revisionDataTable), $base_fields);
+
+        // Find fields that are not revisioned or entity keys. Data fields have
+        // the same value regardless of entity revision.
+        $data_fields = array_diff($table_mapping->getFieldNames($this->dataTable), $revisioned_fields, $base_fields);
+        // If there are no data fields then only revisioned fields are needed
+        // else both data fields and revisioned fields are needed to map the
+        // entity values.
+        $shared_fields = $revisioned_fields;
+        if ($data_fields) {
+          $shared_fields = array_merge($revisioned_fields, $data_fields);
+          if ($load_from_revision) {
+            $query->leftJoin($this->dataTable, 'data', "([data].[$this->idKey] = [$base_table].[$this->idKey] AND [$base_table].[$this->langcodeKey] = [data].[$this->langcodeKey])");
+            $column_names = [];
+            // Some fields can have more then one columns in the data table so
+            // column names are needed.
+            foreach ($data_fields as $data_field) {
+              // \Drupal\Core\Entity\Sql\TableMappingInterface::getColumnNames()
+              // returns an array keyed by property names so remove the keys
+              // before array_merge() to avoid losing data with fields having
+              // the same columns i.e. value.
+              $column_names[] = array_values($table_mapping->getColumnNames($data_field));
+            }
+            $column_names = array_merge(...$column_names);
+            $query->fields('data', $column_names);
+          }
         }
+      }
+      else {
+        $shared_fields = $table_mapping->getFieldNames($base_table);
+      }
+      foreach ($shared_fields as $field_name) {
+        $storage_definition = $this->fieldStorageDefinitions[$field_name];
+        $field_definition_columns[$field_name] = $storage_definition->getColumns();
+        $field_columns[$field_name] = $table_mapping->getColumnNames($field_name);
+      }
+    }
 
+    // Add a left join for each single cardinality field.
+    foreach ($single_cardinality_fields as $field_name => $storage_definition) {
+      $table = !$load_from_revision ? $table_mapping->getDedicatedDataTableName($storage_definition) : $table_mapping->getDedicatedRevisionTableName($storage_definition);
+      // If the entity is translatable, add the langcode to the join and
+      // a condition on valid langcodes.
+      if ($this->langcodeKey) {
+        $query->leftJoin($table, $table, "[$table].[$id_key] = [$base_table].[$base_id_key] AND [$table].[langcode] = [$base_table].[$this->langcodeKey] AND [$table].[deleted] = 0");
+      }
+      else {
+        $query->leftJoin($table, $table, "[$table].[$id_key] = [$base_table].[$base_id_key] AND [$table].[deleted] = 0");
+      }
+      $query->fields($table, $table_mapping->getColumnNames($field_name));
+    }
+
+    $results = $query->execute();
+
+    $is_not_null = fn($value) => !is_null($value);
+
+    foreach ($results as $row) {
+      $row = (array) $row;
+      $value_key = $row[$base_id_key];
+      $bundle = $this->bundleKey ? $values[$value_key][$this->bundleKey][LanguageInterface::LANGCODE_DEFAULT] : $this->entityTypeId;
+      // Field values in default language are stored with
+      // LanguageInterface::LANGCODE_DEFAULT as key.
+      $langcode = $this->langcodeKey && empty($row[$this->defaultLangcodeKey]) ? $row[$base_langcode_alias] : LanguageInterface::LANGCODE_DEFAULT;
+      $translations[$value_key][$langcode] = TRUE;
+      foreach ($shared_fields as $field_name) {
+        $definition_columns = $field_definition_columns[$field_name];
+        $columns = $field_columns[$field_name];
+        // Do not key single-column fields by property name.
+        if (count($columns) == 1) {
+          $column_name = reset($columns);
+          // Special case for the langcode key which is aliased in the query
+          // results.
+          if ($column_name === $this->langcodeKey) {
+            $column_name = $base_langcode_alias;
+          }
+          $column_attributes = $definition_columns[key($columns)];
+          $values[$value_key][$field_name][$langcode] = (!empty($column_attributes['serialize'])) ? $this->handleNullableFieldUnserialize($row[$column_name]) : $row[$column_name];
+        }
+        else {
+          foreach ($columns as $property_name => $column_name) {
+            $column_attributes = $definition_columns[$property_name];
+            $values[$value_key][$field_name][$langcode][$property_name] = (!empty($column_attributes['serialize'])) ? $this->handleNullableFieldUnserialize($row[$column_name]) : $row[$column_name];
+          }
+        }
+      }
+      $langcode = $this->langcodeKey && empty($row[$this->defaultLangcodeKey]) && isset($default_langcodes[$value_key]) && $row[$base_langcode_alias] != $default_langcodes[$value_key] ? $row[$base_langcode_alias] : LanguageInterface::LANGCODE_DEFAULT;
+
+      foreach ($single_cardinality_fields as $field_name => $storage_definition) {
+        $field_values = array_intersect_key($row, array_flip($field_columns[$field_name]));
+
+        // If all the field values are null, then there was no result for this
+        // field.
+        // @todo use array_any() once Drupal core requires PHP 8.4.
+        if (empty(array_filter($field_values, $is_not_null))) {
+          continue;
+        }
         if (!isset($values[$value_key][$field_name][$langcode])) {
           $values[$value_key][$field_name][$langcode] = [];
         }
@@ -1254,18 +1514,185 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         // Ensure that records for non-translatable fields having invalid
         // languages are skipped.
         if ($langcode == LanguageInterface::LANGCODE_DEFAULT || $definitions[$bundle][$field_name]->isTranslatable()) {
-          if ($storage_definition->getCardinality() == FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED || count($values[$value_key][$field_name][$langcode]) < $storage_definition->getCardinality()) {
+          if (empty($values[$value_key][$field_name][$langcode])) {
             $item = [];
-            // For each column declared by the field, populate the item from the
-            // prefixed database column.
-            foreach ($storage_definition->getColumns() as $column => $attributes) {
-              $column_name = $table_mapping->getFieldColumnName($storage_definition, $column);
+            // For each column declared by the field, populate the item from
+            // the prefixed database column.
+            foreach ($field_definition_columns[$field_name] as $column => $attributes) {
+              $column_name = $field_columns[$field_name][$column];
               // Unserialize the value if specified in the column schema.
-              $item[$column] = (!empty($attributes['serialize'])) ? unserialize($row->$column_name) : $row->$column_name;
+              $item[$column] = (!empty($attributes['serialize'])) ? $this->handleNullableFieldUnserialize($row[$column_name]) : $row[$column_name];
             }
-
             // Add the item to the field values for the entity.
             $values[$value_key][$field_name][$langcode][] = $item;
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Load multiple cardinality fields.
+   *
+   * @param array &$values
+   *   The entity values populated so far.
+   * @param string $base_table
+   *   The base table used to identify default translations.
+   * @param string $base_id_key
+   *   The ID key in the base table.
+   * @param string $id_key
+   *   The ID key depending on whether regular entities or revisions are being
+   *   loaded.
+   * @param bool $load_from_revision
+   *   Whether we're loading from revisions.
+   * @param array $multiple_cardinality_fields
+   *   The multiple cardinality fields to load.
+   * @param array $definitions
+   *   The field definitions.
+   * @param array $field_columns
+   *   The field columns.
+   * @param array $field_definition_columns
+   *   The field definition columns.
+   * @param array $default_langcodes
+   *   The default langcodes.
+   * @param array $ids
+   *   The entity or revision IDs being loaded.
+   */
+  private function loadMultipleCardinalityFields(
+    array &$values,
+    string $base_table,
+    string $base_id_key,
+    string $id_key,
+    bool $load_from_revision,
+    array $multiple_cardinality_fields,
+    array $definitions,
+    array $field_columns,
+    array $field_definition_columns,
+    array $default_langcodes,
+    array $ids,
+  ): void {
+    $table_mapping = $this->getTableMapping();
+    $delta_keys = [];
+
+    if (count($multiple_cardinality_fields) > 1) {
+      // Each field table holds one row per delta, and different fields can have
+      // different deltas. Left joining several field tables directly would
+      // multiply their rows together (a cartesian product). To avoid this,
+      // build a "delta spine": the set of (ID, langcode, delta) combinations
+      // that exist across the fields in this chunk. Every field table is then
+      // left joined on that delta, so each delta produces one row and the field
+      // values line up.
+      $query = $delta_query = NULL;
+      foreach ($multiple_cardinality_fields as $field_name => $storage_definition) {
+        $table = !$load_from_revision ? $table_mapping->getDedicatedDataTableName($storage_definition) : $table_mapping->getDedicatedRevisionTableName($storage_definition);
+        $select = $this->database->select($table, $table);
+        $select->addField($table, $id_key, 'id');
+        if ($this->langcodeKey) {
+          $select->addField($table, 'langcode', 'langcode');
+        }
+        $select->addField($table, 'delta', 'delta');
+        $select->condition("[$table].[$id_key]", $ids, 'IN');
+        $select->condition("[$table].[deleted]", 0);
+        if ($delta_query === NULL) {
+          $delta_query = $select;
+        }
+        else {
+          $delta_query->union($select);
+        }
+
+        if (!$query) {
+          $query = $this->database->select($delta_query, 'delta_join');
+          $query->addField('delta_join', 'id', 'id');
+          if ($this->langcodeKey) {
+            $query->addField('delta_join', 'langcode', 'langcode');
+          }
+          // Sort by the delta provided by the delta spine.
+          $query->orderBy('[delta_join].[delta]');
+        }
+
+        $table = !$load_from_revision ? $table_mapping->getDedicatedDataTableName($storage_definition) : $table_mapping->getDedicatedRevisionTableName($storage_definition);
+        // Left join the field table to the delta spine on ID, langcode and
+        // delta.
+        if ($this->langcodeKey) {
+          $query->leftJoin($table, $table, "[$table].[$id_key] = [delta_join].[id] AND [$table].[langcode] = [delta_join].[langcode] AND [$table].[delta] = [delta_join].[delta] AND [$table].[deleted] = 0");
+        }
+        else {
+          $query->leftJoin($table, $table, "[$table].[$id_key] = [delta_join].[id] AND [$table].[delta] = [delta_join].[delta] AND [$table].[deleted] = 0");
+        }
+        $query->fields($table, $field_columns[$field_name]);
+        $delta_keys[$field_name] = $query->addField($table, 'delta', $field_name . '_delta');
+      }
+    }
+    else {
+      // A single field table cannot multiply, so select from it directly.
+      $field_name = key($multiple_cardinality_fields);
+      $table = !$load_from_revision ? $table_mapping->getDedicatedDataTableName($multiple_cardinality_fields[$field_name]) : $table_mapping->getDedicatedRevisionTableName($multiple_cardinality_fields[$field_name]);
+
+      $query = $this->database->select($table, $table);
+      $query->addField($table, $id_key, 'id');
+      if ($this->langcodeKey) {
+        $query->addField($table, 'langcode', 'langcode');
+      }
+      $query->condition("[$table].[$id_key]", $ids, 'IN');
+      $query->condition("[$table].[deleted]", 0);
+      $query->orderBy("[$table].[delta]");
+
+      $query->fields($table, $field_columns[$field_name]);
+      $delta_keys[$field_name] = $query->addField($table, 'delta', $field_name . '_delta');
+    }
+
+    if ($this->langcodeKey && $this->defaultLangcodeKey) {
+      if (count($multiple_cardinality_fields) > 1) {
+        $join_id = '[delta_join].[id]';
+        $join_langcode = '[delta_join].[langcode]';
+      }
+      else {
+        $join_id = "[$table].[$id_key]";
+        $join_langcode = "[$table].[langcode]";
+      }
+      $query->innerJoin($base_table, 'base', "[base].[$base_id_key] = $join_id AND [base].[$this->langcodeKey] = $join_langcode");
+      $query->addField('base', $this->defaultLangcodeKey, 'base_default_langcode');
+    }
+
+    $results = $query->execute();
+
+    foreach ($results as $row) {
+      $row = (array) $row;
+      $value_key = $row['id'];
+      // Field values in default language are stored with
+      // LanguageInterface::LANGCODE_DEFAULT as key.
+      $langcode = LanguageInterface::LANGCODE_DEFAULT;
+      if ($this->langcodeKey && empty($row['base_default_langcode']) && isset($default_langcodes[$value_key]) && $row['langcode'] != $default_langcodes[$value_key]) {
+        $langcode = $row['langcode'];
+      }
+
+      foreach ($multiple_cardinality_fields as $field_name => $storage_definition) {
+        $delta_key = $delta_keys[$field_name];
+        $bundle = $this->bundleKey ? $values[$value_key][$this->bundleKey][LanguageInterface::LANGCODE_DEFAULT] : $this->entityTypeId;
+
+        // If the delta is null then there are no values at this delta for
+        // this field.
+        if (!isset($row[$delta_key])) {
+          continue;
+        }
+        if (!isset($values[$value_key][$field_name][$langcode])) {
+          $values[$value_key][$field_name][$langcode] = [];
+        }
+
+        // Ensure that records for non-translatable fields having invalid
+        // languages are skipped.
+        if ($langcode == LanguageInterface::LANGCODE_DEFAULT || $definitions[$bundle][$field_name]->isTranslatable()) {
+          if (($storage_definition->getCardinality() === FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED || $row[$delta_key] < $storage_definition->getCardinality())) {
+            $item = [];
+            // For each column declared by the field, populate the item from
+            // the prefixed database column.
+            foreach ($field_definition_columns[$field_name] as $column => $attributes) {
+              $column_name = $field_columns[$field_name][$column];
+              // Unserialize the value if specified in the column schema.
+              $item[$column] = (!empty($attributes['serialize'])) ? $this->handleNullableFieldUnserialize($row[$column_name]) : $row[$column_name];
+            }
+            // Add the item to the field values for the entity.
+            $values[$value_key][$field_name][$langcode][(int) $row[$delta_key]] = $item;
           }
         }
       }
@@ -1296,12 +1723,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $vid = $id;
     }
 
-    $original = !empty($entity->original) ? $entity->original : NULL;
-
-    // Use the loaded revision instead of default one to check for data change.
-    if ($original && !$entity->isNewRevision() && !$entity->isDefaultRevision()) {
-      $original = $this->loadRevision($entity->getLoadedRevisionId());
-    }
+    $original = $entity->getOriginal();
 
     // Determine which fields should be actually stored.
     $definitions = $this->entityFieldManager->getFieldDefinitions($entity_type, $bundle);
@@ -1316,8 +1738,13 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       }
 
       // When updating an existing revision, keep the existing records if the
-      // field values did not change.
-      if (!$entity->isNewRevision() && $original && !$this->hasFieldValueChanged($field_definition, $entity, $original)) {
+      // field values did not change or if we're not re-saving a pending
+      // revision as the default one.
+      if (!$entity->isNewRevision()
+        && $original
+        && $entity->isDefaultRevision() === $original->isDefaultRevision()
+        && !$this->hasFieldValueChanged($field_definition, $entity, $original)
+      ) {
         continue;
       }
 
@@ -1404,10 +1831,10 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Deletes values of fields in dedicated tables for all revisions.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
-   *   The entity.
+   * @param array $ids
+   *   An array of entity IDs.
    */
-  protected function deleteFromDedicatedTables(ContentEntityInterface $entity) {
+  protected function deleteFromDedicatedTables(array $ids) {
     $table_mapping = $this->getTableMapping();
     foreach ($this->fieldStorageDefinitions as $storage_definition) {
       if (!$table_mapping->requiresDedicatedTableStorage($storage_definition)) {
@@ -1416,11 +1843,11 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $table_name = $table_mapping->getDedicatedDataTableName($storage_definition);
       $revision_name = $table_mapping->getDedicatedRevisionTableName($storage_definition);
       $this->database->delete($table_name)
-        ->condition('entity_id', $entity->id())
+        ->condition('entity_id', $ids, 'IN')
         ->execute();
       if ($this->entityType->isRevisionable()) {
         $this->database->delete($revision_name)
-          ->condition('entity_id', $entity->id())
+          ->condition('entity_id', $ids, 'IN')
           ->execute();
       }
     }
@@ -1645,7 +2072,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $table_name = $table_mapping->getDedicatedDataTableName($storage_definition, $storage_definition->isDeleted());
 
     // Get the entities which we want to purge first.
-    $entity_query = $this->database->select($table_name, 't', ['fetch' => \PDO::FETCH_ASSOC]);
+    $entity_query = $this->database->select($table_name, 't', ['fetch' => FetchAs::Associative]);
     $or = $entity_query->orConditionGroup();
     foreach ($storage_definition->getColumns() as $column_name => $data) {
       $or->isNotNull($table_mapping->getFieldColumnName($storage_definition, $column_name));
@@ -1665,7 +2092,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     $entities = [];
     $items_by_entity = [];
     foreach ($entity_query->execute() as $row) {
-      $item_query = $this->database->select($table_name, 't', ['fetch' => \PDO::FETCH_ASSOC])
+      $item_query = $this->database->select($table_name, 't', ['fetch' => FetchAs::Associative])
         ->fields('t')
         ->condition('entity_id', $row['entity_id'])
         ->condition('deleted', 1)
@@ -1677,7 +2104,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
           $item_row['entity_type'] = $this->entityTypeId;
           // @todo Replace this by an entity object created via an entity
           //   factory. https://www.drupal.org/node/1867228.
-          $entities[$item_row['revision_id']] = _field_create_entity_from_ids((object) $item_row);
+          $entities[$item_row['revision_id']] = $this->createEntityFromIds($item_row);
         }
         $item = [];
         foreach ($column_map as $db_column => $field_column) {
@@ -1789,6 +2216,24 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $count = $query->execute()->fetchField();
     }
     return $as_bool ? (bool) $count : (int) $count;
+  }
+
+  /**
+   * Handles NULL values before passing data to unserialize().
+   *
+   * @param mixed|null $value
+   *   The serialized value.
+   *
+   * @return mixed|null
+   *   The unserialized data, or NULL if the original value is NULL.
+   */
+  protected function handleNullableFieldUnserialize(mixed $value): mixed {
+    // Ensure NULL values aren't passed to unserialize().
+    if ($value === NULL) {
+      return NULL;
+    }
+
+    return unserialize($value);
   }
 
 }

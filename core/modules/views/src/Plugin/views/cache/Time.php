@@ -8,7 +8,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsCache;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Simple caching of query results for Views displays.
@@ -56,16 +55,6 @@ class Time extends CachePluginBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('date.formatter'),
-      $container->get('datetime.time'),
-    );
-  }
-
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['results_lifespan'] = ['default' => 3600];
@@ -76,6 +65,9 @@ class Time extends CachePluginBase {
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
     $options = [60, 300, 1800, 3600, 21600, 518400];
@@ -124,6 +116,9 @@ class Time extends CachePluginBase {
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function validateOptionsForm(&$form, FormStateInterface $form_state) {
     $custom_fields = ['output_lifespan', 'results_lifespan'];
     foreach ($custom_fields as $field) {
@@ -134,18 +129,28 @@ class Time extends CachePluginBase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function summaryTitle() {
     $results_lifespan = $this->getLifespan('results');
     $output_lifespan = $this->getLifespan('output');
     return $this->dateFormatter->formatInterval($results_lifespan, 1) . '/' . $this->dateFormatter->formatInterval($output_lifespan, 1);
   }
 
+  /**
+   * Gets the value for the lifespan of the given type.
+   */
   protected function getLifespan($type) {
     $lifespan = $this->options[$type . '_lifespan'] == 'custom' ? $this->options[$type . '_lifespan_custom'] : $this->options[$type . '_lifespan'];
     return $lifespan;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function cacheExpire($type) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3576855', E_USER_DEPRECATED);
     $lifespan = $this->getLifespan($type);
     if ($lifespan) {
       $cutoff = $this->time->getRequestTime() - $lifespan;

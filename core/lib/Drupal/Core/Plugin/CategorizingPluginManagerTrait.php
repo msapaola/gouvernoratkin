@@ -108,7 +108,7 @@ trait CategorizingPluginManagerTrait {
   /**
    * {@inheritdoc}
    */
-  public function getSortedDefinitions(?array $definitions = NULL, $label_key = 'label') {
+  public function getSortedDefinitions(?array $definitions = NULL, string $label_key = 'label') {
     // Sort the plugins first by category, then by label.
     $definitions = $definitions ?? $this->getDefinitions();
     uasort($definitions, function ($a, $b) use ($label_key) {
@@ -123,8 +123,8 @@ trait CategorizingPluginManagerTrait {
   /**
    * {@inheritdoc}
    */
-  public function getGroupedDefinitions(?array $definitions = NULL, $label_key = 'label') {
-    /** @var \Drupal\Core\Plugin\CategorizingPluginManagerTrait|\Drupal\Component\Plugin\PluginManagerInterface $this */
+  public function getGroupedDefinitions(?array $definitions = NULL, string $label_key = 'label') {
+    // @phpstan-ignore arguments.count
     $definitions = $this->getSortedDefinitions($definitions ?? $this->getDefinitions(), $label_key);
     $grouped_definitions = [];
     foreach ($definitions as $id => $definition) {
@@ -132,5 +132,10 @@ trait CategorizingPluginManagerTrait {
     }
     return $grouped_definitions;
   }
+
+  /**
+   * {@inheritdoc}
+   */
+  abstract public function getDefinitions();
 
 }

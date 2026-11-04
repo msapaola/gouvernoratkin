@@ -1,0 +1,22 @@
+uuid: ca720396-4d57-4731-846f-43a29ceffe1e
+langcode: fr
+status: true
+dependencies:
+  config:
+    - node.type.evenement
+id: node.evenement.promote
+field_name: promote
+entity_type: node
+bundle: evenement
+label: "Promu en page d'accueil"
+description: ''
+required: false
+translatable: true
+default_value:
+  -
+    value: 1
+default_value_callback: ''
+settings:
+  on_label: Activé
+  off_label: Désactivé
+field_type: boolean

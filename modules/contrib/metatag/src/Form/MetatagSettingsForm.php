@@ -2,9 +2,14 @@
 
 namespace Drupal\metatag\Form;
 
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\State\StateInterface;
+use Drupal\metatag\MetatagManagerInterface;
 use Drupal\metatag\MetatagSeparator;
+use Drupal\metatag\MetatagTagPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -19,35 +24,35 @@ class MetatagSettingsForm extends ConfigFormBase {
    *
    * @var \Drupal\metatag\MetatagManagerInterface
    */
-  protected $metatagManager;
+  protected MetatagManagerInterface $metatagManager;
 
   /**
    * The entity_type.bundle.info service.
    *
    * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
    */
-  protected $entityTypeBundleInfo;
+  protected EntityTypeBundleInfoInterface $entityTypeBundleInfo;
 
   /**
    * The state service.
    *
    * @var \Drupal\Core\State\StateInterface
    */
-  protected $state;
+  protected StateInterface $state;
 
   /**
    * The tag plugin manager.
    *
    * @var \Drupal\metatag\MetatagTagPluginManager
    */
-  protected $tagPluginManager;
+  protected MetatagTagPluginManager $tagPluginManager;
 
   /**
    * The module handler.
    *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface $moduleHandler;
 
   /**
    * {@inheritdoc}
@@ -181,7 +186,7 @@ class MetatagSettingsForm extends ConfigFormBase {
     }
 
     $form['tag_trim']['tag_trim_method'] = [
-      '#title' => $this->t('Meta Tags: Trimming Options'),
+      '#title' => $this->t('Trimming options'),
       '#type' => 'select',
       '#required' => TRUE,
       '#default_value' => $trimMethod ?? 'beforeValue',
@@ -190,6 +195,20 @@ class MetatagSettingsForm extends ConfigFormBase {
         'onValue' => $this->t('Trim the Meta Tag on the given value'),
         'beforeValue' => $this->t('Trim the Meta Tag before the word on the given value'),
       ],
+    ];
+
+    $form['tag_trim']['tag_trim_end'] = [
+      '#title' => $this->t('Characters to trim'),
+      '#type' => 'textfield',
+      '#default_value' => $this->config('metatag.settings')->get('tag_trim_end'),
+      '#description' => $this->t('A list of characters to trim at the end of all metatags. Provide a single string without any separators, e.g. "|,." (instead of "| , ."). Note that spaces, tabs, new lines, carriage returns and vertical tabs (" \n\r\t\v") will be trimmed automatically and do not need to be listed in this field. The trimming is applied at the very end after the tag is trimmed for length, and after the trimming option was executed.'),
+    ];
+
+    $form['tag_trim']['suffix'] = [
+      '#title' => $this->t('Optional suffix to add'),
+      '#type' => 'textfield',
+      '#default_value' => $this->config('metatag.settings')->get('trim_suffix'),
+      '#description' => $this->t('If provided this string will be added at the end of all meta tags that are trimmed to length.'),
     ];
 
     $scrollheight = $this->config('metatag.settings')->get('tag_scroll_max_height');
@@ -237,6 +256,9 @@ class MetatagSettingsForm extends ConfigFormBase {
     $settings->set('tag_trim_method', $trimmingMethod);
     $trimmingValues = $form_state->getValue(['tag_trim', 'maxlength']);
     $settings->set('tag_trim_maxlength', $trimmingValues);
+    $trimEndCharacters = $form_state->getValue(['tag_trim', 'tag_trim_end']);
+    $settings->set('tag_trim_end', $trimEndCharacters);
+    $settings->set('trim_suffix', $form_state->getValue(['tag_trim', 'suffix']));
 
     // Widget settings.
     $scrollheightvalue = $form_state->getValue([

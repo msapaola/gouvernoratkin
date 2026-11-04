@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
@@ -48,15 +49,27 @@ trait LockableTrait
                 $store = new FlockStore();
             }
 
-            $this->lockFactory = (new LockFactory($store));
+            $this->lockFactory = new LockFactory($store);
         }
 
-        $this->lock = $this->lockFactory->createLock($name ?: $this->getName());
-        if (!$this->lock->acquire($blocking)) {
-            $this->lock = null;
+        if (!$name) {
+            if ($this instanceof Command) {
+                $name = $this->getName();
+            } elseif ($command = InvokableCommand::getRunningCommand($this)) {
+                $name = $command->getName();
+            } elseif ($attribute = (new \ReflectionClass($this::class))->getAttributes(AsCommand::class)) {
+                $name = explode('|', ltrim($attribute[0]->newInstance()->name, '|'), 2)[0];
+            } else {
+                throw new LogicException(\sprintf('Lock name missing: provide it via "%s()", #[AsCommand] attribute, or by extending Command class.', __METHOD__));
+            }
+        }
 
+        $lock = $this->lockFactory->createLock($name);
+        if (!$lock->acquire($blocking)) {
             return false;
         }
+
+        $this->lock = $lock;
 
         return true;
     }
@@ -66,9 +79,9 @@ trait LockableTrait
      */
     private function release(): void
     {
-        if ($this->lock) {
-            $this->lock->release();
+        if ($lock = $this->lock) {
             $this->lock = null;
+            $lock->release();
         }
     }
 }

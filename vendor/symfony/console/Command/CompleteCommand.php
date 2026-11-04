@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Command;
 
+use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -20,6 +21,7 @@ use Symfony\Component\Console\Completion\Output\FishCompletionOutput;
 use Symfony\Component\Console\Completion\Output\ZshCompletionOutput;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 use Symfony\Component\Console\Exception\ExceptionInterface;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -35,6 +37,7 @@ final class CompleteCommand extends Command
     public const COMPLETION_API_VERSION = '1';
 
     private array $completionOutputs;
+    private ?InputDefinition $fullDefinition = null;
     private bool $isDebug = false;
 
     /**
@@ -50,6 +53,53 @@ final class CompleteCommand extends Command
         ];
 
         parent::__construct();
+    }
+
+    public function setApplication(?Application $application): void
+    {
+        $this->fullDefinition = null;
+
+        parent::setApplication($application);
+    }
+
+    public function setDefinition(array|InputDefinition $definition): static
+    {
+        $this->fullDefinition = null;
+
+        return parent::setDefinition($definition);
+    }
+
+    /**
+     * @internal
+     */
+    public function mergeApplicationDefinition(bool $mergeArgs = true): void
+    {
+        if (!$application = $this->getApplication()) {
+            return;
+        }
+
+        $definition = $this->getNativeDefinition();
+        $this->fullDefinition = new InputDefinition();
+        $this->fullDefinition->setOptions($definition->getOptions());
+
+        foreach ($application->getDefinition()->getOptions() as $option) {
+            // the completion scripts rely on the options of this command, they win over the conflicting application ones
+            if ($definition->hasOption($option->getName()) || array_filter(explode('|', $option->getShortcut() ?? ''), $definition->hasShortcut(...))) {
+                continue;
+            }
+
+            $this->fullDefinition->addOption($option);
+        }
+
+        if ($mergeArgs) {
+            $this->fullDefinition->setArguments($application->getDefinition()->getArguments());
+        }
+        $this->fullDefinition->addArguments($definition->getArguments());
+    }
+
+    public function getDefinition(): InputDefinition
+    {
+        return $this->fullDefinition ?? parent::getDefinition();
     }
 
     protected function configure(): void
@@ -104,24 +154,29 @@ final class CompleteCommand extends Command
                 '<info>Messages:</>',
             ]);
 
-            $command = $this->findCommand($completionInput);
+            if ($command = $this->findCommand($completionInput)) {
+                $command->mergeApplicationDefinition();
+                $completionInput->bind($command->getDefinition());
+            }
             if (null === $command) {
                 $this->log('  No command found, completing using the Application class.');
 
                 $this->getApplication()->complete($completionInput, $suggestions);
             } elseif (
                 $completionInput->mustSuggestArgumentValuesFor('command')
-                && $command->getName() !== $completionInput->getCompletionValue()
-                && !\in_array($completionInput->getCompletionValue(), $command->getAliases(), true)
             ) {
-                $this->log('  No command found, completing using the Application class.');
+                $this->log('  Command found, completing command name.');
 
                 // expand shortcut names ("cache:cl<TAB>") into their full name ("cache:clear")
-                $suggestions->suggestValues(array_filter(array_merge([$command->getName()], $command->getAliases())));
+                $commandNames = array_filter(array_merge([$command->getName()], $command->getAliases()));
+                foreach ($commandNames as $name) {
+                    if (str_starts_with($name, $completionInput->getCompletionValue())) {
+                        $commandNames = [$name];
+                        break;
+                    }
+                }
+                $suggestions->suggestValues($commandNames);
             } else {
-                $command->mergeApplicationDefinition();
-                $completionInput->bind($command->getDefinition());
-
                 if (CompletionInput::TYPE_OPTION_NAME === $completionInput->getCompletionType()) {
                     $this->log('  Completing option names for the <comment>'.($command instanceof LazyCommand ? $command->getCommand() : $command)::class.'</> command.');
 
@@ -144,7 +199,7 @@ final class CompleteCommand extends Command
 
             $this->log('<info>Suggestions:</>');
             if ($options = $suggestions->getOptionSuggestions()) {
-                $this->log('  --'.implode(' --', array_map(fn ($o) => $o->getName(), $options)));
+                $this->log('  --'.implode(' --', array_map(static fn ($o) => $o->getName(), $options)));
             } elseif ($values = $suggestions->getValueSuggestions()) {
                 $this->log('  '.implode(' ', $values));
             } else {

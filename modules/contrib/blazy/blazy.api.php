@@ -22,7 +22,7 @@
  * create the object like so:
  *
  * @code
- * $settings = \Drupal\blazy\Blazy::init();
+ * $settings = \Drupal\blazy\BlazyApi::init();
  * $blazies = $settings['blazies'];
  * @endcode
  *
@@ -41,7 +41,7 @@
  *   // Put the namespaces into `use` directives, e.g.: use Drupal\blazy\Blazy;
  *   // The ::init() contains empty blazies object for convenience, and optional
  *   // initial settings data parameter to override defaults.
- *   $settings = \Drupal\blazy\Blazy::init();
+ *   $settings = \Drupal\blazy\BlazyApi::init();
  *
  *   // Pass configurable settings directly into $settings. These can also be
  *   // moved into ::init() method argument above instead.
@@ -97,7 +97,7 @@
  *   return $build;
  * }
  * @endcode
- * @see \Drupal\blazy\Theme\BlazyTheme::blazy()
+ * @see \Drupal\blazy\Hook\ThemeHooks::preprocessBlazy()
  * @see \Drupal\blazy\BlazyDefault::imageSettings()
  * @see \Drupal\gridstack_ui\Controller\GridStackListBuilder::buildRow()
  * @see template_preprocess_blazy()
@@ -128,7 +128,7 @@
  *   // Option init #1 at container level:
  *   // The ::init() contains empty blazies object for convenience, and optional
  *   // initial settings data parameter to override defaults.
- *   $settings = \Drupal\blazy\Blazy::init();
+ *   $settings = \Drupal\blazy\BlazyApi::init();
  *
  *   // Option init #2 at item level:
  *   // $parent_settings is the first settings setup as above, here in a loop.
@@ -311,6 +311,13 @@ function hook_blazy_attach_alter(array &$load, array $settings) {
       'container' => blazy()->renderInIsolation($template),
     ];
   }
+
+  // Attach animate.css library only if the Image effect is anything but Blur.
+  // See hook_blazy_image_effects_alter() to register the effects.
+  $fx = $blazies->get('fx');
+  if ($fx && $fx != 'blur') {
+    $load['library'][] = 'MY_MODULE/animation';
+  }
 }
 
 /**
@@ -328,6 +335,26 @@ function hook_blazy_lightboxes_alter(array &$lightboxes) {
 }
 
 /**
+ * Alters available Image effect option at Blazy UI.
+ *
+ * @param array $effects
+ *   The array of Image effect options being modified, default to Blur.
+ *
+ * @see \Drupal\blazy\Utility\Animation
+ * @see /admin/help/blazy_ui#animate-css
+ * @see hook_blazy_attach_alter
+ *
+ * @ingroup blazy_api
+ */
+function hook_blazy_image_effects_alter(array &$effects) {
+  // Use Drupal\blazy\Utility\Animation
+  // to add Image effect options based on animate.css at Blazy UI.
+  // $effects += Animation::animations();
+  // Or use a special animation.
+  $effects[] = 'peekaboo';
+}
+
+/**
  * Alters Blazy individual item output to support a custom lightbox.
  *
  * Or better use hook_preprocess_blazy() for simple needs.
@@ -341,7 +368,7 @@ function hook_blazy_lightboxes_alter(array &$lightboxes) {
  */
 function hook_blazy_alter(array &$build, array $settings) {
   if (!empty($settings['media_switch']) && $settings['media_switch'] == 'photoswipe') {
-    // Full blown overrides:
+    // Full blown overrides, and must also implement trusted callback:
     $build['#pre_render'][] = 'my_module_pre_render';
   }
 }
@@ -369,7 +396,7 @@ function hook_blazy_build_alter(array &$build, array $settings) {
   // This also allows a quasi-lightbox like ElevateZoomPlus inject its optionset
   // as its value: elevatezoomplus: responsive, etc.
   if ($blazies->get('colorbox') || $blazies->get('zooming')) {
-    // Full blown overrides:
+    // Full blown overrides, and must also implement trusted callback:
     $build['#pre_render'][] = 'my_module_pre_render_build';
   }
 }
@@ -464,6 +491,7 @@ function hook_blazy_settings_alter(array &$build, $object) {
   // account/ calculated automatically only if Aspect ratio Fluid is chosen.
   // The benefit is removing the need to use padding hack inline styles for
   // your own custom CSS rules so to have cleaner markups.
+  // The TRUE parameter ensures you merge, not nullify the existing ones.
   $blazies->set('css.ratio', ['7:8', '6:5'], TRUE);
 
   // Overrides one pixel placeholder on particular pages relevant if using Views
@@ -472,6 +500,13 @@ function hook_blazy_settings_alter(array &$build, $object) {
   $id = $blazies->get('entity.id');
   if ($id && in_array($id, [45, 67])) {
     $blazies->set('ui.placeholder', '/blank.gif');
+  }
+
+  // Override Image effect: Blur or animate.css effects based on pages:
+  if ($id && in_array($id, [77, 123])) {
+    // If you have global Image effect:zoomIn, change it to anything else here.
+    // See hook_blazy_image_effects_alter.
+    $blazies->set('fx', 'wobble');
   }
 
   // Alternatively override views blocks identified by `view.view_mode` with
@@ -494,13 +529,13 @@ function hook_blazy_settings_alter(array &$build, $object) {
   // - `blazy_filter` for BlazyFilter, supports both plain media and galleries.
   // - `slick_filter` for SlickFilter galleries.
   // - `splide_filter` for SplideFilter galleries.
-  $plugin_id = $blazies->get('view.plugin_id') == 'blazy';
+  $expected_plugin_id = $blazies->get('view.plugin_id') == 'blazy';
 
   // Only concern with blocks having `Rewrite view resuts` to fix 404 due to
   // `data:image` placeholder is stripped out by Views sanitization procedure.
   // By default machine names are like block_1, or page_1, etc. till changed.
   $rewriten_blocks = ['block_categories', 'block_popular', 'block_related'];
-  if ($plugin_id && $view_mode = $blazies->get('view.view_mode')) {
+  if ($expected_plugin_id && $view_mode = $blazies->get('view.view_mode')) {
     if (in_array($view_mode, $rewriten_blocks)) {
       $blazies->set('ui.placeholder', '/blank.svg');
     }
@@ -547,10 +582,12 @@ function hook_blazy_item_alter(array &$settings, array &$attributes, array &$ite
   // says put $blazies->set('libs.media', TRUE); in hook_blazy_settings_alter(),
   // conditionally to not waste libraries.
   if ($blazies->get('colorbox') && $blazies->get('media.embed_url')) {
+    // Set the Media switch option to Image to iframe, hence, media player.
     $blazies->set('switch', 'media')
       // The is.player is deprecated in 2.17 for use.player.
       // ->set('is.player', TRUE)
       ->set('use.player', TRUE)
+      // Disable lightbox so to use the above inline media player.
       ->set('is.lightbox', FALSE);
   }
 

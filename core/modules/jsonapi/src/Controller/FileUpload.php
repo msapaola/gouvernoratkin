@@ -17,12 +17,13 @@ use Drupal\Core\Lock\LockAcquiringException;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\file\Upload\ContentDispositionFilenameParser;
-use Drupal\file\Upload\FileUploadHandler;
+use Drupal\file\Upload\FileUploadHandlerInterface;
 use Drupal\file\Upload\FileUploadLocationTrait;
 use Drupal\file\Upload\FileUploadResult;
 use Drupal\file\Upload\InputStreamFileWriterInterface;
 use Drupal\file\Upload\InputStreamUploadedFile;
 use Drupal\file\Validation\FileValidatorSettingsTrait;
+use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Drupal\jsonapi\Entity\EntityValidationTrait;
 use Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel;
 use Drupal\jsonapi\JsonApiResource\Link;
@@ -63,7 +64,7 @@ class FileUpload {
   public function __construct(
     protected AccountInterface $currentUser,
     protected EntityFieldManagerInterface $fieldManager,
-    protected FileUploadHandler $fileUploadHandler,
+    protected FileUploadHandlerInterface $fileUploadHandler,
     protected HttpKernelInterface $httpKernel,
     protected InputStreamFileWriterInterface $inputStreamFileWriter,
     protected FileSystemInterface $fileSystem,
@@ -171,6 +172,9 @@ class FileUpload {
 
     $settings = $field_definition->getSettings();
     $validators = $this->getFileUploadValidators($settings);
+    if (\is_a($field_definition->getItemDefinition()->getClass(), ImageItem::class, TRUE) && !array_key_exists('FileIsImage', $validators)) {
+      $validators['FileIsImage'] = [];
+    }
     if (!array_key_exists('FileExtension', $validators) && $settings['file_extensions'] === '') {
       // An empty string means 'all file extensions' but the FileUploadHandler
       // needs the FileExtension entry to be present and empty in order for this

@@ -42,6 +42,8 @@ trait BlazyFormatterViewTrait {
 
     // Collects specific settings to this formatter.
     $defaults = $this->buildSettings();
+
+    /** @var array $settings */
     $settings = $this->formatter->merge($settings, $defaults);
 
     // Internal overrides before enough data is populated below.
@@ -61,8 +63,9 @@ trait BlazyFormatterViewTrait {
     unset($build['settings']);
 
     // Build the elements.
+    /* @phpstan-ignore-next-line */
     if (method_exists($this, 'buildElements')) {
-      // @todo remove $langcode at 3.x:
+      // @todo deprecate and remove $langcode at 3.x:
       $this->buildElements($build, $elements, $langcode);
     }
 

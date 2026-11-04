@@ -19,14 +19,14 @@ class MetatagToken {
    *
    * @var \Drupal\Core\Utility\Token
    */
-  protected $token;
+  protected Token $token;
 
   /**
    * Token entity type mapper service.
    *
    * @var \Drupal\token\TokenEntityMapperInterface
    */
-  protected $tokenEntityMapper;
+  protected TokenEntityMapperInterface $tokenEntityMapper;
 
   /**
    * Constructs a new MetatagToken object.
@@ -57,7 +57,7 @@ class MetatagToken {
    * @return string
    *   The processed string.
    */
-  public function replace($string, array $data = [], array $options = [], BubbleableMetadata $bubbleable_metadata = NULL): string {
+  public function replace($string, array $data = [], array $options = [], ?BubbleableMetadata $bubbleable_metadata = NULL): string {
     // Set default requirements for metatag unless options specify otherwise.
     $options = $options + [
       'clear' => TRUE,

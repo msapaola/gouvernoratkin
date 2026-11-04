@@ -58,8 +58,9 @@ class WebhooksCommands extends DrushCommands {
    * @option headers
    *   JSON-encoded webhook headers for testing, e.g. '{"X-Custom": "Header"}'.
    * @option content_type
-   *   Specify the content-type to send the webhook with, e.g. application/json
-   *   or application/xml.
+   *   Specify the content-type to send the webhook with, e.g.
+   *   'application/json', 'application/xml' or
+   *   'application/x-www-form-urlencoded'.
    * @usage webhooks-trigger entity:node:create
    *   Usage description
    *
@@ -71,14 +72,11 @@ class WebhooksCommands extends DrushCommands {
     $payload = (array) json_decode($options['payload'], TRUE);
     $headers = (array) json_decode($options['headers'], TRUE);
 
-    $event = $event;
-    $content_type = $options['content_type'];
-
     $webhook = new Webhook(
       $payload,
       $headers,
       $event,
-      $content_type
+      $options['content_type']
     );
 
     // Trigger the webhook for all subscribers.
@@ -130,6 +128,7 @@ class WebhooksCommands extends DrushCommands {
 
     $ids = $query->execute();
     $webhooks_configs = WebhookConfig::loadMultiple($ids);
+    $rows = [];
     /** @var \Drupal\webhooks\Entity\WebhookConfigInterface $webhooks_config */
     foreach ($webhooks_configs as $webhooks_config) {
       $rows[] = [
@@ -139,7 +138,7 @@ class WebhooksCommands extends DrushCommands {
         'status' => $webhooks_config->status() ? $this->t('active') : $this->t('inactive'),
       ];
     }
-    return new RowsOfFields((array) $rows);
+    return new RowsOfFields($rows);
   }
 
 }

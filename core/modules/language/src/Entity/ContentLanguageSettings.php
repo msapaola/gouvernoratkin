@@ -20,6 +20,7 @@ use Drupal\language\ContentLanguageSettingsInterface;
   label_singular: new TranslatableMarkup('content language setting'),
   label_plural: new TranslatableMarkup('content languages settings'),
   config_prefix: 'content_settings',
+  static_cache: TRUE,
   entity_keys: [
     'id' => 'id',
   ],
@@ -33,9 +34,11 @@ use Drupal\language\ContentLanguageSettingsInterface;
   ],
   constraints: [
     'ImmutableProperties' => [
-      'id',
-      'target_entity_type_id',
-      'target_bundle',
+      'properties' => [
+        'id',
+        'target_entity_type_id',
+        'target_bundle',
+      ],
     ],
   ],
   config_export: [

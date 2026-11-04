@@ -31,6 +31,8 @@ use Drupal\Core\Entity\EntityStorageInterface;
  *     "events",
  *     "content_type",
  *     "secret",
+ *     "signature_header",
+ *     "signature_algorithm",
  *     "token",
  *     "non_blocking"
  *   },
@@ -59,6 +61,26 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
    * The Xml format.
    */
   const CONTENT_TYPE_XML = 'application/xml';
+
+  /**
+   * The form urlencoded format.
+   */
+  const CONTENT_TYPE_WWW_FORM_URLENCODED = 'application/x-www-form-urlencoded';
+
+  /**
+   * The Yaml format.
+   */
+  const CONTENT_TYPE_YAML = 'application/yaml';
+
+  /**
+   * Default HMAC signature header name.
+   */
+  const DEFAULT_SIGNATURE_HEADER = 'X-Hub-Signature-256';
+
+  /**
+   * Default HMAC algorithm for signatures without an algorithm prefix.
+   */
+  const DEFAULT_SIGNATURE_ALGORITHM = 'sha256';
 
   /**
    * The Webhook ID.
@@ -136,6 +158,20 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
    * @var string
    */
   protected $secret;
+
+  /**
+   * The HTTP header that carries the HMAC signature.
+   *
+   * @var string
+   */
+  protected $signature_header;
+
+  /**
+   * The HMAC algorithm used when the signature has no algorithm prefix.
+   *
+   * @var string
+   */
+  protected $signature_algorithm;
 
   /**
    * The Webhook token.
@@ -216,7 +252,8 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
    * Get the content type.
    *
    * @return string
-   *   The content type string, e.g. 'application/json', 'application/xml'.
+   *   The content type string, e.g. 'application/json', 'application/xml' or
+   *   'x-www-form-urlencoded'.
    */
   public function getContentType() {
     return $this->content_type;
@@ -270,6 +307,30 @@ class WebhookConfig extends ConfigEntityBase implements WebhookConfigInterface {
    */
   public function getSecret() {
     return $this->secret;
+  }
+
+  /**
+   * Get the signature header name.
+   *
+   * @return string
+   *   The HTTP header that carries the HMAC signature.
+   */
+  public function getSignatureHeader() {
+    return trim((string) ($this->signature_header ?? ''));
+  }
+
+  /**
+   * Get the HMAC algorithm for unprefixed signatures.
+   *
+   * @return string
+   *   The hash_hmac() algorithm name, e.g. sha256.
+   */
+  public function getSignatureAlgorithm() {
+    $algorithm = strtolower(trim((string) ($this->signature_algorithm ?? '')));
+    if ($algorithm === '') {
+      return self::DEFAULT_SIGNATURE_ALGORITHM;
+    }
+    return $algorithm;
   }
 
   /**

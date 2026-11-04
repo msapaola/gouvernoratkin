@@ -58,9 +58,12 @@ class HeaderUtils
                         "(?:[^"\\\\]|\\\\.)*(?:"|\\\\|$)
                     |
                         # token
-                        [^"'.$quotedSeparators.']+
-                    )+
-                (?<!\s)
+                        [^"\s'.$quotedSeparators.']++
+                    |
+                        # whitespace that is not a separator, only when more of the value follows it,
+                        # so that a value never ends on whitespace and none of it ever has to be given back
+                        [^\S'.$quotedSeparators.']++(?!['.$quotedSeparators.']|$)
+                    )++
             |
                 # separator
                 \s*
@@ -164,7 +167,7 @@ class HeaderUtils
      */
     public static function makeDisposition(string $disposition, string $filename, string $filenameFallback = ''): string
     {
-        if (!\in_array($disposition, [self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE])) {
+        if (!\in_array($disposition, [self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE], true)) {
             throw new \InvalidArgumentException(\sprintf('The disposition must be either "%s" or "%s".', self::DISPOSITION_ATTACHMENT, self::DISPOSITION_INLINE));
         }
 
@@ -173,7 +176,7 @@ class HeaderUtils
         }
 
         // filenameFallback is not ASCII.
-        if (!preg_match('/^[\x20-\x7e]*$/', $filenameFallback)) {
+        if (!preg_match('/^[\x20-\x7e]*$/D', $filenameFallback)) {
             throw new \InvalidArgumentException('The filename fallback must only contain ASCII characters.');
         }
 
@@ -238,7 +241,7 @@ class HeaderUtils
             return $q;
         }
 
-        parse_str(implode('&', $q), $q);
+        @parse_str(implode('&', $q), $q);
 
         $query = [];
 

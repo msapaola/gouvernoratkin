@@ -8,12 +8,14 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\file\Entity\File;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests file token replacement.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileTokenReplaceTest extends FileFieldTestBase {
 
   /**
@@ -46,7 +48,6 @@ class FileTokenReplaceTest extends FileFieldTestBase {
     $nid = $this->uploadNodeFile($test_file, $field_name, $type_name);
 
     // Load the node and the file.
-    $node_storage->resetCache([$nid]);
     $node = $node_storage->load($nid);
     $file = File::load($node->{$field_name}->target_id);
 
@@ -102,8 +103,22 @@ class FileTokenReplaceTest extends FileFieldTestBase {
     $tests['[file:size]'] = ByteSizeMarkup::create($file->getSize());
 
     foreach ($tests as $input => $expected) {
-      $output = $token_service->replace($input, ['file' => $file], ['langcode' => $language_interface->getId(), 'sanitize' => FALSE]);
+      $output = $token_service->replace($input, ['file' => $file], [
+        'langcode' => $language_interface->getId(),
+        'sanitize' => FALSE,
+      ]);
       $this->assertEquals($expected, $output, "Unsanitized file token $input replaced.");
+    }
+
+    // Assign the file to a non-existent user so that getOwner() returns NULL,
+    // then verify that the owner tokens are left unreplaced rather than causing
+    // an error. Both [file:owner] and the chained [file:owner:*] tokens are
+    // skipped when there is no user entity to derive their values from.
+    $file->setOwnerId(999999)->save();
+    $this->assertNull($file->getOwner());
+    foreach (['[file:owner]', '[file:owner:uid]', '[file:owner:name]'] as $input) {
+      $output = $token_service->replace($input, ['file' => $file], ['langcode' => $language_interface->getId()]);
+      $this->assertSame($input, $output, "File token $input is left unreplaced when the owner is missing.");
     }
   }
 

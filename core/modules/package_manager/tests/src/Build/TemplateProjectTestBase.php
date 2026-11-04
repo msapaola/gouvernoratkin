@@ -42,6 +42,13 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
   private string $webRoot;
 
   /**
+   * The project root of the test site, relative to the workspace directory.
+   *
+   * @var string
+   */
+  const string PROJECT_ROOT_RELATIVE = 'project/';
+
+  /**
    * A secondary server instance, to serve XML metadata about available updates.
    *
    * @var \Symfony\Component\Process\Process
@@ -184,7 +191,7 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
    * {@inheritdoc}
    */
   public function installQuickStart($profile, $working_dir = NULL): void {
-    parent::installQuickStart("$profile --no-ansi", $working_dir ?: $this->webRoot);
+    parent::installQuickStart("$profile --no-ansi", $working_dir ?: self::PROJECT_ROOT_RELATIVE);
 
     // Allow package_manager to be installed, since it is hidden by default.
     // Always allow test modules to be installed in the UI and, for easier
@@ -319,15 +326,15 @@ END;
     // ignores .htaccess files and everything in them, so a Composer-generated
     // .htaccess file won't cause this test to fail.
     if ($template === 'RecommendedProject') {
-      $this->assertFileDoesNotExist("$workspace_dir/project/.htaccess");
+      $this->assertFileDoesNotExist($workspace_dir . '/' . self::PROJECT_ROOT_RELATIVE . '.htaccess');
     }
 
     // Now that we know the project was created successfully, we can set the
     // web root with confidence.
-    $this->webRoot = 'project/' . $data['extra']['drupal-scaffold']['locations']['web-root'];
+    $this->webRoot = self::PROJECT_ROOT_RELATIVE . $data['extra']['drupal-scaffold']['locations']['web-root'];
 
     // Install Drupal.
-    $this->installQuickStart('standard');
+    $this->installQuickStart('minimal');
     $this->formLogin($this->adminUsername, $this->adminPassword);
 
     // When checking for updates, we need to be able to make sub-requests, but
@@ -342,12 +349,12 @@ END;
 
     // Ensure Package Manager logs Composer Stager's process output to a file
     // named for the current test.
-    $log = $this->getDrupalRoot() . '/sites/simpletest/browser_output';
+    $log = $this->root . '/sites/simpletest/browser_output';
     @mkdir($log, recursive: TRUE);
     $this->assertDirectoryIsWritable($log);
     $log .= '/' . str_replace('\\', '_', static::class) . '-' . $this->name();
     if ($this->usesDataProvider()) {
-      $log .= '-' . preg_replace('/[^a-z0-9]+/i', '_', $this->dataName());
+      $log .= '-' . preg_replace('/[^a-z0-9]+/i', '_', (string) $this->dataName());
     }
     $code .= <<<END
 \$config['package_manager.settings']['log'] = '$log-package_manager.log';
@@ -357,6 +364,7 @@ END;
 
     // Install helpful modules.
     $this->installModules([
+      'automated_cron',
       'package_manager_test_api',
       'package_manager_test_event_logger',
       'package_manager_test_release_history',
@@ -441,16 +449,18 @@ END;
         $requirements['symfony/polyfill-php81'],
         $requirements['symfony/polyfill-php82'],
         $requirements['symfony/polyfill-php83'],
+        // Needed for PHP 8.4 features while PHP 8.3 is the minimum.
+        $requirements['symfony/polyfill-php84'],
       );
       // If this package requires any Drupal core packages, ensure it allows
       // any version.
       self::unboundCoreConstraints($requirements);
-      // In certain situations, like Drupal CI, auto_updates might be
-      // required into the code base by Composer. This may cause it to be added to
-      // the drupal/core-recommended metapackage, which can prevent the test site
-      // from being built correctly, among other deleterious effects. To prevent
-      // such shenanigans, always remove drupal/auto_updates from
-      // drupal/core-recommended.
+      // In certain situations, like specific CI environments, auto_updates
+      // might be required into the code base by Composer. This may cause it to
+      // be added to the drupal/core-recommended metapackage, which can prevent
+      // the test site from being built correctly, among other deleterious
+      // effects. To prevent such shenanigans, always remove drupal/auto_updates
+      // from drupal/core-recommended.
       if ($name === 'drupal/core-recommended') {
         unset($requirements['drupal/auto_updates']);
       }
@@ -489,6 +499,12 @@ END;
         // scaffold files, like Drupal core.
         'extra' => $package_info['extra'] ?? [],
       ];
+
+      if ($name === 'drupal/core') {
+        $packages[$name][$version]['bin'] = [
+          'scripts/dr',
+        ];
+      }
     }
     $data = json_encode(['packages' => $packages], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     file_put_contents($workspace_dir . '/vendor.json', $data);
@@ -613,7 +629,7 @@ END;
     }
     $this->assertNotEmpty($expected_events);
 
-    $log_file = $this->getWorkspaceDirectory() . '/project/' . EventLogSubscriber::LOG_FILE_NAME;
+    $log_file = $this->getWorkspaceDirectory() . '/' . self::PROJECT_ROOT_RELATIVE . EventLogSubscriber::LOG_FILE_NAME;
     $max_wait = time() + $wait;
     do {
       $this->assertFileIsReadable($log_file);
@@ -719,6 +735,9 @@ END;
       $this->serverErrorLog,
     );
     $this->assertSame(200, $session->getStatusCode(), $message);
+    // Sometimes we get a 200 response after a PHP timeout or OOM error, so we
+    // also check the page content to ensure it's what we expect.
+    $this->assertSame('Finished', $session->getPage()->getText());
   }
 
   /**

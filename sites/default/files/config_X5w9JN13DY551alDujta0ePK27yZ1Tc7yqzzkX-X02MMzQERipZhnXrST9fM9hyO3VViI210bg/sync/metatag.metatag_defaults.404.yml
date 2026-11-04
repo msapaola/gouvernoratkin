@@ -7,6 +7,6 @@ _core:
 id: '404'
 label: 'Page 404 non trouvée'
 tags:
-  canonical_url: '[site:url]'
-  shortlink: '[site:url]'
+  canonical_url: '<none>'
+  shortlink: '<none>'
   robots: noindex

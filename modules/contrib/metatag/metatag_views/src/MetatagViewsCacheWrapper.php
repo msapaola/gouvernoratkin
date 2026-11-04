@@ -2,8 +2,11 @@
 
 namespace Drupal\metatag_views;
 
+use Drupal\Component\Utility\DeprecationHelper;
+use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
@@ -29,7 +32,14 @@ class MetatagViewsCacheWrapper extends CachePluginBase {
    *
    * @var \Drupal\views\Plugin\views\cache\CachePluginBase
    */
-  protected $plugin;
+  protected CachePluginBase $plugin;
+
+  /**
+   * The cache backend.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected CacheBackendInterface $cache;
 
   /**
    * MetatagViewsCacheWrapper constructor.
@@ -39,6 +49,7 @@ class MetatagViewsCacheWrapper extends CachePluginBase {
    */
   public function __construct(CachePluginBase $plugin) {
     $this->plugin = $plugin;
+    $this->cache = $this->container->get('cache.' . $this->plugin->resultsBin);
   }
 
   /**
@@ -74,9 +85,8 @@ class MetatagViewsCacheWrapper extends CachePluginBase {
         'first_row_tokens' => MetatagDisplayExtender::getFirstRowTokensFromStylePlugin($view),
       ];
       $cache_set_max_age = $this->cacheSetMaxAge('results');
-      $expire = ($cache_set_max_age === Cache::PERMANENT) ? Cache::PERMANENT : (int) $view->getRequest()->server->get('REQUEST_TIME') + $cache_set_max_age;
-      \Drupal::cache($plugin->resultsBin)
-        ->set($plugin->generateResultsKey(), $data, $expire, $plugin->getCacheTags());
+      $expire = $cache_set_max_age === Cache::PERMANENT ? Cache::PERMANENT : (int) $view->getRequest()->server->get('REQUEST_TIME') + $cache_set_max_age;
+      $this->cache->set($plugin->generateResultsKey(), $data, $expire, $plugin->getCacheTags());
     }
     else {
       $this->plugin->cacheSet($type);
@@ -92,7 +102,7 @@ class MetatagViewsCacheWrapper extends CachePluginBase {
         $cutoff = $this->plugin->cacheExpire($type);
         // Values to set: $view->result, $view->total_rows,
         // $view->current_page and pass row tokens to metatag display extender.
-        if ($cache = \Drupal::cache($this->plugin->resultsBin)->get($this->plugin->generateResultsKey())) {
+        if ($cache = $this->cache->get($this->plugin->generateResultsKey())) {
           if (!$cutoff || $cache->created > $cutoff) {
             $view = $this->plugin->view;
             $view->result = $cache->data['result'];
@@ -181,21 +191,7 @@ class MetatagViewsCacheWrapper extends CachePluginBase {
   /**
    * {@inheritdoc}
    */
-  public function getRowCacheKeys(ResultRow $row) {
-    return $this->plugin->getRowCacheKeys($row);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getRowId(ResultRow $row) {
-    return $this->plugin->getRowId($row);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function init(ViewExecutable $view, DisplayPluginBase $display, array &$options = NULL) {
+  public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     $this->plugin->init($view, $display, $options);
   }
 
@@ -230,7 +226,7 @@ class MetatagViewsCacheWrapper extends CachePluginBase {
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array|string {
     return CachePluginBase::trustedCallbacks();
   }
 
@@ -307,14 +303,14 @@ class MetatagViewsCacheWrapper extends CachePluginBase {
   /**
    * {@inheritdoc}
    */
-  public static function preRenderAddFieldsetMarkup(array $form) {
+  public static function preRenderAddFieldsetMarkup(array $form): array {
     return CachePluginBase::preRenderAddFieldsetMarkup($form);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function preRenderFlattenData($form) {
+  public static function preRenderFlattenData($form): array {
     return CachePluginBase::preRenderFlattenData($form);
   }
 
@@ -335,7 +331,7 @@ class MetatagViewsCacheWrapper extends CachePluginBase {
   /**
    * {@inheritdoc}
    */
-  public static function queryLanguageSubstitutions() {
+  public static function queryLanguageSubstitutions(): array {
     return CachePluginBase::queryLanguageSubstitutions();
   }
 
@@ -371,7 +367,7 @@ class MetatagViewsCacheWrapper extends CachePluginBase {
    * {@inheritdoc}
    */
   public function isConfigurable() {
-    return $this->plugin->isConfigurable();
+    return DeprecationHelper::backwardsCompatibleCall(\Drupal::VERSION, '11.1.0', fn() => $this->plugin instanceof ConfigurableInterface, fn() => $this->plugin->isConfigurable());
   }
 
   /**
@@ -384,8 +380,8 @@ class MetatagViewsCacheWrapper extends CachePluginBase {
   /**
    * {@inheritdoc}
    */
-  public function setMessenger(MessengerInterface $messenger) {
-    $this->plugin->setMessenger($messenger);
+  public function setMessenger(MessengerInterface $messenger): MessengerInterface {
+    return $this->plugin->setMessenger($messenger);
   }
 
   /**

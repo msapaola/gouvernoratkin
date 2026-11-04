@@ -1,5 +1,5 @@
 uuid: de949cff-4ece-40bd-a84a-64c3fc89ad9d
-langcode: en
+langcode: fr
 status: true
 dependencies:
   config:
@@ -20,8 +20,8 @@ content:
     type: image
     label: hidden
     settings:
-      image_style: thumbnail
       image_link: ''
+      image_style: thumbnail
       image_loading:
         attribute: lazy
     third_party_settings: {  }

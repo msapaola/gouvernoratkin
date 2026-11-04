@@ -1143,7 +1143,7 @@ Drupal.TBMegaMenu = Drupal.TBMegaMenu || {};
             // Check if a valid block was loaded & a JSON object was returned.
             var isJson = true;
             try {
-              var resp = $.parseJSON(msg.responseText);
+              var resp = JSON.parse(msg.responseText);
             } catch (err) {
               isJson = false;
             }

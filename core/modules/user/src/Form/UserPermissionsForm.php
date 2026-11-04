@@ -13,6 +13,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Provides the user permissions administration form.
  *
+ * @phpstan-import-type PermissionInfoList from
+ *   \Drupal\user\PermissionHandlerInterface
+ *
  * @internal
  */
 class UserPermissionsForm extends FormBase {
@@ -86,15 +89,18 @@ class UserPermissionsForm extends FormBase {
    *   An array of role objects.
    */
   protected function getRoles() {
-    return $this->roleStorage->loadMultiple();
+    return $this->roleStorage->loadMultipleOverrideFree();
   }
 
   /**
    * Group permissions by the modules that provide them.
    *
-   * @return string[][]
+   * @return array<string, PermissionInfoList>
    *   A nested array. The outer keys are modules that provide permissions. The
-   *   inner arrays are permission names keyed by their machine names.
+   *   inner arrays contain permissions info as defined in
+   *   PermissionHandlerInterface.
+   *
+   * @see \Drupal\user\PermissionHandlerInterface::getPermissions
    */
   protected function permissionsByProvider(): array {
     $permissions = $this->permissionHandler->getPermissions();
@@ -188,7 +194,7 @@ class UserPermissionsForm extends FormBase {
 
     foreach ($this->permissionsByProvider() as $provider => $permissions) {
       // Module name.
-      $form['permissions'][$provider] = [
+      $form['permissions']['module_' . $provider] = [
         [
           '#wrapper_attributes' => [
             'colspan' => count($role_names) + 1,

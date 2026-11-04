@@ -2,6 +2,8 @@ uuid: 7583236e-159e-405e-aa4e-7b53a26c8b44
 langcode: fr
 status: true
 dependencies:
+  config:
+    - node.type.membre
   module:
     - node
 id: motif_membre
@@ -12,7 +14,6 @@ selection_criteria:
   6ce933a8-8483-421b-884f-3a7274de4f08:
     id: 'entity_bundle:node'
     negate: false
-    uuid: 6ce933a8-8483-421b-884f-3a7274de4f08
     context_mapping:
       node: node
     bundles:

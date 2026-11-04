@@ -84,6 +84,7 @@ class Insert extends Query implements \Countable {
         $stmt->execute($insert_values, $this->queryOptions);
         $last_insert_id = $this->connection->lastInsertId();
       }
+      $transaction->commitOrRelease();
     }
     catch (\Exception $e) {
       if (isset($transaction)) {
@@ -149,8 +150,8 @@ class Insert extends Query implements \Countable {
       // We have to assume that the used aliases match the insert fields.
       // Regular fields are added to the query before expressions, maintain the
       // same order for the insert fields.
-      // This behavior can be overridden by calling fields() manually as only the
-      // first call to fields() does have an effect.
+      // This behavior can be overridden by calling fields() manually as only
+      // the first call to fields() does have an effect.
       $this->fields(array_merge(array_keys($this->fromQuery->getFields()), array_keys($this->fromQuery->getExpressions())));
     }
     else {

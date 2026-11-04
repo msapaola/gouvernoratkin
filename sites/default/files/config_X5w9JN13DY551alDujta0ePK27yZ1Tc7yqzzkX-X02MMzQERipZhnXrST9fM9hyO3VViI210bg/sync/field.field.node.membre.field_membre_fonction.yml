@@ -9,7 +9,7 @@ id: node.membre.field_membre_fonction
 field_name: field_membre_fonction
 entity_type: node
 bundle: membre
-label: 'Fonction'
+label: Fonction
 description: "Telle qu'elle s'affiche sous le nom, par exemple « Ministre de la Santé, Hygiène et Prévention »."
 required: true
 translatable: false

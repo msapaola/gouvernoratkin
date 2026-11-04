@@ -35,11 +35,15 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof ServiceLocatorArgument) {
-            if ($value->getTaggedIteratorArgument()) {
-                $value->setValues($this->findAndSortTaggedServices($value->getTaggedIteratorArgument(), $this->container));
+            if ($taggedIterator = $value->getTaggedIteratorArgument()) {
+                $exclude = $taggedIterator->getExclude();
+                if ($taggedIterator->excludeSelf()) {
+                    $exclude[] = $this->currentId;
+                }
+                $value->setValues($this->findAndSortTaggedServices($taggedIterator, $this->container, $exclude));
             }
 
-            return self::register($this->container, $value->getValues());
+            return self::register($this->container, $this->processValue($value->getValues()));
         }
 
         if ($value instanceof Definition) {
@@ -54,19 +58,43 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
             $value->setClass(ServiceLocator::class);
         }
 
-        $services = $value->getArguments()[0] ?? null;
+        $values = $value->getArguments()[0] ?? null;
+        $services = [];
 
-        if ($services instanceof TaggedIteratorArgument) {
-            $services = $this->findAndSortTaggedServices($services, $this->container);
-        }
-
-        if (!\is_array($services)) {
+        if ($values instanceof TaggedIteratorArgument) {
+            foreach ($this->findAndSortTaggedServices($values, $this->container) as $k => $v) {
+                $services[$k] = new ServiceClosureArgument($v);
+            }
+        } elseif (!\is_array($values)) {
             throw new InvalidArgumentException(\sprintf('Invalid definition for service "%s": an array of references is expected as first argument when the "container.service_locator" tag is set.', $this->currentId));
+        } else {
+            $i = 0;
+
+            foreach ($values as $k => $v) {
+                if ($v instanceof ServiceClosureArgument) {
+                    $services[$k] = $this->processValue($v);
+                    continue;
+                }
+
+                if ($i === $k) {
+                    if ($v instanceof Reference) {
+                        $k = (string) $v;
+                    }
+                    ++$i;
+                } elseif (\is_int($k)) {
+                    $i = null;
+                }
+
+                $services[$k] = new ServiceClosureArgument($this->processValue($v));
+            }
+            if (\count($services) === $i) {
+                ksort($services);
+            }
         }
 
-        $value->setArgument(0, self::map($services));
+        $value->setArgument(0, $services);
 
-        $id = '.service_locator.'.ContainerBuilder::hash($value);
+        $id = self::getLocatorId($this->container, $value, $this->currentId);
 
         if ($isRoot) {
             if ($id !== $this->currentId) {
@@ -83,15 +111,19 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
 
     public static function register(ContainerBuilder $container, array $map, ?string $callerId = null): Reference
     {
+        foreach ($map as $k => $v) {
+            $map[$k] = new ServiceClosureArgument($v);
+        }
+
         $locator = (new Definition(ServiceLocator::class))
-            ->addArgument(self::map($map))
+            ->addArgument($map)
             ->addTag('container.service_locator');
 
         if (null !== $callerId && $container->hasDefinition($callerId)) {
             $locator->setBindings($container->getDefinition($callerId)->getBindings());
         }
 
-        if (!$container->hasDefinition($id = '.service_locator.'.ContainerBuilder::hash($locator))) {
+        if (!$container->hasDefinition($id = self::getLocatorId($container, $locator, $callerId))) {
             $container->setDefinition($id, $locator);
         }
 
@@ -110,28 +142,21 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
         return new Reference($id);
     }
 
-    public static function map(array $services): array
+    private static function getLocatorId(ContainerBuilder $container, Definition $locator, ?string $consumerId): string
     {
-        $i = 0;
-
-        foreach ($services as $k => $v) {
-            if ($v instanceof ServiceClosureArgument) {
-                continue;
-            }
-
-            if ($i === $k) {
-                if ($v instanceof Reference) {
-                    unset($services[$k]);
-                    $k = (string) $v;
-                }
-                ++$i;
-            } elseif (\is_int($k)) {
-                $i = null;
-            }
-
-            $services[$k] = new ServiceClosureArgument($v);
+        $values = $bindingIds = [];
+        foreach ($locator->getBindings() as $key => $binding) {
+            [$values[$key], $bindingIds[$key]] = $binding->getValues();
         }
 
-        return $services;
+        // The file declaring a binding and its usage-tracking id are not hashed, so that the id depends neither on the project directory nor on what else the process compiled
+        $hash = ContainerBuilder::hash($values ? [(clone $locator)->setBindings([]), $values] : $locator);
+        $id = '.service_locator.'.$hash;
+
+        if (null !== $consumerId && $container->hasDefinition($id) && $bindingIds !== array_map(static fn ($binding) => $binding->getValues()[1], $container->getDefinition($id)->getBindings())) {
+            $id = '.service_locator.'.ContainerBuilder::hash([$hash, $consumerId]);
+        }
+
+        return $id;
     }
 }

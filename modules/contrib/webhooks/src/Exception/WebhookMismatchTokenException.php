@@ -13,17 +13,12 @@ class WebhookMismatchTokenException extends \Exception {
    * MismatchSignatureException constructor.
    *
    * @param string $token
-   *   The webhook token.
+   *   The configured token. Accepted for backwards compatibility, never logged.
    * @param string $token_received
-   *   The webhook token from the headers.
+   *   The supplied token. Accepted for backwards compatibility, never logged.
    */
   public function __construct($token, $token_received) {
-    $message = sprintf(
-      'The received token "%s" does not match the generated signature "%s".',
-      $token,
-      $token_received
-    );
-    parent::__construct($message);
+    parent::__construct('Webhook token verification failed.');
   }
 
 }

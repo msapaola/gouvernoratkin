@@ -36,13 +36,15 @@ use Drupal\field\FieldConfigInterface;
     'plural' => '@count fields',
   ],
   constraints: [
-    'RequiredConfigDependencies' => ['field_storage_config'],
+    'RequiredConfigDependencies' => ['entityTypes' => ['field_storage_config']],
     'ImmutableProperties' => [
-      'id',
-      'entity_type',
-      'field_name',
-      'bundle',
-      'field_type',
+      'properties' => [
+        'id',
+        'entity_type',
+        'field_name',
+        'bundle',
+        'field_type',
+      ],
     ],
   ],
   config_export: [
@@ -83,11 +85,6 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
    * @var \Drupal\field\Entity\FieldStorageConfig
    */
   protected $fieldStorage;
-
-  /**
-   * The original FieldConfig entity.
-   */
-  public FieldConfig $original;
 
   /**
    * Constructs a FieldConfig object.
@@ -184,17 +181,17 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
     }
     else {
       // Some updates are always disallowed.
-      if ($this->entity_type != $this->original->entity_type) {
+      if ($this->entity_type != $this->getOriginal()->entity_type) {
         throw new FieldException("Cannot change an existing field's entity_type.");
       }
-      if ($this->bundle != $this->original->bundle) {
+      if ($this->bundle != $this->getOriginal()->bundle) {
         throw new FieldException("Cannot change an existing field's bundle.");
       }
-      if ($storage_definition->uuid() != $this->original->getFieldStorageDefinition()->uuid()) {
+      if ($storage_definition->uuid() != $this->getOriginal()->getFieldStorageDefinition()->uuid()) {
         throw new FieldException("Cannot change an existing field's storage.");
       }
       // Notify the entity storage.
-      \Drupal::service('field_definition.listener')->onFieldDefinitionUpdate($this, $this->original);
+      \Drupal::service('field_definition.listener')->onFieldDefinitionUpdate($this, $this->getOriginal());
     }
 
     parent::preSave($storage);
@@ -221,7 +218,7 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
     parent::preDelete($storage, $fields);
 
     // Keep the field definitions in the deleted fields repository so we can use
-    // them later during field_purge_batch().
+    // them later during the field purge process.
     /** @var \Drupal\field\FieldConfigInterface $field */
     foreach ($fields as $field) {
       // Only mark a field for purging if there is data. Otherwise, just remove

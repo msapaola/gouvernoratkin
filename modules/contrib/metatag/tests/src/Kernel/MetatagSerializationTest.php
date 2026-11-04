@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\metatag\Kernel;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -10,6 +11,7 @@ use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\metatag\Entity\MetatagDefaults;
 use Drupal\user\Entity\User;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Tests metatag field serialization.
@@ -38,7 +40,7 @@ class MetatagSerializationTest extends EntityKernelTestBase {
    *
    * @var \Symfony\Component\Serializer\SerializerInterface
    */
-  protected $serializer;
+  protected SerializerInterface $serializer;
 
   /**
    * {@inheritdoc}
@@ -46,7 +48,7 @@ class MetatagSerializationTest extends EntityKernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->serializer = \Drupal::service('serializer');
+    $this->serializer = $this->container->get('serializer');
 
     // Create a generic metatag field.
     FieldStorageConfig::create([
@@ -95,9 +97,9 @@ class MetatagSerializationTest extends EntityKernelTestBase {
       'name' => 'Llama',
       'type' => 'entity_test',
       'field_test' => [
-        'value' => [
+        'value' => Json::encode([
           'description' => 'This is a description for use in Search Engines',
-        ],
+        ]),
       ],
     ]);
     assert($entity instanceof EntityTest);

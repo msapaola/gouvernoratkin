@@ -10,13 +10,17 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\webhooks\Entity\WebhookConfig;
+use Drupal\webhooks\Event\ReceiveErrorEvent;
 use Drupal\webhooks\Event\ReceiveEvent;
 use Drupal\webhooks\Event\SendErrorEvent;
 use Drupal\webhooks\Event\SendEvent;
 use Drupal\webhooks\Event\WebhookEvents;
 use Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException;
+use Drupal\webhooks\Exception\WebhookMismatchSignatureException;
+use Drupal\webhooks\Exception\WebhookMismatchTokenException;
 use GuzzleHttp\Client;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Serializer;
 
@@ -51,11 +55,11 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   protected $eventDispatcher;
 
   /**
-   * The webhook storage.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $webhookStorage;
+  protected $entityTypeManager;
 
   /**
    * The serializer.
@@ -113,9 +117,6 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    *   The config factory.
    * @param \Drupal\Core\Queue\QueueFactory $queueFactory
    *   The queue factory object.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public function __construct(
     Client $client,
@@ -132,7 +133,7 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     $this->logger = $logger_factory->get('webhooks');
     $this->requestStack = $request_stack;
     $this->eventDispatcher = $event_dispatcher;
-    $this->webhookStorage = $entity_type_manager->getStorage('webhook_config');
+    $this->entityTypeManager = $entity_type_manager;
     $this->serializer = $serializer;
     $this->uuid = $uuid;
     $this->config = $config_factory->get('webhooks.settings');
@@ -143,12 +144,13 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
    * {@inheritdoc}
    */
   public function loadMultipleByEvent($event, $type = 'outgoing') {
-    $query = $this->webhookStorage->getQuery()
+    $query = $this->entityTypeManager->getStorage('webhook_config')->getQuery()
+      ->accessCheck(FALSE)
       ->condition('status', 1)
       ->condition('events', $event, 'CONTAINS')
       ->condition('type', $type, '=');
     $ids = $query->execute();
-    return $this->webhookStorage
+    return $this->entityTypeManager->getStorage('webhook_config')
       ->loadMultiple($ids);
   }
 
@@ -177,25 +179,30 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
       new SendEvent($webhook_config, $webhook),
       WebhookEvents::SEND
     );
+    // Keep canonical metadata and legacy aliases synchronized after SEND.
+    $webhook->setUuid($webhook->getUuid());
+    $webhook->setEvent($webhook->getEvent());
 
     $body = $this->encode(
       $webhook->getPayload(),
       $webhook->getMimeSubType()
     );
+
     if ($secret = $webhook_config->getSecret()) {
       $webhook->setSecret($secret);
       $webhook->setSignature($body);
     }
 
     try {
+      $timeout = $this->resolveTimeout($webhook_config->getPayloadUrl());
       $this->client->post(
         $webhook_config->getPayloadUrl(),
         [
           'headers' => $webhook->getHeaders(),
-          'body' => $body,
+          'body'    => $body,
           // Workaround for blocking local to local requests,
           // there will be 'Dispatch Failed' errors in the logs.
-          'timeout' => (strpos($webhook_config->getPayloadUrl(), $this->requestStack->getCurrentRequest()->getHost())) ? 0.1 : 0,
+          'timeout' => $timeout,
         ]
       );
     }
@@ -241,12 +248,40 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
   }
 
   /**
+   * Resolves the Guzzle timeout for an outgoing webhook request.
+   *
+   * When Drupal dispatches a webhook to its own host, the PHP process blocks
+   * waiting for a response from itself and the request never completes. A
+   * short 0.1-second timeout is applied in that case so the dispatch does
+   * not stall indefinitely.
+   *
+   * The comparison uses parse_url() for an exact host match instead of
+   * strpos(), which would incorrectly treat a subdomain such as
+   * erp.example.fr as local when the Drupal host is example.fr.
+   *
+   * @param string $url
+   *   The outgoing payload URL.
+   *
+   * @return float
+   *   0.1 when the payload host exactly matches the current request host,
+   *   0.0 for any other host (Guzzle default: wait as long as needed, or
+   *   honour the http_client timeout from settings.php).
+   */
+  protected function resolveTimeout(string $url): float {
+    $currentHost = $this->requestStack->getCurrentRequest()->getHost();
+    $payloadHost = parse_url($url, PHP_URL_HOST);
+
+    return $payloadHost === $currentHost ? 0.1 : 0.0;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function receive($name) {
     // We only receive webhook requests when a webhook configuration exists
     // with a matching machine name.
-    $query = $this->webhookStorage->getQuery()
+    $query = $this->entityTypeManager->getStorage('webhook_config')->getQuery()
+      ->accessCheck(FALSE)
       ->condition('id', $name)
       ->condition('type', 'incoming')
       ->condition('status', 1);
@@ -256,32 +291,114 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     }
 
     $request = $this->requestStack->getCurrentRequest();
-    $payload = $this->decode(
-      $request->getContent(),
-      $request->getContentTypeFormat()
-    );
+    $format  = $request->getContentTypeFormat();
+    // Capture posted bytes before decode. HMAC and storage use this
+    // string, not json_encode() of the decoded array.
+    $body = (string) $request->getContent();
+    // Symfony Serializer has no decoder for real form-urlencoded
+    // bodies (format "form"). Skip decode for those, empty bodies,
+    // and any format the serializer does not support.
+    if (
+      $body === ''
+      || $format === 'form'
+      || $format === 'x-www-form-urlencoded'
+      || !$this->supportsDecoding((string) $format)
+    ) {
+      $payload = $request->request->all();
+    }
+    else {
+      $payload = $this->decode(
+        $body,
+        $format
+      );
+    }
 
     $webhook = new Webhook(
-      $payload,
+      (array) $payload,
       $request->headers->all(),
       '',
       $request->headers->get('Content-Type')
     );
-    $webhook->setUuid($request->headers->get('X-Drupal-Delivery'));
-    $webhook->setEvent($request->headers->get('X-Drupal-Event'));
+    $webhook->setBody($body);
+
+    // Prefer the new name; retain the deprecated header for older senders.
+    $drupal_uuid = $request->headers->get('Webhook-Delivery-Id')
+      ?: $request->headers->get('X-Drupal-Delivery');
+    if ($drupal_uuid) {
+      $webhook->setUuid($drupal_uuid);
+    }
+
+    $drupal_event = $request->headers->get('Webhook-Event')
+      ?: $request->headers->get('X-Drupal-Event');
+    if ($drupal_event) {
+      $webhook->setEvent($drupal_event);
+    }
 
     /** @var \Drupal\webhooks\Entity\WebhookConfig $webhook_config */
-    $webhook_config = $this->webhookStorage
+    $webhook_config = $this->entityTypeManager->getStorage('webhook_config')
       ->load($name);
+
+    // WooCommerce deliver_ping() posts webhook_id=<digits> with no
+    // X-WC-Webhook-* headers and requires HTTP 200. Skip HMAC and
+    // do not dispatch RECEIVE so subscribers do not treat this as
+    // an order.
+    if ($this->isWooCommerceActivationPing($request, $body)) {
+      return $webhook;
+    }
 
     // Verify in both cases: the webhook_config contains a secret
     // and/or the webhook contains a signature.
-    if ($webhook_config->getSecret() || $webhook->getSignature()) {
-      Webhook::verify($webhook_config->getSecret(), $request->getContent(), $webhook->getSignature());
+    $header_name = $webhook_config->getSignatureHeader();
+    $signature = '';
+    if ($header_name !== '') {
+      $from_request = $request->headers->get($header_name);
+      if (is_string($from_request) && trim($from_request) !== '') {
+        $signature = trim($from_request);
+      }
     }
-    // Legacy webhooks often only use a secret token.
-    elseif ($webhook_config->getSecret() || $webhook->getToken()) {
-      Webhook::verifyToken($webhook_config->getToken(), $webhook->getToken());
+    if ($signature === '') {
+      $signature = $webhook->getSignature($header_name);
+    }
+    try {
+      if ($webhook_config->getSecret() || $signature) {
+        Webhook::verify(
+          $webhook_config->getSecret(),
+          $webhook->getBody(),
+          $signature,
+          $webhook_config->getSignatureAlgorithm()
+        );
+      }
+      // Legacy webhooks often only use a secret token.
+      elseif ($webhook_config->getToken() || $webhook->getToken()) {
+        Webhook::verifyToken($webhook_config->getToken(), $webhook->getToken());
+      }
+    }
+    catch (WebhookMismatchSignatureException | WebhookMismatchTokenException $e) {
+      $this->eventDispatcher->dispatch(
+        new ReceiveErrorEvent($webhook_config, $webhook, $e),
+        WebhookEvents::RECEIVE_ERROR
+      );
+      $payload_length = $e instanceof WebhookMismatchSignatureException
+        ? $e->getPayloadLength()
+        : strlen($webhook->getBody());
+      $this->logger->error(
+        'Unauthorized. @type mismatch for Webhook Subscriber %name: @message. Payload length: @length bytes.',
+        [
+          '@type' => $e instanceof WebhookMismatchSignatureException
+            ? 'Signature'
+            : 'Token',
+          '%name' => $webhook_config->id(),
+          '@message' => $e->getMessage(),
+          '@length' => $payload_length,
+          'link' => Link::createFromRoute(
+            $this->t('Edit Webhook'),
+            'entity.webhook_config.edit_form', [
+              'webhook_config' => $webhook_config->id(),
+            ]
+          )->toString(),
+        ]
+      );
+      throw $e;
     }
 
     if ($webhook_config->isNonBlocking()) {
@@ -313,6 +430,32 @@ class WebhooksService implements WebhookDispatcherInterface, WebhookReceiverInte
     }
 
     return $webhook;
+  }
+
+  /**
+   * Whether the request is a WooCommerce webhook activation ping.
+   *
+   * Matches only the exact form body webhook_id=<digits> with no
+   * X-WC-Webhook-* headers, including an empty signature header.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The incoming request.
+   * @param string $body
+   *   Raw request body; not trimmed.
+   *
+   * @return bool
+   *   TRUE when this request is the activation ping.
+   */
+  protected function isWooCommerceActivationPing(Request $request, string $body): bool {
+    if (!preg_match('/^webhook_id=[0-9]+$/', $body)) {
+      return FALSE;
+    }
+    foreach ($request->headers->keys() as $name) {
+      if (str_starts_with(strtolower((string) $name), 'x-wc-webhook-')) {
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 
   /**

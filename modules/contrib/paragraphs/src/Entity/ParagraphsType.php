@@ -3,11 +3,17 @@
 namespace Drupal\paragraphs\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBundleBase;
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
+use Drupal\paragraphs\Controller\ParagraphsTypeListBuilder;
+use Drupal\paragraphs\Form\ParagraphsTypeDeleteConfirm;
+use Drupal\paragraphs\Form\ParagraphsTypeForm;
 use Drupal\paragraphs\ParagraphsBehaviorCollection;
+use Drupal\paragraphs\ParagraphsTypeAccessControlHandler;
 use Drupal\paragraphs\ParagraphsTypeInterface;
 use Drupal\Core\File\FileSystemInterface;
 
@@ -55,6 +61,47 @@ use Drupal\Core\File\FileSystemInterface;
  *   }
  * )
  */
+#[ConfigEntityType(
+  id: 'paragraphs_type',
+  label: new TranslatableMarkup('Paragraphs type'),
+  label_collection: new TranslatableMarkup('Paragraphs types'),
+  label_singular: new TranslatableMarkup('Paragraphs type'),
+  label_plural: new TranslatableMarkup('Paragraphs types'),
+  config_prefix: 'paragraphs_type',
+  static_cache: TRUE,
+  entity_keys: [
+    'id' => 'id',
+    'label' => 'label',
+  ],
+  handlers: [
+    'access' => ParagraphsTypeAccessControlHandler::class,
+    'list_builder' => ParagraphsTypeListBuilder::class,
+    'form' => [
+      'add' => ParagraphsTypeForm::class,
+      'edit' => ParagraphsTypeForm::class,
+      'delete' => ParagraphsTypeDeleteConfirm::class,
+    ],
+  ],
+  links: [
+    'edit-form' => '/admin/structure/paragraphs_type/{paragraphs_type}',
+    'delete-form' => '/admin/structure/paragraphs_type/{paragraphs_type}/delete',
+    'collection' => '/admin/structure/paragraphs_type',
+  ],
+  admin_permission: 'administer paragraphs types',
+  bundle_of: 'paragraph',
+  label_count: [
+    'singular' => '@count Paragraphs type',
+    'plural' => '@count Paragraphs types',
+  ],
+  config_export: [
+    'id',
+    'label',
+    'icon_uuid',
+    'icon_default',
+    'description',
+    'behavior_plugins',
+  ]
+)]
 class ParagraphsType extends ConfigEntityBundleBase implements ParagraphsTypeInterface, EntityWithPluginCollectionInterface {
 
   /**
@@ -274,11 +321,12 @@ class ParagraphsType extends ConfigEntityBundleBase implements ParagraphsTypeInt
    * {@inheritdoc}
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
-    if (!$update || $this->icon_uuid != $this->original->icon_uuid) {
+    $original = method_exists($this, 'getOriginal') ? $this->getOriginal() : ($this->original ?? NULL);
+    if (!$update || $this->icon_uuid != $original->icon_uuid) {
       // Update the file usage for the icon file.
       $new_icon_file = $this->icon_uuid ? $this->getFileByUuid($this->icon_uuid) : FALSE;
       // Update the file usage of the old icon as well if the icon was changed.
-      $old_icon_file = $update && $this->original->icon_uuid ? $this->getFileByUuid($this->original->icon_uuid) : FALSE;
+      $old_icon_file = $update && $original->icon_uuid ? $this->getFileByUuid($original->icon_uuid) : FALSE;
       $this->updateFileIconUsage($new_icon_file, $old_icon_file);
     }
 
@@ -313,6 +361,9 @@ class ParagraphsType extends ConfigEntityBundleBase implements ParagraphsTypeInt
   protected function updateFileIconUsage($new_icon, $old_icon = FALSE) {
     /** @var \Drupal\file\FileUsage\FileUsageInterface $file_usage */
     $file_usage = \Drupal::service('file.usage');
+
+    // Clear the UUID lookup cache in case this changes an existing file.
+    \Drupal::service('paragraphs_type.uuid_lookup')->clear();
 
     if ($new_icon) {
       // Add usage of the new icon file.

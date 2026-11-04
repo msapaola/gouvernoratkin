@@ -53,7 +53,8 @@ mapping:
   constraints:
     # By default, allow the explicitly listed mapping keys, and require their
     # presence unless `requiredKey: false` is specified.
-    ValidKeys: '<infer>'
+    ValidKeys:
+      allowedKeys: '<infer>'
 sequence:
   label: Sequence
   class: '\Drupal\Core\Config\Schema\Sequence'
@@ -84,6 +85,15 @@ required_label:
 plural_label:
   type: label
   label: 'Plural variants'
+  constraints:
+    Regex:
+      # Normally, labels cannot contain invisible control characters. In this particular
+      # case, an invisible character (ASCII 3, 0x03) is used to encode translation
+      # information, so carve out an exception for that only.
+      # @see \Drupal\views\Plugin\views\field\NumericField
+      pattern: '/([^\PC\x03])/u'
+      match: false
+      message: 'Labels are not allowed to span multiple lines or contain control characters.'
 
 # Internal Drupal path
 path:
@@ -166,7 +176,8 @@ bytes:
   type: string
   label: 'Bytes'
   constraints:
-    Callback: ['\Drupal\Component\Utility\Bytes', 'validateConstraint']
+    Callback:
+      callback: ['\Drupal\Component\Utility\Bytes', 'validateConstraint']
 
 weight:
   type: integer
@@ -191,13 +202,16 @@ _core_config_info:
       label: 'Default configuration hash'
       constraints:
         NotNull: []
-        Regex: '/^[a-zA-Z0-9\-_]+$/'
+        Regex:
+          pattern: '/^[a-zA-Z0-9\-_]+$/'
         # The hash is a base64-encoded version of the config's SHA-256 hash. Given
         # the deterministic length of a SHA-256 hash, and the way base64 encoding
         # works, this is always going to be 43 characters long.
-        Length: 43
+        Length:
+          exactly: 43
   constraints:
-    ValidKeys: ['default_config_hash']
+    ValidKeys:
+      allowedKeys: ['default_config_hash']
 
 config_object:
   type: mapping
@@ -373,7 +387,8 @@ config_dependencies_base:
         constraints:
           NotBlank: []
           ExtensionName: []
-          ExtensionExists: module
+          ExtensionExists:
+            type: module
     theme:
       # All dependency keys are optional: this might not depend on any themes.
       requiredKey: false
@@ -384,9 +399,11 @@ config_dependencies_base:
         constraints:
           NotBlank: []
           ExtensionName: []
-          ExtensionExists: theme
+          ExtensionExists:
+            type: theme
   constraints:
-    ValidKeys: '<infer>'
+    ValidKeys:
+      allowedKeys: '<infer>'
 
 config_dependencies:
   type: config_dependencies_base
@@ -398,7 +415,8 @@ config_dependencies:
       type: config_dependencies_base
       label: 'Enforced configuration dependencies'
   constraints:
-    ValidKeys: '<infer>'
+    ValidKeys:
+      allowedKeys: '<infer>'
 
 config_entity:
   type: mapping
@@ -445,15 +463,22 @@ block_settings:
       type: label
       label: 'Description'
     label_display:
-      type: label
+      type: string
       label: 'Display title'
+      constraints:
+        Choice:
+          choices:
+            - '0'
+            - visible
+        NotBlank: []
     provider:
       type: string
       label: 'Provider of this block plugin'
       constraints:
         NotBlank: []
         ExtensionName: []
-        ExtensionExists: module
+        ExtensionExists:
+          type: module
     context_mapping:
       requiredKey: false
       type: sequence
@@ -475,9 +500,8 @@ condition.plugin:
     negate:
       type: boolean
       label: 'Negate'
-    uuid:
-      type: uuid
     context_mapping:
+      requiredKey: false
       type: sequence
       label: 'Context assignments'
       sequence:
@@ -537,17 +561,29 @@ field_config_base:
     id:
       type: string
       label: 'ID'
+      constraints:
+        StringEqualsConcatenatedValues:
+          separator: .
+          values:
+            - '%parent.entity_type'
+            - '%parent.bundle'
+            - '%parent.field_name'
     field_name:
-      type: string
+      type: machine_name
       label: 'Field name'
     entity_type:
       type: string
       label: 'Entity type'
+      constraints:
+        PluginExists:
+          manager: 'entity_type.manager'
+          interface: '\Drupal\Core\Entity\FieldableEntityInterface'
     bundle:
       type: string
       label: 'Bundle'
       constraints:
-        EntityBundleExists: '%parent.entity_type'
+        EntityBundleExists:
+          entityTypeId: '%parent.entity_type'
     label:
       type: required_label
       label: 'Label'
@@ -578,10 +614,14 @@ field_config_base:
         PluginExists:
           manager: plugin.manager.field.field_type
           interface: '\Drupal\Core\Field\FieldItemInterface'
+  constraints:
+    FullyValidatable: ~
 
 core.base_field_override.*.*.*:
   type: field_config_base
   label: 'Base field bundle override'
+  constraints:
+    FullyValidatable: ~
 
 core.date_format.*:
   type: config_entity
@@ -940,6 +980,18 @@ field.value.timestamp:
       type: timestamp
       label: 'Value'
 
+field.value.language:
+  type: mapping
+  label: 'Language value'
+  mapping:
+    value:
+      # Not this doesn't make use of type: langcode because that doesn't allow null values.
+      type: string
+      label: 'Language value'
+      constraints:
+        Choice:
+          callback: 'Drupal\Core\TypedData\Plugin\DataType\LanguageReference::getAllValidLangcodes'
+
 # Text with a text format.
 text_format:
   type: mapping
@@ -1097,10 +1149,25 @@ mailer_dsn.options.smtp:
   type: mapping
   label: 'SMTP options'
   mapping:
+    auto_tls:
+      type: boolean
+      nullable: true
+      label: 'Whether or not to enable TLS opportunistically (defaults to true).'
+    require_tls:
+      type: boolean
+      nullable: true
+      label: 'Whether or not to enforce TLS (defaults to false).'
     verify_peer:
       type: boolean
       nullable: true
       label: 'TLS Peer Verification (defaults to true)'
+    source_ip:
+      type: string
+      nullable: true
+      label: 'Bind to a specific IPv4 or IPv6 address (no default).'
+      constraints:
+        UriHost:
+          message: 'The source IP should conform to RFC 3986 URI host component.'
     peer_fingerprint:
       type: string
       nullable: true
@@ -1125,29 +1192,25 @@ mailer_dsn.options.smtp:
       nullable: true
       label: 'Maximum number of messages to send before re-starting the transport (defaults to 100 messages)'
       constraints:
-        Range:
-          min: 0
+        PositiveOrZero: ~
     restart_threshold_sleep:
       type: float
       nullable: true
       label: 'Number of seconds to sleep between stopping and re-starting the transport (defaults to no delay)'
       constraints:
-        Range:
-          min: 0
+        PositiveOrZero: ~
     ping_threshold:
       type: integer
       nullable: true
       label: 'The minimum number of seconds between two messages required to ping the server (defaults to 100 seconds)'
       constraints:
-        Range:
-          min: 0
+        PositiveOrZero: ~
     max_per_second:
       type: integer
       nullable: true
       label: 'The number of messages to send per second (defaults to no limit)'
       constraints:
-        Range:
-          min: 0
+        PositiveOrZero: ~
 
 mailer_dsn.options.smtps:
   type: mailer_dsn.options.smtp

@@ -2,6 +2,8 @@
 
 namespace Drupal\webhook;
 
+use Drupal\Component\Utility\DeprecationHelper;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
@@ -81,6 +83,9 @@ final class WebhookListBuilder extends EntityListBuilder {
   public function buildHeader() {
     $header['id'] = $this->t('ID');
     $header['title'] = $this->t('Title');
+    $header['webhook_config'] = $this->t('Config');
+    $header['verified'] = $this->t('Verified');
+    $header['payload_length'] = $this->t('Bytes');
     $header['created'] = $this->t('Created');
     return $header + parent::buildHeader();
   }
@@ -92,6 +97,9 @@ final class WebhookListBuilder extends EntityListBuilder {
     /** @var \Drupal\webhook\WebhookInterface $entity */
     $row['id'] = $entity->id();
     $row['title'] = $entity->toLink();
+    $row['webhook_config'] = $entity->getWebhookConfigId();
+    $row['verified'] = $entity->isVerified() ? $this->t('Yes') : $this->t('No');
+    $row['payload_length'] = $entity->getPayloadLength();
     $row['created'] = $this->dateFormatter->format($entity->getCreatedTime());
     return $row + parent::buildRow($entity);
   }
@@ -99,8 +107,13 @@ final class WebhookListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultOperations(EntityInterface $entity) {
-    $operations = parent::getDefaultOperations($entity);
+  protected function getDefaultOperations(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL) {
+    $operations = DeprecationHelper::backwardsCompatibleCall(
+      \Drupal::VERSION,
+      '11.3.0',
+      fn() => parent::getDefaultOperations($entity, $cacheability),
+      fn() => parent::getDefaultOperations($entity),
+    );
     $destination = $this->redirectDestination->getAsArray();
     foreach ($operations as $key => $operation) {
       $operations[$key]['query'] = $destination;

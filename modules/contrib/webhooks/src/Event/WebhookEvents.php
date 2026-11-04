@@ -33,6 +33,18 @@ final class WebhookEvents {
   const RECEIVE = 'webhook.receive';
 
   /**
+   * Name of the event fired when inbound webhook verification fails.
+   *
+   * This event allows modules to log the request for debugging. The event
+   * listener method receives a \Drupal\webhooks\Event\ReceiveErrorEvent
+   * instance. Business processing must not run here; RECEIVE is not
+   * dispatched.
+   *
+   * @Event
+   */
+  const RECEIVE_ERROR = 'webhook.receive.error';
+
+  /**
    * Name of the event fired when a webhook send error is sent.
    *
    * This event allows modules to perform an action whenever a webhook send

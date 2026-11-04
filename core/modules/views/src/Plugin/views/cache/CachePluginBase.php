@@ -75,10 +75,16 @@ abstract class CachePluginBase extends PluginBase {
    *
    * Plugins must override this to implement expiration.
    *
-   * @param $type
+   * @param string $type
    *   The cache type, either 'query', 'result'.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. No
+   *   replacement is provided.
+   *
+   * @see https://www.drupal.org/node/3576855
    */
   protected function cacheExpire($type) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3576855', E_USER_DEPRECATED);
   }
 
   /**
@@ -103,7 +109,7 @@ abstract class CachePluginBase extends PluginBase {
    *
    * A plugin should override this to provide specialized caching behavior.
    *
-   * @param $type
+   * @param string $type
    *   The cache type, either 'query', 'result'.
    */
   public function cacheSet($type) {
@@ -129,14 +135,13 @@ abstract class CachePluginBase extends PluginBase {
    *
    * A plugin should override this to provide specialized caching behavior.
    *
-   * @param $type
+   * @param string $type
    *   The cache type, either 'query', 'result'.
    *
    * @return bool
    *   TRUE if data has been taken from the cache, otherwise FALSE.
    */
   public function cacheGet($type) {
-    $cutoff = $this->cacheExpire($type);
     switch ($type) {
       case 'query':
         // Not supported currently, but this is certainly where we'd put it.
@@ -146,15 +151,13 @@ abstract class CachePluginBase extends PluginBase {
         // Values to set: $view->result, $view->total_rows, $view->execute_time,
         // $view->current_page.
         if ($cache = \Drupal::cache($this->resultsBin)->get($this->generateResultsKey())) {
-          if (!$cutoff || $cache->created > $cutoff) {
-            $this->view->result = $cache->data['result'];
-            // Load entities for each result.
-            $this->view->query->loadEntities($this->view->result);
-            $this->view->total_rows = $cache->data['total_rows'];
-            $this->view->setCurrentPage($cache->data['current_page']);
-            $this->view->execute_time = 0;
-            return TRUE;
-          }
+          $this->view->result = $cache->data['result'];
+          // Load entities for each result.
+          $this->view->query->loadEntities($this->view->result);
+          $this->view->total_rows = $cache->data['total_rows'];
+          $this->view->setCurrentPage($cache->data['current_page']);
+          $this->view->execute_time = 0;
+          return TRUE;
         }
         return FALSE;
     }
@@ -261,6 +264,7 @@ abstract class CachePluginBase extends PluginBase {
    * Gets the max age for the current view.
    *
    * @return int
+   *   The maximum age for the current view's cache.
    */
   public function getCacheMaxAge() {
     $max_age = $this->getDefaultCacheMaxAge();
@@ -337,8 +341,13 @@ abstract class CachePluginBase extends PluginBase {
    *
    * @return string[]
    *   The row cache keys.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There
+   * is no replacement.
+   * @see https://www.drupal.org/node/3564958
    */
   public function getRowCacheKeys(ResultRow $row) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3564958', E_USER_DEPRECATED);
     return [
       'views',
       'fields',
@@ -356,8 +365,13 @@ abstract class CachePluginBase extends PluginBase {
    *
    * @return string
    *   The row identifier.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There
+   * is no replacement.
+   * @see https://www.drupal.org/node/3564958
    */
   public function getRowId(ResultRow $row) {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3564958', E_USER_DEPRECATED);
     // Here we compute a unique identifier for the row by computing the hash of
     // its data. We exclude the current index, since the same row could have a
     // different result index depending on the user permissions. We exclude also

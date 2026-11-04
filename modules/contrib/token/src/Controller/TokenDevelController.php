@@ -32,7 +32,7 @@ class TokenDevelController extends ControllerBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('token.tree_builder'),
       $container->get('token.entity_mapper')
@@ -73,7 +73,6 @@ class TokenDevelController extends ControllerBase {
    * @see static::entityLoad
    */
   protected function renderTokenTree(EntityInterface $entity) {
-    $this->moduleHandler()->loadInclude('token', 'pages.inc');
     $entity_type = $entity->getEntityTypeId();
 
     $token_type = $this->entityMapper->getTokenTypeForEntityType($entity_type);

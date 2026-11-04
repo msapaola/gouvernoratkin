@@ -11,7 +11,7 @@ id: node.membre.field_membre_photo
 field_name: field_membre_photo
 entity_type: node
 bundle: membre
-label: 'Photo'
+label: Photo
 description: "Portrait de la personne, au moins 400 × 500 pixels. Il est recadré automatiquement au format portrait. Sans photo, ses initiales s'affichent."
 required: false
 translatable: false

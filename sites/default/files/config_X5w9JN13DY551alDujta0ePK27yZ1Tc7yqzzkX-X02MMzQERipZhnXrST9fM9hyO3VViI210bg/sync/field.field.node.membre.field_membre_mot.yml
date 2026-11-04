@@ -9,8 +9,8 @@ id: node.membre.field_membre_mot
 field_name: field_membre_mot
 entity_type: node
 bundle: membre
-label: 'Mot'
-description: "Facultatif. Pour le directeur de cabinet : le texte de la section « Mot du directeur de cabinet ». Séparez les paragraphes par une ligne vide."
+label: Mot
+description: 'Facultatif. Pour le directeur de cabinet : le texte de la section « Mot du directeur de cabinet ». Séparez les paragraphes par une ligne vide.'
 required: false
 translatable: false
 default_value: {  }

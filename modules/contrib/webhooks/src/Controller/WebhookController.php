@@ -12,6 +12,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\webhooks\Exception\WebhookIncomingEndpointNotFoundException;
 use Drupal\webhooks\Exception\WebhookMismatchSignatureException;
+use Drupal\webhooks\Exception\WebhookMismatchTokenException;
 use Drupal\webhooks\WebhooksService;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -104,21 +105,8 @@ final class WebhookController extends ControllerBase {
       $this->logger->error($e->getMessage());
       return new Response(404, [], $e->getMessage());
     }
-    catch (WebhookMismatchSignatureException $e) {
-      $this->logger->error(
-        'Unauthorized. Signature mismatch for Webhook Subscriber %name: @message',
-        [
-          '%name' => $incoming_webhook_name,
-          '@message' => $e->getMessage(),
-          'link' => Link::createFromRoute(
-            $this->t('Edit Webhook'),
-            'entity.webhook_config.edit_form', [
-              'webhook_config' => $incoming_webhook_name,
-            ]
-          )->toString(),
-        ]
-      );
-      return new Response(401, [], $e->getMessage());
+    catch (WebhookMismatchSignatureException | WebhookMismatchTokenException $e) {
+      return new Response(401, [], 'Unauthorized.');
     }
     $this->logger->info(
       'Received a Webhook: %name',

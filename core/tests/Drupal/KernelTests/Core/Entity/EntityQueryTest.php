@@ -6,25 +6,30 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\Query\QueryException;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestMulRev;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field_test\FieldTestHelper;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 // cspell:ignore merhaba siema xsiemax
-
 /**
  * Tests Entity Query functionality.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityQueryTest extends EntityKernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -35,7 +40,9 @@ class EntityQueryTest extends EntityKernelTestBase {
   protected static $modules = ['field_test', 'language'];
 
   /**
-   * @var array
+   * An array of entity IDs keyed by the revision or entity ID.
+   *
+   * @var array<int, string>
    */
   protected $queryResults;
 
@@ -61,6 +68,13 @@ class EntityQueryTest extends EntityKernelTestBase {
   public $figures;
 
   /**
+   * Field name for the unlimited cardinality figures field.
+   *
+   * @var string
+   */
+  public $figuresUnlimited;
+
+  /**
    * The entity_test_mulrev entity storage.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
@@ -78,13 +92,18 @@ class EntityQueryTest extends EntityKernelTestBase {
     $this->installConfig(['language']);
 
     $figures = $this->randomMachineName();
+    $figures_unlimited = $this->randomMachineName();
     $greetings = $this->randomMachineName();
-    foreach ([$figures => 'shape', $greetings => 'text'] as $field_name => $field_type) {
+    foreach ([
+      $figures => ['shape', 2],
+      $figures_unlimited => ['shape', FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED],
+      $greetings => ['text', 2],
+    ] as $field_name => [$field_type, $cardinality]) {
       $field_storage = FieldStorageConfig::create([
         'field_name' => $field_name,
         'entity_type' => 'entity_test_mulrev',
         'type' => $field_type,
-        'cardinality' => 2,
+        'cardinality' => $cardinality,
       ]);
       $field_storage->save();
       $field_storages[] = $field_storage;
@@ -96,7 +115,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       do {
         $bundle = $this->randomMachineName();
       } while ($bundles && strtolower($bundles[0]) >= strtolower($bundle));
-      entity_test_create_bundle($bundle, entity_type: $field_storage->getTargetEntityTypeId());
+      EntityTestHelper::createBundle($bundle, entity_type: $field_storage->getTargetEntityTypeId());
       foreach ($field_storages as $field_storage) {
         FieldConfig::create([
           'field_storage' => $field_storage,
@@ -164,10 +183,12 @@ class EntityQueryTest extends EntityKernelTestBase {
           $entity->getTranslation($units[$key][1])->{$units[$key][0]}[] = $units[$key][2];
         }
       }
+      $entity->{$figures_unlimited} = $entity->{$figures}->getValue();
       $entity->save();
     }
     $this->bundles = $bundles;
     $this->figures = $figures;
+    $this->figuresUnlimited = $figures_unlimited;
     $this->greetings = $greetings;
     $this->storage = $this->container->get('entity_type.manager')->getStorage('entity_test_mulrev');
   }
@@ -178,6 +199,7 @@ class EntityQueryTest extends EntityKernelTestBase {
   public function testEntityQuery(): void {
     $greetings = $this->greetings;
     $figures = $this->figures;
+    $figures_unlimited = $this->figuresUnlimited;
     $this->queryResults = $this->storage
       ->getQuery()
       ->accessCheck(FALSE)
@@ -252,6 +274,18 @@ class EntityQueryTest extends EntityKernelTestBase {
     // Unit 0 and unit 1, so bits 0 1.
     $this->assertResult(3, 7, 11, 15);
 
+    // Do the same test with an unlimited cardinality field.
+    $query = $this->storage->getQuery()->accessCheck(FALSE);
+    $group_blue = $query->andConditionGroup()->condition("$figures_unlimited.color", 'blue');
+    $group_red = $query->andConditionGroup()->condition("$figures_unlimited.color", 'red');
+    $this->queryResults = $query
+      ->condition($group_blue)
+      ->condition($group_red)
+      ->sort('revision_id')
+      ->execute();
+    // Unit 0 and unit 1, so bits 0 1.
+    $this->assertResult(3, 7, 11, 15);
+
     // Do the same test but with IN operator.
     $query = $this->storage->getQuery()->accessCheck(FALSE);
     $group_blue = $query->andConditionGroup()->condition("$figures.color", ['blue'], 'IN');
@@ -283,6 +317,28 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->execute();
     // Bit 0 or 1 is on but 2 and 3 are not.
     $this->assertResult(1, 2, 3);
+
+    // Passing LanguageInterface::LANGCODE_DEFAULT as the langcode makes the
+    // query join via the 'default_langcode' column instead of a literal
+    // language code match, so the condition applies to whichever language is
+    // the entity's default.
+    $entity = EntityTestMulRev::load(1);
+    $default_name = $entity->name->value;
+    $tr_name = $entity->getTranslation('tr')->name->value;
+    $this->queryResults = $this->storage
+      ->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('name.value', $default_name, '=', LanguageInterface::LANGCODE_DEFAULT)
+      ->execute();
+    $this->assertResult(1);
+    // A name that lives only in a non-default translation must not match.
+    $this->queryResults = $this->storage
+      ->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('name.value', $tr_name, '=', LanguageInterface::LANGCODE_DEFAULT)
+      ->execute();
+    $this->assertResult();
+
     // Now update the 'merhaba' string to xsiemax which is not a meaningful
     // word but allows us to test revisions and string operations.
     $ids = $this->storage
@@ -349,7 +405,20 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->execute();
     // This matches both the original and new current revisions, multiple
     // revisions are returned for some entities.
-    $assert = [16 => '4', 17 => '5', 18 => '6', 19 => '7', 8 => '8', 9 => '9', 10 => '10', 11 => '11', 20 => '12', 21 => '13', 22 => '14', 23 => '15'];
+    $assert = [
+      16 => '4',
+      17 => '5',
+      18 => '6',
+      19 => '7',
+      8 => '8',
+      9 => '9',
+      10 => '10',
+      11 => '11',
+      20 => '12',
+      21 => '13',
+      22 => '14',
+      23 => '15',
+    ];
     $this->assertSame($assert, $results);
     $results = $this->storage
       ->getQuery()
@@ -378,8 +447,52 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->sort('revision_id')
       ->execute();
     // Now we get everything.
-    $assert = [4 => '4', 5 => '5', 6 => '6', 7 => '7', 8 => '8', 9 => '9', 10 => '10', 11 => '11', 12 => '12', 20 => '12', 13 => '13', 21 => '13', 14 => '14', 22 => '14', 15 => '15', 23 => '15'];
+    $assert = [
+      4 => '4',
+      5 => '5',
+      6 => '6',
+      7 => '7',
+      8 => '8',
+      9 => '9',
+      10 => '10',
+      11 => '11',
+      12 => '12',
+      20 => '12',
+      13 => '13',
+      21 => '13',
+      14 => '14',
+      22 => '14',
+      15 => '15',
+      23 => '15',
+    ];
     $this->assertSame($assert, $results);
+
+    $results = $this->queryResults = $this->storage
+      ->getQuery()
+      ->latestRevision()
+      ->notExists("$figures.color")
+      ->sort('id')
+      ->accessCheck(TRUE)
+      ->execute();
+    $expected = [16 => '4', 8 => '8', 20 => '12'];
+    $this->assertSame($expected, $results);
+
+    // Update an entity.
+    $entity = EntityTestMulRev::load(4);
+    $entity->setNewRevision();
+    $entity->name->value .= 'x';
+    $entity->save();
+
+    // Updated entity should now have revision ID 24.
+    $results = $this->queryResults = $this->storage
+      ->getQuery()
+      ->latestRevision()
+      ->sort('id')
+      ->notExists("$figures.color")
+      ->accessCheck(TRUE)
+      ->execute();
+    $expected = [24 => '4', 8 => '8', 20 => '12'];
+    $this->assertSame($expected, $results);
 
     // Check that a query on the latest revisions without any condition returns
     // the correct results.
@@ -390,7 +503,23 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->sort('id')
       ->sort('revision_id')
       ->execute();
-    $expected = [1 => '1', 2 => '2', 3 => '3', 16 => '4', 17 => '5', 18 => '6', 19 => '7', 8 => '8', 9 => '9', 10 => '10', 11 => '11', 20 => '12', 21 => '13', 22 => '14', 23 => '15'];
+    $expected = [
+      1 => '1',
+      2 => '2',
+      3 => '3',
+      24 => '4',
+      17 => '5',
+      18 => '6',
+      19 => '7',
+      8 => '8',
+      9 => '9',
+      10 => '10',
+      11 => '11',
+      20 => '12',
+      21 => '13',
+      22 => '14',
+      23 => '15',
+    ];
     $this->assertSame($expected, $results);
   }
 
@@ -424,6 +553,7 @@ class EntityQueryTest extends EntityKernelTestBase {
     // As we do not have any conditions, here are the possible colors and
     // language codes, already in order, with the first occurrence of the
     // entity id marked with *:
+
     // 8  NULL pl *
     // 12 NULL pl *
 
@@ -562,7 +692,7 @@ class EntityQueryTest extends EntityKernelTestBase {
     ]);
     $field_storage->save();
     $bundle = $this->randomMachineName();
-    entity_test_create_bundle($bundle);
+    EntityTestHelper::createBundle($bundle);
     FieldConfig::create([
       'field_storage' => $field_storage,
       'bundle' => $bundle,
@@ -742,6 +872,8 @@ class EntityQueryTest extends EntityKernelTestBase {
   }
 
   /**
+   * Asserts the query results.
+   *
    * @internal
    */
   protected function assertResult(): void {
@@ -757,6 +889,8 @@ class EntityQueryTest extends EntityKernelTestBase {
   }
 
   /**
+   * Asserts revision query results.
+   *
    * @internal
    */
   protected function assertRevisionResult(array $keys, array $expected): void {
@@ -768,6 +902,8 @@ class EntityQueryTest extends EntityKernelTestBase {
   }
 
   /**
+   * Asserts the bundle order.
+   *
    * @internal
    */
   protected function assertBundleOrder(string $order): void {
@@ -797,7 +933,7 @@ class EntityQueryTest extends EntityKernelTestBase {
    * The tags and metadata should propagate to the SQL query object.
    */
   public function testMetaData(): void {
-    field_test_memorize();
+    FieldTestHelper::memorize();
 
     $query = $this->storage->getQuery()->accessCheck(FALSE);
     $query
@@ -805,7 +941,7 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->addMetaData('foo', 'bar')
       ->execute();
 
-    $mem = field_test_memorize();
+    $mem = FieldTestHelper::memorize();
     $this->assertEquals('bar', $mem['field_test_query_efq_metadata_test_alter'][0], 'Tag and metadata propagated to the SQL query object.');
   }
 
@@ -814,7 +950,7 @@ class EntityQueryTest extends EntityKernelTestBase {
    */
   public function testCaseSensitivity(): void {
     $bundle = $this->randomMachineName();
-    entity_test_create_bundle($bundle, entity_type: 'entity_test_mulrev');
+    EntityTestHelper::createBundle($bundle, entity_type: 'entity_test_mulrev');
 
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_ci',
@@ -1296,7 +1432,9 @@ class EntityQueryTest extends EntityKernelTestBase {
    * Test the entity query alter hooks are invoked.
    *
    * Hook functions in field_test.module add additional conditions to the query
-   * removing entities with specific ids.
+   * removing entities with specific ids. The alterations are also applied when
+   * the query is cast to a string, so its string representation matches the
+   * query that is executed.
    */
   public function testAlterHook(): void {
     $basicQuery = $this->storage
@@ -1308,15 +1446,18 @@ class EntityQueryTest extends EntityKernelTestBase {
 
     // Verify assumptions about the unaltered result.
     $query = clone $basicQuery;
+    // The unaltered query does not contain the condition added by the hook.
+    $this->assertDoesNotMatchRegularExpression("/<>\s*'5'/", (string) $query);
     $this->queryResults = $query->execute();
     $this->assertResult(5, 7, 13, 15);
 
     // field_test_entity_query_alter() removes the entity with id '5'.
     $query = clone $basicQuery;
-    $this->queryResults = $query
-      // Add a tag that no hook function matches.
-      ->addTag('entity_query_alter_hook_test')
-      ->execute();
+    $query->addTag('entity_query_alter_hook_test');
+    // Casting the query to a string applies the alter hooks, so the added
+    // condition is reflected even before the query is executed.
+    $this->assertMatchesRegularExpression("/<>\s*'5'/", (string) $query);
+    $this->queryResults = $query->execute();
     $this->assertResult(7, 13, 15);
 
     // field_test_entity_query_entity_test_mulrev_alter() removes the
@@ -1384,6 +1525,28 @@ class EntityQueryTest extends EntityKernelTestBase {
       ->execute();
     $this->assertCount(1, $result);
     $this->assertEquals($entity->id(), reset($result));
+  }
+
+  /**
+   * Tests langcode key handling for revision data table joins.
+   */
+  public function testRevisionDataTableJoinUsesConfiguredLangcodeKey(): void {
+    $entity_type_manager = $this->container->get('entity_type.manager');
+    $entity_type = $entity_type_manager->getActiveDefinition('entity_test_mulrev');
+    $keys = $entity_type->getKeys();
+    $keys['langcode'] = 'language';
+    $entity_type->set('entity_keys', $keys);
+
+    $query = $this->storage
+      ->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('name.value', $this->randomMachineName(), '=', 'tr')
+      ->allRevisions();
+
+    $query_string = (string) $query;
+    $this->assertStringContainsString('entity_test_mulrev_property_revision', $query_string);
+    $this->assertMatchesRegularExpression('/"entity_test_mulrev_property_revision"\."language"\s*=\s*\'tr\'/', $query_string);
+    $this->assertDoesNotMatchRegularExpression('/"entity_test_mulrev_property_revision"\."langcode"\s*=\s*\'tr\'/', $query_string);
   }
 
   /**

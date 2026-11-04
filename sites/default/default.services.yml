@@ -238,8 +238,19 @@ parameters:
     # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials
     supportsCredentials: false
 
+  # The maximum number of entities stored in memory. Lowering this number can
+  # reduce the amount of memory used in long-running processes like migrations,
+  # however will also increase requests to the database or entity cache backend.
+  entity.memory_cache.slots: 1000
+
   queue.config:
     # The maximum number of seconds to wait if a queue is temporarily suspended.
     # This is not applicable when a queue is suspended but does not specify
     # how long to wait before attempting to resume.
     suspendMaximumWait: 30
+
+  # Can be argon2i, argon2id or 2y (bcrypt). Setting to NULL (~) will use PASSWORD_DEFAULT.
+  # See https://www.php.net/password_hash
+  password.algorithm: ~
+  # Options passed to password_hash. See https://www.php.net/password_hash
+  password.options: [ ]

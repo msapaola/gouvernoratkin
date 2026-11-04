@@ -8,7 +8,7 @@ name: 'Statistics test views'
 package: Testing
 type: module
 
-# Information added by Drupal.org packaging script on 2024-05-07
-version: '1.0.0'
+# Information added by Drupal.org packaging script on 2026-03-01
+version: '1.0.1'
 project: 'statistics'
-datestamp: 1715094460
+datestamp: 1772384054

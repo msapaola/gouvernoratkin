@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\statistics\Functional;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Tests\statistics\Unit\StatisticsNidFilterTest;
 
 /**
  * Tests posting to statistics.php with invalid values.
@@ -59,7 +60,7 @@ class StatisticsInvalidPostTest extends StatisticsTestBase {
   /**
    * Test if nothing breaks when posting with invalid params.
    *
-   * @dataProvider Drupal\Tests\statistics\Unit\StatisticsNidFilterTest::providerTestNidFilter()
+   * @dataProvider providerTestNidFilter
    *
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
@@ -77,6 +78,13 @@ class StatisticsInvalidPostTest extends StatisticsTestBase {
       return;
     }
     $this->assertSame($expected, intval($record));
+  }
+
+  /**
+   * Data provider for testInvalidPost().
+   */
+  public static function providerTestNidFilter(): array {
+    return StatisticsNidFilterTest::providerTestNidFilter();
   }
 
 }

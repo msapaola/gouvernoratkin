@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\rest_test\Hook;
 
+use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Access\AccessResult;
@@ -23,37 +24,37 @@ class RestTestHooks {
    * @see \Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase::setUp()
    */
   #[Hook('entity_field_access')]
-  public function entityFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL) {
-    // @see \Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase::testPost()
-    // @see \Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase::testPatch()
+  public function entityFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL): AccessResultInterface {
+    // @see \Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase::doTestPost()
+    // @see \Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase::doTestPatch()
     if ($field_definition->getName() === 'field_rest_test') {
       switch ($operation) {
         case 'view':
           // Never ever allow this field to be viewed: this lets
-          // EntityResourceTestBase::testGet() test in a "vanilla" way.
+          // EntityResourceTestBase::doTestGet() test in a "vanilla" way.
           return AccessResult::forbidden();
 
         case 'edit':
           return AccessResult::forbidden();
       }
     }
-    // @see \Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase::testGet()
-    // @see \Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase::testPatch()
+    // @see \Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase::doTestGet()
+    // @see \Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase::doTestPatch()
     if ($field_definition->getName() === 'field_rest_test_multivalue') {
       switch ($operation) {
         case 'view':
           // Never ever allow this field to be viewed: this lets
-          // EntityResourceTestBase::testGet() test in a "vanilla" way.
+          // EntityResourceTestBase::doTestGet() test in a "vanilla" way.
           return AccessResult::forbidden();
       }
     }
-    // @see \Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase::testGet()
-    // @see \Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase::testPatch()
+    // @see \Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase::doTestGet()
+    // @see \Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase::doTestPatch()
     if ($field_definition->getName() === 'rest_test_validation') {
       switch ($operation) {
         case 'view':
           // Never ever allow this field to be viewed: this lets
-          // EntityResourceTestBase::testGet() test in a "vanilla" way.
+          // EntityResourceTestBase::doTestGet() test in a "vanilla" way.
           return AccessResult::forbidden();
       }
     }
@@ -65,9 +66,9 @@ class RestTestHooks {
    * Implements hook_entity_base_field_info().
    */
   #[Hook('entity_base_field_info')]
-  public function entityBaseFieldInfo(EntityTypeInterface $entity_type) {
+  public function entityBaseFieldInfo(EntityTypeInterface $entity_type): array {
     $fields = [];
-    $fields['rest_test_validation'] = BaseFieldDefinition::create('string')->setLabel(t('REST test validation field'))->setDescription(t('A text field with some special validations attached used for testing purposes'))->addConstraint('rest_test_validation');
+    $fields['rest_test_validation'] = BaseFieldDefinition::create('string')->setLabel('REST test validation field')->setDescription('A text field with some special validations attached used for testing purposes')->addConstraint('rest_test_validation');
     return $fields;
   }
 

@@ -1,0 +1,10 @@
+eca.event.plugin.webhook_receive:
+  type: eca.event.plugin
+  label: 'Webhook received'
+  mapping:
+    webhook_id:
+      type: string
+      label: 'Incoming webhook ID or wildcard'
+    verify_payload:
+      type: boolean
+      label: 'Legacy verification setting (ignored)'

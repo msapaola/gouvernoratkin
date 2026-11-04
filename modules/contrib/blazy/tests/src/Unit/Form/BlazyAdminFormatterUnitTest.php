@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\blazy\Unit\Form;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -11,9 +13,6 @@ use Drupal\blazy\Form\BlazyAdminFormatter;
 
 /**
  * Tests the Blazy admin formatter form.
- *
- * @coversDefaultClass \Drupal\blazy\Form\BlazyAdminFormatter
- * @group blazy
  */
 class BlazyAdminFormatterUnitTest extends UnitTestCase {
 
@@ -54,7 +53,7 @@ class BlazyAdminFormatterUnitTest extends UnitTestCase {
   /**
    * Provide test cases for ::testBuildSettingsForm.
    */
-  public function providerTestBuildSettingsForm() {
+  public static function providerTestBuildSettingsForm() {
     return [
       [FALSE],
       [TRUE],
@@ -62,14 +61,8 @@ class BlazyAdminFormatterUnitTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::buildSettingsForm
-   * @covers ::openingForm
-   * @covers ::fieldableForm
-   * @covers ::imageStyleForm
-   * @covers ::mediaSwitchForm
-   * @covers ::gridForm
-   * @covers ::closingForm
-   * @covers ::finalizeForm
+   * Tests settings form.
+   *
    * @dataProvider providerTestBuildSettingsForm
    */
   public function testBuildSettingsForm($vanilla) {
@@ -82,6 +75,7 @@ class BlazyAdminFormatterUnitTest extends UnitTestCase {
     $definition['_views'] = TRUE;
 
     $this->blazyAdminFormatter->openingForm($form, $definition);
+    /** @var array $form */
     $this->assertEquals($vanilla, !empty($form['vanilla']));
 
     $this->blazyAdminFormatter->buildSettingsForm($form, $definition);
@@ -93,7 +87,7 @@ class BlazyAdminFormatterUnitTest extends UnitTestCase {
   /**
    * Provider for ::testGetSettingsSummary.
    */
-  public function providerTestGetSettingsSummary() {
+  public static function providerTestGetSettingsSummary() {
     return [
       [FALSE, FALSE, FALSE, '', FALSE],
       [TRUE, TRUE, TRUE, 'blazy_responsive_test', TRUE],

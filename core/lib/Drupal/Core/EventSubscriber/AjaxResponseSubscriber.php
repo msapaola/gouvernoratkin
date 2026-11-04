@@ -39,7 +39,8 @@ class AjaxResponseSubscriber implements EventSubscriberInterface {
    */
   public function onRequest(RequestEvent $event) {
     // Pass to the Html class that the current request is an Ajax request.
-    if ($event->getRequest()->get(static::AJAX_REQUEST_PARAMETER)) {
+    $request = $event->getRequest();
+    if ($request->query->get(static::AJAX_REQUEST_PARAMETER) || $request->request->get(static::AJAX_REQUEST_PARAMETER)) {
       Html::setIsAjax(TRUE);
     }
   }
@@ -82,10 +83,10 @@ class AjaxResponseSubscriber implements EventSubscriberInterface {
       if (str_contains($accept, 'text/html')) {
         $response->headers->set('Content-Type', 'text/html; charset=utf-8');
 
-        // Browser IFRAMEs expect HTML. Browser extensions, such as Linkification
-        // and Skype's Browser Highlighter, convert URLs, phone numbers, etc.
-        // into links. This corrupts the JSON response. Protect the integrity of
-        // the JSON data by making it the value of a textarea.
+        // Browser IFRAMEs expect HTML. Browser extensions, such as
+        // Linkification and Skype's Browser Highlighter, convert URLs, phone
+        // numbers, etc. into links. This corrupts the JSON response. Protect
+        // the integrity of the JSON data by making it the value of a textarea.
         // @see http://malsup.com/jquery/form/#file-upload
         // @see https://www.drupal.org/node/1009382
         $response->setContent('<textarea>' . $response->getContent() . '</textarea>');

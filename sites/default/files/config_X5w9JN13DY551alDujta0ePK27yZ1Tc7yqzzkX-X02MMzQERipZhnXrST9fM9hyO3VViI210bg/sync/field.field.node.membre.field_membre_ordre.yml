@@ -9,7 +9,7 @@ id: node.membre.field_membre_ordre
 field_name: field_membre_ordre
 entity_type: node
 bundle: membre
-label: 'Ordre'
+label: Ordre
 description: "Position dans sa section : les plus petits nombres viennent en premier. À égalité, l'ordre alphabétique s'applique."
 required: false
 translatable: false

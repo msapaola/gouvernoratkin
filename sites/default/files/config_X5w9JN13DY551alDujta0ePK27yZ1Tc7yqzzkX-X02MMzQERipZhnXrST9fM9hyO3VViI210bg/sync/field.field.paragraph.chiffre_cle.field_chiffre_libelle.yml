@@ -9,7 +9,7 @@ id: paragraph.chiffre_cle.field_chiffre_libelle
 field_name: field_chiffre_libelle
 entity_type: paragraph
 bundle: chiffre_cle
-label: 'Libellé'
+label: Libellé
 description: "Ce que mesure le chiffre, par exemple « habitants dans l'aire urbaine »."
 required: true
 translatable: false

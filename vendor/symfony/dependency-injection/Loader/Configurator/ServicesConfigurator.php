@@ -40,7 +40,9 @@ class ServicesConfigurator extends AbstractConfigurator
     ) {
         $this->defaults = new Definition();
         $this->instanceof = &$instanceof;
-        $this->anonymousHash = ContainerBuilder::hash($path ?: mt_rand());
+        $projectDir = $container->hasParameter('kernel.project_dir') ? $container->getParameter('kernel.project_dir') : null;
+        // hashing the path relative to the project keeps the ids independent from where the project is
+        $this->anonymousHash = ContainerBuilder::hash($path ? (\is_string($projectDir) && str_starts_with($path, $projectDir) ? substr($path, \strlen($projectDir)) : $path) : mt_rand());
         $this->anonymousCount = &$anonymousCount;
         $instanceof = [];
     }
@@ -80,14 +82,14 @@ class ServicesConfigurator extends AbstractConfigurator
             }
 
             $id = \sprintf('.%d_%s', ++$this->anonymousCount, preg_replace('/^.*\\\\/', '', $class).'~'.$this->anonymousHash);
-        } elseif (!$defaults->isPublic() || !$defaults->isPrivate()) {
-            $definition->setPublic($defaults->isPublic() && !$defaults->isPrivate());
+        } else {
+            $definition->setPublic($defaults->isPublic());
         }
 
         $definition->setAutowired($defaults->isAutowired());
         $definition->setAutoconfigured($defaults->isAutoconfigured());
         // deep clone, to avoid multiple process of the same instance in the passes
-        $definition->setBindings(unserialize(serialize($defaults->getBindings())));
+        $definition->setBindings(unserialize(serialize($defaults->getBindings()), ['allowed_classes' => true]));
         $definition->setChanges([]);
 
         $configurator = new ServiceConfigurator($this->container, $this->instanceof, true, $this, $definition, $id, $defaults->getTags(), $this->path);
@@ -115,9 +117,7 @@ class ServicesConfigurator extends AbstractConfigurator
     {
         $ref = static::processValue($referencedId, true);
         $alias = new Alias((string) $ref);
-        if (!$this->defaults->isPublic() || !$this->defaults->isPrivate()) {
-            $alias->setPublic($this->defaults->isPublic());
-        }
+        $alias->setPublic($this->defaults->isPublic());
         $this->container->setAlias($id, $alias);
 
         return new AliasConfigurator($this, $alias);

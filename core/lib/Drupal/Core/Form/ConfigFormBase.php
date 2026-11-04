@@ -3,6 +3,8 @@
 namespace Drupal\Core\Form;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
@@ -10,7 +12,6 @@ use Drupal\Core\Render\Element;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base class for implementing system configuration forms.
@@ -46,16 +47,6 @@ abstract class ConfigFormBase extends FormBase {
     protected TypedConfigManagerInterface $typedConfigManager,
   ) {
     $this->setConfigFactory($config_factory);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('config.typed')
-    );
   }
 
   /**
@@ -120,7 +111,9 @@ abstract class ConfigFormBase extends FormBase {
   }
 
   /**
-   * #after_build callback which stores a map of element names to config keys.
+   * Render API callback: Stores a map of element names to config keys.
+   *
+   * This function is assigned as a #after_build callback.
    *
    * This will store an array in the form state whose keys are strings in the
    * form of `CONFIG_NAME:PROPERTY_PATH`, and whose values are instances of
@@ -145,7 +138,21 @@ abstract class ConfigFormBase extends FormBase {
     // rebuilding the form.
     $form_state->set(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP, []);
 
-    return $this->doStoreConfigMap($element, $form_state);
+    $element = $this->doStoreConfigMap($element, $form_state);
+
+    // Use the map to set the cacheability metadata on the form.
+    $map = $form_state->get(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP) ?? [];
+    $tags = [];
+    foreach (array_merge(array_keys($map), $this->getEditableConfigNames()) as $config_name) {
+      $tags = Cache::mergeTags(
+        $tags,
+        $this->configFactory()->getEditable($config_name)->getCacheTags()
+      );
+    }
+    if (!empty($tags)) {
+      CacheableMetadata::createFromRenderArray($element)->addCacheTags($tags)->applyTo($element);
+    }
+    return $element;
   }
 
   /**

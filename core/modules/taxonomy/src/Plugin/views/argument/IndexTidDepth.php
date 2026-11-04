@@ -8,7 +8,6 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\taxonomy\TaxonomyIndexDepthQueryTrait;
 use Drupal\views\Attribute\ViewsArgument;
 use Drupal\views\Plugin\views\argument\ArgumentPluginBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Argument handler for taxonomy terms with depth.
@@ -34,15 +33,6 @@ class IndexTidDepth extends ArgumentPluginBase implements ContainerFactoryPlugin
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity.repository')
-    );
-  }
-
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -53,6 +43,9 @@ class IndexTidDepth extends ArgumentPluginBase implements ContainerFactoryPlugin
     return $options;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $form['depth'] = [
       '#type' => 'weight',
@@ -89,6 +82,9 @@ class IndexTidDepth extends ArgumentPluginBase implements ContainerFactoryPlugin
     return $actions;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function query($group_by = FALSE) {
     $this->ensureMyTable();
 
@@ -106,6 +102,9 @@ class IndexTidDepth extends ArgumentPluginBase implements ContainerFactoryPlugin
     $this->addSubQueryJoin($tids);
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function title() {
     $term = $this->entityRepository->getCanonical('taxonomy_term', $this->argument);
     if (!empty($term)) {

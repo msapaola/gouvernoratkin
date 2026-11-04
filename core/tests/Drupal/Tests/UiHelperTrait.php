@@ -11,6 +11,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Test\RefreshVariablesTrait;
 use Drupal\Core\Url;
+use Drupal\user\OneTimeAuthentication;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 
 /**
@@ -24,7 +25,7 @@ trait UiHelperTrait {
   /**
    * The current user logged in using the Mink controlled browser.
    *
-   * @var \Drupal\user\UserInterface
+   * @var \Drupal\user\UserInterface|false
    */
   protected $loggedInUser = FALSE;
 
@@ -72,15 +73,19 @@ trait UiHelperTrait {
    */
   protected function submitForm(array $edit, $submit, $form_html_id = NULL) {
     $assert_session = $this->assertSession();
-
+    $submit_button = $assert_session->buttonExists($submit);
+    // Check if button has a form attribute set.
+    if ($form_id = $submit_button->getAttribute('form')) {
+      $form = $assert_session->elementExists('xpath', "//form[@id='$form_id']");
+      $action = $form->getAttribute('action');
+    }
     // Get the form.
-    if (isset($form_html_id)) {
+    elseif (isset($form_html_id)) {
       $form = $assert_session->elementExists('xpath', "//form[@id='$form_html_id']");
       $submit_button = $assert_session->buttonExists($submit, $form);
       $action = $form->getAttribute('action');
     }
     else {
-      $submit_button = $assert_session->buttonExists($submit);
       $form = $assert_session->elementExists('xpath', './ancestor::form', $submit_button);
       $action = $form->getAttribute('action');
     }
@@ -166,7 +171,10 @@ trait UiHelperTrait {
       $storage = \Drupal::entityTypeManager()->getStorage('user');
       /** @var \Drupal\user\UserInterface $accountUnchanged */
       $accountUnchanged = $storage->loadUnchanged($account->id());
-      $login = user_pass_reset_url($accountUnchanged) . '/login?destination=user/' . $account->id();
+      $login = \Drupal::service(OneTimeAuthentication::class)
+        ->generateOneTimeLoginUrl($accountUnchanged, immediate: TRUE)
+        ->mergeOptions(['query' => ['destination' => 'user/' . $account->id()]])
+        ->toString();
       $this->drupalGet($login);
     }
     else {

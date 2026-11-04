@@ -404,24 +404,12 @@ window.Drupal = { behaviors: {}, locale: {} };
    *
    * @see https://github.com/angular/angular.js/blob/v1.4.4/src/ng/urlUtils.js
    * @see https://grack.com/blog/2009/11/17/absolutizing-url-in-javascript
-   * @see https://github.com/jquery/jquery-ui/blob/1.11.4/ui/tabs.js#L53
    */
   Drupal.url.toAbsolute = function (url) {
     const urlParsingNode = document.createElement('a');
-
-    // Decode the URL first; this is required by IE <= 6. Decoding non-UTF-8
-    // strings may throw an exception.
-    try {
-      url = decodeURIComponent(url);
-    } catch (e) {
-      // Empty.
-    }
-
     urlParsingNode.setAttribute('href', url);
 
-    // IE <= 7 normalizes the URL when assigned to the anchor node similar to
-    // the other browsers.
-    return urlParsingNode.cloneNode(false).href;
+    return urlParsingNode.href;
   };
 
   /**
@@ -616,9 +604,13 @@ window.Drupal = { behaviors: {}, locale: {} };
    *   but also a complex object.
    */
   Drupal.theme = function (func, ...args) {
-    if (func in Drupal.theme) {
+    if (typeof Drupal.theme?.[func] === 'function') {
       return Drupal.theme[func](...args);
     }
+
+    Drupal.throwError(
+      new TypeError(`Drupal.theme.${func} must be function type.`),
+    );
   };
 
   /**

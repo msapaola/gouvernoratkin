@@ -96,7 +96,7 @@ class TaxonomyMenu extends ConfigEntityBase implements TaxonomyMenuInterface {
   /**
    * The menu parent.
    *
-   * @var string
+   * @var string|null
    */
   protected $menu_parent;
 
@@ -270,7 +270,7 @@ class TaxonomyMenu extends ConfigEntityBase implements TaxonomyMenuInterface {
 
     // Note:
     // if menu_parent_id is NULL, it will not update the hierarchy properly.
-    if (empty($menu_parent_id) && !$this->getMenuParent()) {
+    if (empty($menu_parent_id) && $this->getMenuParent()) {
       $menu_parent_id = str_replace($this->getMenu() . ':', '', $this->getMenuParent());
     }
 

@@ -54,6 +54,16 @@ Version 3.x includes the following changes from the 8.x version:
 - Navigate to Extend and enable the TB Mega Menu module.
 - Navigate to Structure -> TB Mega Menu to create a new menu.
 
+## FRONT END
+
+To build the front-end assets after making changes to anything in /js or /scss:
+
+1. Install NVM (see https://github.com/nvm-sh/nvm#installing-and-updating).
+2. Run `nvm install 10.19.0`. You only need to do this the first time.
+3. Run `nvm use`.
+4. Run `npm ci`.
+5. Run `npm run develop` to watch changes to source CSS or JS, or run `npm run build` to build production-ready assets in `/dist`. Always run `npm run build` before creating merge requests.
+
 ## MAINTAINERS
 
 - Wade Stewart ([themodularlab](https://www.drupal.org/u/themodularlab))
@@ -89,13 +99,3 @@ Version 3.x includes the following changes from the 8.x version:
   _ The latest version comes first.
   _ The release date of each version is displayed.
   Mention whether you follow Semantic Versioning.
-
-## FRONT END
-
-To build the front-end assets:
-
-1. Install NVM (see https://github.com/nvm-sh/nvm#installing-and-updating).
-2. Run `nvm install 10.19.0`. You only need to do this the first time.
-3. Run `nvm use`.
-4. Run `yarn install`.
-5. Run `yarn develop`.

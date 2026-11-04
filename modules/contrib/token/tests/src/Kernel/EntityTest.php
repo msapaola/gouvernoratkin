@@ -2,16 +2,21 @@
 
 namespace Drupal\Tests\token\Kernel;
 
+use Drupal\Component\Utility\DeprecationHelper;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\VocabularyInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests entity tokens.
  *
  * @group token
  */
+#[Group('token')]
+#[RunTestsInSeparateProcesses]
 class EntityTest extends TokenKernelTestBase {
 
   /**
@@ -50,12 +55,12 @@ class EntityTest extends TokenKernelTestBase {
     $this->assertSame('node', $mapper->getEntityTypeForTokenType('node'));
     $this->assertSame('taxonomy_term', $mapper->getEntityTypeForTokenType('term'));
     $this->assertSame('taxonomy_vocabulary', $mapper->getEntityTypeForTokenType('vocabulary'));
-    $this->assertSame(FALSE, $mapper->getEntityTypeForTokenType('invalid'));
+    $this->assertFalse($mapper->getEntityTypeForTokenType('invalid'));
     $this->assertSame('invalid', $mapper->getEntityTypeForTokenType('invalid', TRUE));
     $this->assertSame('node', $mapper->getTokenTypeForEntityType('node'));
     $this->assertSame('term', $mapper->getTokenTypeForEntityType('taxonomy_term'));
     $this->assertSame('vocabulary', $mapper->getTokenTypeForEntityType('taxonomy_vocabulary'));
-    $this->assertSame(FALSE, $mapper->getTokenTypeForEntityType('invalid'));
+    $this->assertFalse($mapper->getTokenTypeForEntityType('invalid'));
     $this->assertSame('invalid', $mapper->getTokenTypeForEntityType('invalid', TRUE));
 
     // Test that when we send the mis-matched entity type into
@@ -93,9 +98,14 @@ class EntityTest extends TokenKernelTestBase {
     $this->assertTokens('node', ['node' => $node], $tokens);
 
     // Emulate the original entity property that would be available from
-    // node_save() and change the title for the node.
-    $node->original = \Drupal::entityTypeManager()->getStorage('node')->loadUnchanged($node->id());
-    $node->title = 'New title';
+    // during node save and change the title for the node.
+    $original = \Drupal::entityTypeManager()->getStorage('node')->loadUnchanged($node->id());
+    DeprecationHelper::backwardsCompatibleCall(
+      \Drupal::VERSION, '11.2.0',
+      fn() => $node->setOriginal($original),
+      fn() => $node->original = $original,
+    );
+    $node->setTitle('New title');
 
     $tokens = [
       'nid' => $node->id(),

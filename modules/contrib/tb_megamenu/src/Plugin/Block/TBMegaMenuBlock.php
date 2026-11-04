@@ -80,6 +80,8 @@ class TBMegaMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
    * {@inheritdoc}
    */
   public function build(): array {
+    $uuid_service = \Drupal::service('uuid');
+    $uuid = $uuid_service->generate();
     $menu_name = $this->getDerivativeId();
     $theme_name = $this->getThemeName();
     $menu = $this->menuBuilder->getMenus($menu_name, $theme_name);
@@ -90,6 +92,7 @@ class TBMegaMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
       '#theme' => 'tb_megamenu',
       '#menu_name' => $menu_name,
       '#block_theme' => $theme_name,
+      '#menu_id' => $uuid,
       '#attached' => ['library' => ['tb_megamenu/base', 'tb_megamenu/styles']],
       '#post_render' => ['\Drupal\tb_megamenu\Controller\TBMegaMenuController::tbMegamenuAttachNumberColumns'],
     ];
