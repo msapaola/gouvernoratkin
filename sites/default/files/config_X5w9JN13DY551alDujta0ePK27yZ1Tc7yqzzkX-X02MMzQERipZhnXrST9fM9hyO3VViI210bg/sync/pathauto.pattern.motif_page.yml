@@ -1,0 +1,25 @@
+uuid: c48614bf-33a0-4068-ad7b-f617d84009bf
+langcode: fr
+status: true
+dependencies:
+  config:
+    - node.type.page
+    - node.type.page_a_propos
+  module:
+    - node
+id: motif_page
+label: 'Motif Page/[node:title]'
+type: 'canonical_entities:node'
+pattern: '/page/[node:title]'
+selection_criteria:
+  fa1f3267-27bc-4405-af74-59bec2b1e380:
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: node
+    bundles:
+      page: page
+      page_a_propos: page_a_propos
+selection_logic: and
+weight: -5
+relationships: {  }

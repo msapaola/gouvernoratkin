@@ -1,0 +1,6 @@
+services:
+  gouvernorat_seo.redirection_subscriber:
+    class: Drupal\gouvernorat_seo\EventSubscriber\RedirectionSubscriber
+    arguments: ['@current_route_match']
+    tags:
+      - { name: event_subscriber }

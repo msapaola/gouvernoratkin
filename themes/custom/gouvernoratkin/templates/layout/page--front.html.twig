@@ -21,14 +21,21 @@
 #}
 {{ attach_library('gouvernoratkin/accueil') }}
 
-{# Visuels de la page. Tous sont des WebP recadres aux dimensions reellement
-   affichees, generes depuis les photographies du theme.
-   Pour en remplacer un, deposer le nouveau fichier dans assets/images/ et
-   changer la ligne correspondante — rien d'autre a modifier. #}
+{# Visuels de la page. Ce sont des WebP recadrés aux dimensions réellement
+   affichées, tirés des photographies kinhero.png et aboutville.png (2,5 Mo
+   chacune, conservées dans assets/images/ comme originaux) :
+   - accueil-hero.webp          1600 × 900, ~210 Ko (écrans larges) ;
+   - accueil-hero-mobile.webp    720 × 960, ~75 Ko (téléphones, cadrage vertical) ;
+   - accueil-apropos.webp        900 × 675, ~105 Ko.
+   Pour changer une photo : produire les WebP aux mêmes dimensions (par
+   exemple avec squoosh.app) et remplacer les fichiers, ou changer la ligne
+   correspondante ci-dessous. Le préchargement du bandeau se règle dans
+   gouvernoratkin_page_attachments_alter() (gouvernoratkin.theme). #}
 {% set img = '/themes/custom/gouvernoratkin/assets/images/' %}
 {% set visuels = {
-  hero:       img ~ 'kinhero.png',
-  apropos:    img ~ 'aboutville.png'
+  hero:        img ~ 'accueil-hero.webp',
+  hero_mobile: img ~ 'accueil-hero-mobile.webp',
+  apropos:     img ~ 'accueil-apropos.webp'
 } %}
 
 {% include "@gouvernoratkin/layout/partials/site-header.html.twig" %}
@@ -42,7 +49,10 @@
 
   {# ================= BANDEAU D'ACCUEIL ================= #}
   <section class="hero" aria-labelledby="hero-titre">
-    <img class="hero__image" src="{{ visuels.hero }}" alt="" width="1600" height="900" fetchpriority="high" decoding="async">
+    <picture>
+      <source media="(max-width: 767.98px)" srcset="{{ visuels.hero_mobile }}" width="720" height="960">
+      <img class="hero__image" src="{{ visuels.hero }}" alt="" width="1600" height="900" fetchpriority="high" decoding="async">
+    </picture>
     <div class="hero__voile" aria-hidden="true"></div>
 
     <div class="container hero__grille">

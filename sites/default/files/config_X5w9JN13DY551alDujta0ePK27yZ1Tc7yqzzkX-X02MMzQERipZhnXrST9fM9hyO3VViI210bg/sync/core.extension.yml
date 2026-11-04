@@ -34,6 +34,7 @@ module:
   gouvernorat_institutions: 0
   gouvernorat_partage: 0
   gouvernorat_securite: 0
+  gouvernorat_seo: 0
   gouvernorat_services: 0
   gouvernorat_videos: 0
   help: 0

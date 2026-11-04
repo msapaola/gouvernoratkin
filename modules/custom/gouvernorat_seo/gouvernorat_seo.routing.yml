@@ -1,0 +1,6 @@
+gouvernorat_seo.sitemap:
+  path: '/sitemap.xml'
+  defaults:
+    _controller: '\Drupal\gouvernorat_seo\Controller\PlanDuSiteController::xml'
+  requirements:
+    _access: 'TRUE'

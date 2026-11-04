@@ -62,7 +62,10 @@
                 "web-root": "./"
             },
             "file-mapping": {
-                "[web-root]/.htaccess": false
+                "[web-root]/.htaccess": false,
+                "[web-root]/robots.txt": {
+                    "append": "deploiement/scaffold/robots-ajout.txt"
+                }
             }
         },
         "installer-paths": {

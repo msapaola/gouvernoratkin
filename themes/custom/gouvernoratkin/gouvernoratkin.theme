@@ -123,16 +123,9 @@ function gouvernoratkin_preprocess_page(&$variables) {
   $current_path = \Drupal::service('path.current')->getPath();
   $alias = \Drupal::service('path_alias.manager')->getAliasByPath($current_path);
   
-  $route_name = \Drupal::routeMatch()->getRouteName();
-  if ($route_name === 'entity.taxonomy_term.canonical') {
-    $term = \Drupal::routeMatch()->getParameter('taxonomy_term');
-    if ($term && $term->bundle() === 'service_au_citoyen') {
-      $url = \Drupal\Core\Url::fromUserInput('/services-aux-citoyens/' . $term->id());
-      $response = new \Symfony\Component\HttpFoundation\RedirectResponse($url->toString());
-      $response->send();
-      exit;
-    }
-  }
+  // La redirection d'une rubrique des services vers /services-aux-citoyens/N
+  // se fait désormais en 301 dans le module gouvernorat_seo
+  // (RedirectionSubscriber), et non plus ici en 302 avec exit().
 
   if ($alias == '/services-aux-citoyens' || strpos($alias, '/services-aux-citoyens/') === 0) {
     $variables['services_categories_tree'] = _gouvernoratkin_get_services_categories_tree();
@@ -226,4 +219,106 @@ function gouvernoratkin_preprocess_node(&$variables) {
       }
     }
   }
+}
+
+/**
+ * Implements hook_page_attachments_alter().
+ *
+ * Indications de chargement anticipé (diagnostic, lot 2) :
+ * - accueil : préchargement de la photo du bandeau, la plus grande image
+ *   visible à l'ouverture, dans sa version écran large ou téléphone ;
+ * - accueil et page /videos : préconnexion au serveur des vignettes YouTube
+ *   (i.ytimg.com), pour gagner l'ouverture de connexion avant leur affichage.
+ */
+function gouvernoratkin_page_attachments_alter(array &$attachments) {
+  $accueil = \Drupal::service('path.matcher')->isFrontPage();
+  $chemin = \Drupal::service('path.current')->getPath();
+  $alias = \Drupal::service('path_alias.manager')->getAliasByPath($chemin);
+  $images = '/' . \Drupal::service('extension.list.theme')->getPath('gouvernoratkin') . '/assets/images/';
+
+  if ($accueil) {
+    $prechargements = [
+      'accueil_hero_mobile' => ['accueil-hero-mobile.webp', '(max-width: 767.98px)'],
+      'accueil_hero' => ['accueil-hero.webp', '(min-width: 768px)'],
+    ];
+    foreach ($prechargements as $cle => [$fichier, $media]) {
+      $attachments['#attached']['html_head'][] = [[
+        '#tag' => 'link',
+        '#attributes' => [
+          'rel' => 'preload',
+          'as' => 'image',
+          'type' => 'image/webp',
+          'href' => $images . $fichier,
+          'media' => $media,
+          'fetchpriority' => 'high',
+        ],
+      ], 'gouvernoratkin_' . $cle];
+    }
+  }
+
+  if ($accueil || $alias === '/videos') {
+    $attachments['#attached']['html_head'][] = [[
+      '#tag' => 'link',
+      '#attributes' => [
+        'rel' => 'preconnect',
+        // Pas d'attribut crossorigin : les vignettes sont de simples <img>,
+        // chargées sans CORS ; une préconnexion CORS ne leur servirait pas.
+        'href' => 'https://i.ytimg.com',
+      ],
+    ], 'gouvernoratkin_preconnect_ytimg'];
+  }
+
+  // Ces indications dépendent de l'adresse : le cache doit en tenir compte.
+  $attachments['#cache']['contexts'][] = 'url.path';
+}
+
+/**
+ * Nombre maximal de sous-entrées affichées dans un sous-menu de 2e niveau.
+ *
+ * Constat U9 du diagnostic : « Droits, Taxes et Redevances » déroulait 27
+ * secteurs, une liste qui dépassait la hauteur de l'écran. Au-delà de ce
+ * seuil, la rubrique devient un simple lien vers sa page, dont la barre
+ * latérale présente tous les secteurs.
+ */
+const GOUVERNORATKIN_MENU_MAX_ENFANTS = 12;
+
+/**
+ * Implements hook_preprocess_HOOK() for menu--main.html.twig.
+ */
+function gouvernoratkin_preprocess_menu__main(array &$variables) {
+  $variables['items'] = _gouvernoratkin_menu_principal_ajuster($variables['items'] ?? [], 0);
+}
+
+/**
+ * Ajuste les liens du menu principal, niveau par niveau.
+ *
+ * - Un lien vers une rubrique des services aux citoyens (lien de terme créé
+ *   par Taxonomy Menu) pointe directement vers /services-aux-citoyens/N,
+ *   sans passer par la redirection de /taxonomy/term/N.
+ * - Sous le premier niveau, un sous-menu trop long est retiré.
+ */
+function _gouvernoratkin_menu_principal_ajuster(array $items, int $niveau) {
+  foreach ($items as $cle => &$item) {
+    $url = $item['url'] ?? NULL;
+    if ($url instanceof \Drupal\Core\Url && $url->isRouted() && $url->getRouteName() === 'entity.taxonomy_term.canonical') {
+      $tid = $url->getRouteParameters()['taxonomy_term'] ?? NULL;
+      $terme = $tid ? Term::load($tid) : NULL;
+      if ($terme && $terme->bundle() === 'service_au_citoyen') {
+        // La rubrique racine mène à la page générale des services.
+        $racine = (int) $terme->get('parent')->target_id === 0;
+        $item['url'] = \Drupal\Core\Url::fromUserInput('/services-aux-citoyens' . ($racine ? '' : '/' . $terme->id()), $url->getOptions());
+      }
+    }
+
+    if (!empty($item['below'])) {
+      if ($niveau >= 1 && count($item['below']) > GOUVERNORATKIN_MENU_MAX_ENFANTS) {
+        $item['below'] = [];
+        $item['is_expanded'] = FALSE;
+      }
+      else {
+        $item['below'] = _gouvernoratkin_menu_principal_ajuster($item['below'], $niveau + 1);
+      }
+    }
+  }
+  return $items;
 }

@@ -113,6 +113,9 @@ par mot de passe (Manager › Site › Protection par mot de passe, ou un
 ## 9. Après l'ouverture
 
 - Déclarer le site dans Google Search Console et y soumettre
-  `https://kinshasa.cd/sitemap.xml` (une fois le plan du site installé).
+  `https://kinshasa.cd/sitemap.xml` (généré par le module gouvernorat_seo).
+- Si l'adresse principale retenue est **www.kinshasa.cd**, corriger la
+  ligne `Sitemap:` de `deploiement/scaffold/robots-ajout.txt` et de
+  `robots.txt`.
 - Renouveler la date `Expires` de `security.txt` chaque année
   (prochaine échéance : 4 novembre 2027).

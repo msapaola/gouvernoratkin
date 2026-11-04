@@ -7,7 +7,7 @@ dependencies:
   module:
     - block_content
 id: about_us
-label: 'About us'
+label: 'À propos'
 module: views
 description: ''
 tag: ''
@@ -20,7 +20,7 @@ display:
     display_plugin: default
     position: 0
     display_options:
-      title: 'About us'
+      title: 'À propos'
       fields:
         info:
           id: info

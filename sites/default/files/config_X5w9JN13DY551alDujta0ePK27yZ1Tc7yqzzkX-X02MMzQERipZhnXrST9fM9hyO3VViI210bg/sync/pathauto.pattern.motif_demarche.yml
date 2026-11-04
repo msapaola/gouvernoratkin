@@ -1,0 +1,23 @@
+uuid: 38fc2327-e013-4377-95f9-612d76977f44
+langcode: fr
+status: true
+dependencies:
+  config:
+    - node.type.service_au_citoyen
+  module:
+    - node
+id: motif_demarche
+label: 'Motif Démarche/[node:title]'
+type: 'canonical_entities:node'
+pattern: '/demarches/[node:title]'
+selection_criteria:
+  efc86cea-569c-46c2-b9df-196730d2ddcd:
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: node
+    bundles:
+      service_au_citoyen: service_au_citoyen
+selection_logic: and
+weight: -5
+relationships: {  }
