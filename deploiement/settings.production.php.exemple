@@ -1,0 +1,94 @@
+<?php
+
+/**
+ * @file
+ * Réglages du site de production (Infomaniak) — MODÈLE, sans aucun secret.
+ *
+ * Mode d'emploi (voir aussi LISEZMOI-infomaniak.md) :
+ * 1. Copier ce fichier sur le serveur sous le nom
+ *      sites/default/settings.local.php
+ *    (ce nom est exclu de Git par .gitignore : les mots de passe n'entreront
+ *    jamais dans le dépôt).
+ * 2. Remplacer chaque valeur entre chevrons < > par la vraie valeur, fournie
+ *    par le Manager Infomaniak.
+ * 3. À la fin de sites/default/settings.php, vérifier que ces trois lignes
+ *    sont présentes et décommentées :
+ *      if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
+ *        include $app_root . '/' . $site_path . '/settings.local.php';
+ *      }
+ * 4. Protéger le fichier : chmod 440 sites/default/settings.local.php
+ */
+
+// ---------------------------------------------------------------------------
+// Base de données
+// ---------------------------------------------------------------------------
+// Infomaniak : Manager › Hébergement › Bases de données MySQL.
+$databases['default']['default'] = [
+  'database' => '<NOM_DE_LA_BASE>',
+  'username' => '<UTILISATEUR_MYSQL>',
+  'password' => '<MOT_DE_PASSE_MYSQL>',
+  'host' => '<SERVEUR_MYSQL>',
+  'port' => '3306',
+  'driver' => 'mysql',
+  'namespace' => 'Drupal\\mysql\\Driver\\Database\\mysql',
+  'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
+  // Conserver le préfixe actuel si la base est importée telle quelle depuis
+  // Hostinger (tables cu68_*). Mettre '' pour une base sans préfixe.
+  'prefix' => 'cu68_',
+  'collation' => 'utf8mb4_general_ci',
+  // « MySQL server has gone away » : les longues opérations (mises à jour,
+  // imports) dépassaient le délai d'inactivité du serveur MySQL. On l'allonge
+  // pour les connexions de Drupal.
+  'init_commands' => [
+    'wait_timeout' => 'SET SESSION wait_timeout = 600',
+  ],
+];
+
+// ---------------------------------------------------------------------------
+// Sécurité
+// ---------------------------------------------------------------------------
+// Seuls ces noms de domaine sont acceptés (protection contre l'usurpation de
+// l'en-tête Host, signalée par le rapport d'état de Drupal).
+$settings['trusted_host_patterns'] = [
+  '^kinshasa\.cd$',
+  '^www\.kinshasa\.cd$',
+];
+
+// Clé de hachage propre au site : en garder la valeur actuelle (celle du
+// settings.php de Hostinger), sinon toutes les sessions et liens de
+// réinitialisation de mot de passe deviennent invalides.
+$settings['hash_salt'] = '<HASH_SALT_ACTUEL>';
+
+// Fichiers privés (pièces jointes non publiques) : HORS de public_html.
+$settings['file_private_path'] = '<CHEMIN_ABSOLU_HORS_WEB>/prive';
+
+// Pas de mise à jour du code depuis l'interface.
+$settings['update_free_access'] = FALSE;
+
+// Le site de production doit être indexé : la balise noindex ne s'applique
+// qu'aux sites de test (voir le module gouvernorat_securite).
+$settings['gouvernorat_noindex'] = FALSE;
+
+// ---------------------------------------------------------------------------
+// Envoi des courriels (module SMTP)
+// ---------------------------------------------------------------------------
+// Infomaniak : Manager › Service Mail › adresse contact@… › « Configurer
+// un appareil » donne le serveur et le port. Valeurs usuelles :
+// mail.infomaniak.com, port 465 (SSL) ou 587 (STARTTLS).
+$config['smtp.settings']['smtp_on'] = TRUE;
+$config['smtp.settings']['smtp_host'] = 'mail.infomaniak.com';
+$config['smtp.settings']['smtp_port'] = '465';
+$config['smtp.settings']['smtp_protocol'] = 'ssl';
+$config['smtp.settings']['smtp_username'] = '<ADRESSE_EXPEDITRICE>';
+$config['smtp.settings']['smtp_password'] = '<MOT_DE_PASSE_DE_LA_BOITE>';
+$config['smtp.settings']['smtp_from'] = '<ADRESSE_EXPEDITRICE>';
+$config['smtp.settings']['smtp_fromname'] = 'Gouvernorat de Kinshasa';
+$config['system.site']['mail'] = '<ADRESSE_EXPEDITRICE>';
+
+// ---------------------------------------------------------------------------
+// Performances (rappel : déjà dans la configuration exportée)
+// ---------------------------------------------------------------------------
+$config['system.performance']['css']['preprocess'] = TRUE;
+$config['system.performance']['js']['preprocess'] = TRUE;
+// Aucun message d'erreur détaillé affiché aux visiteurs.
+$config['system.logging']['error_level'] = 'hide';

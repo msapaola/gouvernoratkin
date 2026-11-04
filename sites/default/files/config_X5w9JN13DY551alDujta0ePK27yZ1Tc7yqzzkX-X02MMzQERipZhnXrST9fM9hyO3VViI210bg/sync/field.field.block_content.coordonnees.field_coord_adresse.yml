@@ -1,0 +1,19 @@
+uuid: 13a88e99-7062-4e1c-a5b0-cb0f2feed31c
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_content.type.coordonnees
+    - field.storage.block_content.field_coord_adresse
+id: block_content.coordonnees.field_coord_adresse
+field_name: field_coord_adresse
+entity_type: block_content
+bundle: coordonnees
+label: 'Adresse'
+description: "Adresse postale du Gouvernorat, une ligne par ligne d'adresse."
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

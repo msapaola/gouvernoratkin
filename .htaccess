@@ -137,6 +137,15 @@ AddType image/webp .webp
   # kinshasa.cd et www.kinshasa.cd sera arrêté.)
   RewriteCond %{HTTP_HOST} ^www\.(test\.kinshasa\.cd)$ [NC]
   RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+  # Production (Infomaniak) : décommenter UNE des deux paires de lignes
+  # ci-dessous, selon l'adresse principale retenue. Voir
+  # deploiement/LISEZMOI-infomaniak.md, étape « Domaine ».
+  # a) Adresse principale kinshasa.cd : www.kinshasa.cd y est redirigé.
+  # RewriteCond %{HTTP_HOST} ^www\.kinshasa\.cd$ [NC]
+  # RewriteRule ^ https://kinshasa.cd%{REQUEST_URI} [L,R=301]
+  # b) Adresse principale www.kinshasa.cd : kinshasa.cd y est redirigé.
+  # RewriteCond %{HTTP_HOST} ^kinshasa\.cd$ [NC]
+  # RewriteRule ^ https://www.kinshasa.cd%{REQUEST_URI} [L,R=301]
   # /actualites/ répondait comme /actualites : la barre oblique finale est
   # retirée, sauf pour les vrais dossiers.
   RewriteCond %{REQUEST_FILENAME} !-d

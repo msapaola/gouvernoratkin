@@ -1,0 +1,19 @@
+uuid: d2ab32b6-6117-40fe-aec3-d4f82419804a
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_content.type.coordonnees
+    - field.storage.block_content.field_coord_telephone
+id: block_content.coordonnees.field_coord_telephone
+field_name: field_coord_telephone
+entity_type: block_content
+bundle: coordonnees
+label: 'Téléphone'
+description: "Numéro affiché, par exemple +243 81 000 00 00. Laisser vide pour ne rien afficher."
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

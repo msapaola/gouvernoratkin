@@ -1,0 +1,121 @@
+{#
+/**
+ * @file
+ * Page « Contact » du site du Gouvernorat de Kinshasa.
+ *
+ * Même ouverture que les autres pages institutionnelles (entête sobre, filet
+ * tricolore, fil d'Ariane), puis deux colonnes : les coordonnées à gauche, le
+ * formulaire à droite. Le titre était auparavant dessiné en CSS (::before),
+ * invisible pour les lecteurs d'écran et les moteurs de recherche.
+ *
+ * La variable coordonnees vient du module gouvernorat_contact (bloc de contenu
+ * « Coordonnées du Gouvernorat », modifiable dans Contenu › Blocs). Le
+ * formulaire est le contenu principal de la page (page.content).
+ */
+#}
+{{ attach_library('gouvernoratkin/contact') }}
+
+{% include "@gouvernoratkin/layout/partials/site-header.html.twig" with { sans_fil_ariane: true } %}
+
+<main id="main-content" role="main">
+
+  {# ================= ENTÊTE ================= #}
+  <header class="page-entete">
+    <div class="container">
+      <nav aria-label="{{ 'Fil d’Ariane'|t }}">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Contact</li>
+        </ol>
+      </nav>
+
+      <div class="page-entete__contenu">
+        <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
+        <p class="surtitre">Nous écrire</p>
+        <h1 class="page-entete__titre">Contacter le Gouvernorat</h1>
+        <p class="page-entete__accroche">
+          Une question sur une démarche, une suggestion ou un signalement ?
+          Écrivez-nous : votre message est transmis aux services du
+          Gouvernorat de Kinshasa, qui vous répondent par courriel.
+        </p>
+      </div>
+    </div>
+  </header>
+
+  {# ================= CORPS ================= #}
+  <section class="contact-corps">
+    <div class="container">
+      <div class="row g-4 g-lg-5">
+
+        <aside class="col-lg-4" aria-label="{{ 'Coordonnées et informations'|t }}">
+          {% if coordonnees %}
+            <h2 class="contact-coord__titre" id="contact-coord-titre">Nos coordonnées</h2>
+
+            <ul class="contact-coord">
+              {% if coordonnees.adresse %}
+                <li class="contact-coord__item">
+                  <span class="contact-coord__icone" aria-hidden="true"><i class="fas fa-map-marker-alt"></i></span>
+                  <div>
+                    <h3>Adresse</h3>
+                    <address>{% for ligne in coordonnees.adresse %}{{ ligne }}{% if not loop.last %}<br>{% endif %}{% endfor %}</address>
+                  </div>
+                </li>
+              {% endif %}
+              {% if coordonnees.courriel %}
+                <li class="contact-coord__item">
+                  <span class="contact-coord__icone" aria-hidden="true"><i class="fas fa-envelope"></i></span>
+                  <div>
+                    <h3>Courriel</h3>
+                    <p><a href="mailto:{{ coordonnees.courriel }}">{{ coordonnees.courriel }}</a></p>
+                  </div>
+                </li>
+              {% endif %}
+              {% if coordonnees.telephone %}
+                <li class="contact-coord__item">
+                  <span class="contact-coord__icone" aria-hidden="true"><i class="fas fa-phone-alt"></i></span>
+                  <div>
+                    <h3>Téléphone</h3>
+                    <p><a href="tel:{{ coordonnees.telephone_lien }}">{{ coordonnees.telephone }}</a></p>
+                  </div>
+                </li>
+              {% endif %}
+              {% if coordonnees.horaires %}
+                <li class="contact-coord__item">
+                  <span class="contact-coord__icone" aria-hidden="true"><i class="fas fa-clock"></i></span>
+                  <div>
+                    <h3>Horaires d'accueil</h3>
+                    <p>{% for ligne in coordonnees.horaires %}{{ ligne }}{% if not loop.last %}<br>{% endif %}{% endfor %}</p>
+                  </div>
+                </li>
+              {% endif %}
+            </ul>
+
+            {% if user.hasPermission('access block library') %}
+              <p class="contact-gestion">
+                <a href="/admin/content/block/{{ coordonnees.id }}">Modifier les coordonnées</a>
+              </p>
+            {% endif %}
+          {% endif %}
+
+          <div class="contact-renvoi">
+            <h3>Une démarche administrative ?</h3>
+            <p>Pièces à fournir, coûts et lieux de dépôt sont décrits dans les fiches des services aux citoyens.</p>
+            <a href="/services-aux-citoyens" class="lien-suite">Voir les services aux citoyens<i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </aside>
+
+        <div class="col-lg-8">
+          <div class="contact-carte">
+            <h2 class="contact-carte__titre">Envoyer un message</h2>
+            <p class="contact-carte__aide">Les champs marqués d'un astérisque (<span class="contact-carte__etoile">*</span>) sont obligatoires.</p>
+            {{ page.content }}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+{% include "@gouvernoratkin/layout/partials/site-footer.html.twig" %}

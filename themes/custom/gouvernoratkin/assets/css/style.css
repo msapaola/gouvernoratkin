@@ -1397,6 +1397,13 @@ p:last-child {
   background-color: var(--blackColor);
 }
 
+/* Message affiché sous le formulaire d'abonnement (custom.js). */
+.footer-newsletter .newsletter-statut {
+  color: var(--whiteColor);
+  font-size: 14px;
+  margin: 10px 0 0;
+}
+
 .validation-danger {
   color: var(--accentColor);
 }

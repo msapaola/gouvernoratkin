@@ -1,0 +1,8 @@
+uuid: 3a8861c4-27f7-48ad-be84-cf8262e0ece1
+langcode: fr
+status: true
+dependencies: {  }
+id: coordonnees
+label: 'Coordonnées du Gouvernorat'
+revision: false
+description: "Adresse, courriel, téléphone et horaires affichés sur la page Contact. Un seul bloc de ce type est utilisé : le plus récent."

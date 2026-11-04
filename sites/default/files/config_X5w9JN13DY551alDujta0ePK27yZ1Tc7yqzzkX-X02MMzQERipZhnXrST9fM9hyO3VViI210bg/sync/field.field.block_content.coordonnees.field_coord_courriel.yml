@@ -1,0 +1,19 @@
+uuid: fe07f233-24ce-473a-b456-8e666f6a9a57
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_content.type.coordonnees
+    - field.storage.block_content.field_coord_courriel
+id: block_content.coordonnees.field_coord_courriel
+field_name: field_coord_courriel
+entity_type: block_content
+bundle: coordonnees
+label: 'Courriel'
+description: "Adresse de courriel publique. Les messages du formulaire partent vers les destinataires réglés dans Structure › Formulaires de contact."
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: email

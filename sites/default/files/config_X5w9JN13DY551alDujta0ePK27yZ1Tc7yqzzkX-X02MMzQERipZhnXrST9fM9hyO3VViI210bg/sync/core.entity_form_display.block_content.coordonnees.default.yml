@@ -1,0 +1,57 @@
+uuid: 1d42d144-bc2c-4bf6-a2fa-a9a0d51902c8
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_content.type.coordonnees
+    - field.field.block_content.coordonnees.field_coord_adresse
+    - field.field.block_content.coordonnees.field_coord_courriel
+    - field.field.block_content.coordonnees.field_coord_horaires
+    - field.field.block_content.coordonnees.field_coord_telephone
+id: block_content.coordonnees.default
+targetEntityType: block_content
+bundle: coordonnees
+mode: default
+content:
+  field_coord_adresse:
+    type: string_textarea
+    weight: 0
+    region: content
+    settings:
+      rows: 3
+      placeholder: ''
+    third_party_settings: {  }
+  field_coord_courriel:
+    type: email_default
+    weight: 1
+    region: content
+    settings:
+      placeholder: ''
+      size: 60
+    third_party_settings: {  }
+  field_coord_horaires:
+    type: string_textarea
+    weight: 3
+    region: content
+    settings:
+      rows: 3
+      placeholder: 'Du lundi au vendredi, de 8 h à 16 h'
+    third_party_settings: {  }
+  field_coord_telephone:
+    type: string_textfield
+    weight: 2
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  info:
+    type: string_textfield
+    weight: -5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  langcode: true

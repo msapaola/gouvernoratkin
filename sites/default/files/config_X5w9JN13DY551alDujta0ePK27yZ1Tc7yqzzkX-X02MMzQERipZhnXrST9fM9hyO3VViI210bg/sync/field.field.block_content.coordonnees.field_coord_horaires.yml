@@ -1,0 +1,19 @@
+uuid: c32b678b-738b-45c1-981e-c937b930f050
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_content.type.coordonnees
+    - field.storage.block_content.field_coord_horaires
+id: block_content.coordonnees.field_coord_horaires
+field_name: field_coord_horaires
+entity_type: block_content
+bundle: coordonnees
+label: 'Horaires d''accueil'
+description: "Jours et heures d'ouverture au public, une ligne par plage. Laisser vide pour ne rien afficher."
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

@@ -1,0 +1,115 @@
+<?php
+
+/**
+ * @file
+ * Page Contact du site du Gouvernorat de Kinshasa.
+ *
+ * - Les coordonnées (adresse, courriel, téléphone, horaires) vivent dans un
+ *   bloc de contenu de type « coordonnees », modifiable dans Contenu › Blocs.
+ *   Ce module lit le plus récent bloc publié et le donne au gabarit
+ *   page--contact.html.twig ; la mise en page reste dans le thème.
+ * - Le formulaire de contact est allégé : plus de bouton « Aperçu », des
+ *   libellés et des aides adaptés, une mention sur l'usage des données.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Renvoie les coordonnées du plus récent bloc publié, ou NULL.
+ */
+function gouvernorat_contact_coordonnees(): ?array {
+  $storage = \Drupal::entityTypeManager()->getStorage('block_content');
+  $ids = $storage->getQuery()
+    ->accessCheck(FALSE)
+    ->condition('type', 'coordonnees')
+    ->condition('status', 1)
+    ->sort('changed', 'DESC')
+    ->range(0, 1)
+    ->execute();
+  if (!$ids || !($bloc = $storage->load(reset($ids)))) {
+    return NULL;
+  }
+
+  $lignes = fn(?string $texte): array => array_values(array_filter(array_map('trim', preg_split('/\R/u', (string) $texte)), 'strlen'));
+
+  $telephone = trim((string) $bloc->get('field_coord_telephone')->value);
+  return [
+    'adresse' => $lignes($bloc->get('field_coord_adresse')->value),
+    'courriel' => trim((string) $bloc->get('field_coord_courriel')->value),
+    'telephone' => $telephone,
+    // Lien tel: sans espaces ni ponctuation, en gardant le « + » initial.
+    'telephone_lien' => $telephone !== '' ? preg_replace('/(?!^\+)[^0-9]/', '', $telephone) : '',
+    'horaires' => $lignes($bloc->get('field_coord_horaires')->value),
+    'id' => $bloc->id(),
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for page templates.
+ *
+ * Fournit la variable coordonnees à page--contact.html.twig.
+ */
+function gouvernorat_contact_preprocess_page(array &$variables) {
+  // /contact passe par contact.site_page, qui affiche le formulaire par
+  // défaut ; /contact/feedback par entity.contact_form.canonical.
+  if (!in_array(\Drupal::routeMatch()->getRouteName(), ['contact.site_page', 'entity.contact_form.canonical'], TRUE)) {
+    return;
+  }
+  // Toute modification d'un bloc de contenu doit rafraîchir la page, y
+  // compris dans le cache des pages servies aux visiteurs anonymes.
+  $variables['#cache']['tags'][] = 'block_content_list';
+  $variables['coordonnees'] = gouvernorat_contact_coordonnees();
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for contact_message_form.
+ */
+function gouvernorat_contact_form_contact_message_form_alter(array &$form, FormStateInterface $form_state, string $form_id) {
+  // Le formulaire personnel (écrire à un utilisateur) n'est pas concerné.
+  if ($form_id !== 'contact_message_feedback_form') {
+    return;
+  }
+
+  // L'aperçu n'apporte rien à un message de quelques lignes et faisait
+  // concurrence au bouton d'envoi.
+  if (isset($form['actions']['preview'])) {
+    $form['actions']['preview']['#access'] = FALSE;
+  }
+  if (isset($form['actions']['submit'])) {
+    $form['actions']['submit']['#value'] = t('Envoyer le message');
+    $form['actions']['submit']['#attributes']['class'][] = 'contact-envoyer';
+  }
+
+  // Champs à remplir pour un visiteur ; simples textes pour une personne
+  // connectée, dont Drupal connaît déjà le nom et le courriel.
+  if (isset($form['name']['#type'])) {
+    $form['name']['#title'] = t('Nom et prénom');
+    if ($form['name']['#type'] === 'textfield') {
+      $form['name']['#attributes']['autocomplete'] = 'name';
+    }
+  }
+  if (isset($form['mail']['#type'])) {
+    $form['mail']['#title'] = t('Adresse de courriel');
+    if ($form['mail']['#type'] === 'email') {
+      $form['mail']['#description'] = t('La réponse vous sera envoyée à cette adresse.');
+      $form['mail']['#attributes']['autocomplete'] = 'email';
+    }
+  }
+  if (isset($form['subject']['widget'][0]['value'])) {
+    $form['subject']['widget'][0]['value']['#placeholder'] = t('Par exemple : demande d’information sur une démarche');
+  }
+  if (isset($form['message']['widget'][0]['value'])) {
+    $form['message']['widget'][0]['value']['#rows'] = 8;
+  }
+  if (isset($form['copy'])) {
+    $form['copy']['#title'] = t('Recevoir une copie de mon message');
+  }
+
+  $form['mention'] = [
+    '#type' => 'html_tag',
+    '#tag' => 'p',
+    '#value' => t('Les informations saisies servent uniquement à traiter votre demande. Elles ne sont ni publiées ni transmises à des tiers.'),
+    '#attributes' => ['class' => ['contact-mention']],
+    '#weight' => 90,
+  ];
+}

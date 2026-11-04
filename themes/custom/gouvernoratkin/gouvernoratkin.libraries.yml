@@ -11,7 +11,6 @@ bootstrap5-js:
     assets/js/nice-select.min.js: {minified: true}
     assets/js/form-validator.min.js: {minified: true}
     assets/js/contact-form-script.js: {}
-    assets/js/ajaxchimp.min.js: { minified: true }
     assets/js/owl.carousel2.thumbs.min.js: {minified: true}
     assets/js/appear.min.js: {minified: true}
     assets/js/odometer.min.js: {minified: true}
@@ -125,6 +124,14 @@ galerie:
 
 # Entete et barre de recherche de « Services aux citoyens ». Le depliage de la
 # barre laterale rejoint le theme au lieu de vivre en clair dans le gabarit.
+# Styles propres a la page « Contact », attachee depuis page--contact.html.twig.
+contact:
+  css:
+    theme:
+        assets/css/contact.css: {}
+  dependencies:
+    - gouvernoratkin/composants
+
 services:
   css:
     theme:

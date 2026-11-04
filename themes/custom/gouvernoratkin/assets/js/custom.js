@@ -284,54 +284,26 @@
         });
     });
 
-    // Subscribe form
-	$(".newsletter-form").validator().on("submit", function (event) {
-		if (event.isDefaultPrevented()) {
-			// handle the invalid form...
-			formErrorSub();
-			submitMSGSub(false, "Please enter your email correctly.");
-		} else {
-			// everything looks good!
-			event.preventDefault();
-		}
-	});
-	function callbackFunction (resp) {
-		if (resp.result === "success") {
-			formSuccessSub();
-		}
-		else {
-			formErrorSub();
-		}
-	}
-	function formSuccessSub() {
-		$(".newsletter-form")[0].reset();
-		submitMSGSub(true, "Thank you for subscribing!");
-        setTimeout(function () {
-            $("#validator-newsletter").addClass('hide');
-        }, 4000);
-        setTimeout(function() {
-		    $("#validator-newsletter-2").addClass('hide');
-		}, 4000)
-	}
-	function formErrorSub() {
-		$(".newsletter-form").addClass("animated shake");
-		setTimeout(function() {
-			$(".newsletter-form").removeClass("animated shake");
-		}, 1000)
-	}
-	function submitMSGSub(valid, msg) {
-		if(valid){
-			var msgClasses = "validation-success";
-		} else {
-			var msgClasses = "validation-danger";
-		}
-        $("#validator-newsletter").removeClass().addClass(msgClasses).text(msg);
-        $("#validator-newsletter-2").removeClass().addClass(msgClasses).text(msg);
-	}
-
-	$(".newsletter-form").ajaxChimp({
-		url: "https://hibootstrap.us20.list-manage.com/subscribe/post?u=60e1ffe2e8a68ce1204cd39a5&amp;id=42d6d188d9", // Your url MailChimp
-		callback: callbackFunction
+    // Formulaire d'abonnement du pied de page.
+    // Le thème d'origine envoyait les adresses saisies vers la liste Mailchimp
+    // de son éditeur (hibootstrap), et non vers le Gouvernorat : ce branchement
+    // est retiré. Tant qu'un service de lettre d'information n'est pas
+    // choisi, le formulaire n'envoie rien et le dit clairement.
+    // Le texte indicatif du champ était en anglais (« Your Email »), dans le
+    // bloc du pied de page.
+    $(".newsletter-form input[type=email], .newsletter-form input[name=EMAIL]")
+        .attr("placeholder", "Votre adresse de courriel")
+        .attr("aria-label", "Votre adresse de courriel");
+    $(".newsletter-form").on("submit", function (event) {
+        event.preventDefault();
+        var message = "Les inscriptions à la lettre d'information ouvriront prochainement.";
+        $("#validator-newsletter, #validator-newsletter-2")
+            .removeClass().addClass("validation-success").text(message);
+        var $form = $(this);
+        if (!$form.find(".newsletter-statut").length) {
+            $form.append('<p class="newsletter-statut" role="status"></p>');
+        }
+        $form.find(".newsletter-statut").text(message);
     });
 
     // Go to Top

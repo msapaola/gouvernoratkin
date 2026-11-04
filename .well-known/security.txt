@@ -1,0 +1,14 @@
+# Signalement de failles de sécurité — site du Gouvernorat de Kinshasa
+# Norme RFC 9116 : https://www.rfc-editor.org/rfc/rfc9116
+#
+# Vous avez découvert une faille sur ce site ? Écrivez-nous en privé avant
+# toute publication, en décrivant le problème et la manière de le reproduire.
+# Merci de ne pas accéder aux données d'autrui, de ne pas les modifier et de
+# ne pas perturber le service.
+
+Contact: mailto:contact@gouv.kinshasa.cd
+Contact: https://kinshasa.cd/contact
+Expires: 2027-11-04T23:00:00.000Z
+Preferred-Languages: fr, en
+Canonical: https://kinshasa.cd/.well-known/security.txt
+Canonical: https://www.kinshasa.cd/.well-known/security.txt
