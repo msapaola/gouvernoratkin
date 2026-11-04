@@ -8,32 +8,38 @@ definitions:
     expanded: false
     enabled: true
   standard__front_page:
+    menu_name: main
+    parent: ''
     weight: -50
-    menu_name: main
-    parent: ''
-    enabled: true
     expanded: false
+    enabled: true
   'taxonomy_menu__menu_link:taxonomy_menu__menu_link__menu_categories_service_au_citoyen__17':
-    weight: -49
     menu_name: main
     parent: ''
+    weight: -49
     expanded: true
     enabled: true
   'taxonomy_menu__menu_link:taxonomy_menu__menu_link__menu_categories_service_au_citoyen__19':
-    expanded: true
+    menu_name: main
     parent: 'taxonomy_menu.menu_link:taxonomy_menu.menu_link.menu_categories_service_au_citoyen.17'
     weight: 0
-    menu_name: main
+    expanded: true
     enabled: true
   'taxonomy_menu__menu_link:taxonomy_menu__menu_link__menu_categories_service_au_citoyen__25':
-    expanded: true
+    menu_name: main
     parent: 'taxonomy_menu.menu_link:taxonomy_menu.menu_link.menu_categories_service_au_citoyen.17'
     weight: 0
-    menu_name: main
+    expanded: true
     enabled: true
   'taxonomy_menu__menu_link:taxonomy_menu__menu_link__menu_categories_service_au_citoyen__22':
-    expanded: true
+    menu_name: main
     parent: 'taxonomy_menu.menu_link:taxonomy_menu.menu_link.menu_categories_service_au_citoyen.17'
     weight: 0
+    expanded: true
+    enabled: true
+  'taxonomy_menu__menu_link:taxonomy_menu__menu_link__menu_categories_service_au_citoyen__30':
     menu_name: main
+    parent: 'taxonomy_menu.menu_link:taxonomy_menu.menu_link.menu_categories_service_au_citoyen.17'
+    weight: 0
+    expanded: false
     enabled: true
