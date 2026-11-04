@@ -28,17 +28,65 @@ function gouvernoratkin_theme_suggestions_page_alter(array &$suggestions, array 
 }
 
 /**
- * Helper to build the taxonomy tree for service_au_citoyen vocabulary.
+ * Étiquettes de cache de l'arbre des rubriques des services aux citoyens.
+ *
+ * Sans elles, la barre latérale restait figée dans le cache (pages des
+ * visiteurs anonymes comprises) après l'ajout, la suppression ou la
+ * dépublication d'une rubrique.
+ * - taxonomy_term_list : tout ajout, modification ou suppression de terme ;
+ * - config:system.menu.main : activation ou désactivation d'un lien du menu
+ *   principal.
+ */
+function _gouvernoratkin_services_tree_cache_tags() {
+  return ['taxonomy_term_list', 'config:system.menu.main'];
+}
+
+/**
+ * Identifiants des rubriques dont le lien est désactivé dans le menu principal.
+ *
+ * Le menu principal est construit par Taxonomy Menu : décocher « Activé » sur
+ * un lien le masque du menu. La barre latérale suit le même choix.
+ */
+function _gouvernoratkin_services_tids_desactives() {
+  $tids = [];
+  // Arbre complet du menu, liens désactivés compris (mis en cache par Drupal).
+  $arbre = \Drupal::menuTree()->load('main', new \Drupal\Core\Menu\MenuTreeParameters());
+  $parcourir = function (array $elements) use (&$parcourir, &$tids) {
+    foreach ($elements as $element) {
+      $lien = $element->link;
+      $tid = $lien->getMetaData()['taxonomy_term_id'] ?? NULL;
+      if ($tid && !$lien->isEnabled()) {
+        $tids[(int) $tid] = TRUE;
+      }
+      if ($element->subtree) {
+        $parcourir($element->subtree);
+      }
+    }
+  };
+  $parcourir($arbre);
+  return $tids;
+}
+
+/**
+ * Arbre des rubriques publiées du vocabulaire service_au_citoyen.
+ *
+ * Comme dans le menu principal, une rubrique est écartée si elle est
+ * dépubliée ou si son lien de menu est désactivé ; ses sous-rubriques
+ * disparaissent avec elle.
  */
 function _gouvernoratkin_get_services_categories_tree() {
   $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
   $terms = $term_storage->loadTree('service_au_citoyen', 0, NULL, FALSE);
-  
+  $desactives = _gouvernoratkin_services_tids_desactives();
+
   $tree = [];
   $terms_by_id = [];
-  
+
   foreach ($terms as $term) {
     $tid = $term->tid;
+    if ((isset($term->status) && !$term->status) || isset($desactives[(int) $tid])) {
+      continue;
+    }
     $terms_by_id[$tid] = [
       'tid' => $tid,
       'name' => $term->name,
@@ -88,7 +136,10 @@ function gouvernoratkin_preprocess_page(&$variables) {
 
   if ($alias == '/services-aux-citoyens' || strpos($alias, '/services-aux-citoyens/') === 0) {
     $variables['services_categories_tree'] = _gouvernoratkin_get_services_categories_tree();
-    
+    foreach (_gouvernoratkin_services_tree_cache_tags() as $tag) {
+      $variables['#cache']['tags'][] = $tag;
+    }
+
     $active_tid = null;
     $parts = explode('/', ltrim($alias, '/'));
     if (isset($parts[1]) && is_numeric($parts[1])) {
@@ -170,6 +221,9 @@ function gouvernoratkin_preprocess_node(&$variables) {
     }
     else {
       $variables['services_categories_tree'] = _gouvernoratkin_get_services_categories_tree();
+      foreach (_gouvernoratkin_services_tree_cache_tags() as $tag) {
+        $variables['#cache']['tags'][] = $tag;
+      }
     }
   }
 }
