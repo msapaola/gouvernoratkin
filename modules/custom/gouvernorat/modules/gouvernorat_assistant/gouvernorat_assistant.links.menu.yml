@@ -1,0 +1,5 @@
+gouvernorat_assistant.reglages:
+  title: 'Assistant virtuel'
+  description: "Réglages de l'assistant virtuel du site (Claude)."
+  route_name: gouvernorat_assistant.reglages
+  parent: system.admin_config_services

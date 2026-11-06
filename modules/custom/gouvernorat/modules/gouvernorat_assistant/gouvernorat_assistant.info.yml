@@ -1,0 +1,9 @@
+name: Gouvernorat Assistant
+description: "Assistant virtuel du site : répond aux questions des visiteurs avec Claude (Anthropic) et les oriente vers les pages, démarches et articles du site."
+package: 'Gouvernorat de Kinshasa'
+type: module
+core_version_requirement: ^10.1 || ^11
+configure: gouvernorat_assistant.reglages
+dependencies:
+  - drupal:node
+  - drupal:taxonomy

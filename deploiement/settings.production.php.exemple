@@ -86,6 +86,13 @@ $config['smtp.settings']['smtp_fromname'] = 'Gouvernorat de Kinshasa';
 $config['system.site']['mail'] = '<ADRESSE_EXPEDITRICE>';
 
 // ---------------------------------------------------------------------------
+// Assistant virtuel (module gouvernorat_assistant)
+// ---------------------------------------------------------------------------
+// Clé d'API Anthropic, créée sur https://platform.claude.com (Paramètres ›
+// Clés d'API). Sans clé, la bulle de l'assistant n'apparaît pas.
+$settings['gouvernorat_assistant_cle_api'] = '<CLE_API_ANTHROPIC>';
+
+// ---------------------------------------------------------------------------
 // Performances (rappel : déjà dans la configuration exportée)
 // ---------------------------------------------------------------------------
 $config['system.performance']['css']['preprocess'] = TRUE;

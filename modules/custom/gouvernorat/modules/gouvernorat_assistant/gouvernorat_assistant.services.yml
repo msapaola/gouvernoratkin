@@ -1,0 +1,12 @@
+services:
+  gouvernorat_assistant.catalogue:
+    class: Drupal\gouvernorat_assistant\Service\Catalogue
+    arguments: ['@entity_type.manager', '@database', '@cache.default', '@path.validator']
+
+  gouvernorat_assistant.assistant:
+    class: Drupal\gouvernorat_assistant\Service\Assistant
+    arguments: ['@gouvernorat_assistant.catalogue', '@config.factory', '@http_client_factory', '@logger.channel.gouvernorat_assistant', '@path.validator']
+
+  logger.channel.gouvernorat_assistant:
+    parent: logger.channel_base
+    arguments: ['gouvernorat_assistant']

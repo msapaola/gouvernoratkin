@@ -1,0 +1,4 @@
+administer gouvernorat assistant:
+  title: "Régler l'assistant virtuel"
+  description: "Activer ou désactiver l'assistant, changer son message d'accueil et ses limites d'usage."
+  restrict access: true

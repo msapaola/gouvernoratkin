@@ -91,6 +91,16 @@ de l'adresse principale.
 Ouvrir `/admin/config/system/smtp`, envoyer un courriel de test, puis
 envoyer un message depuis `/contact` et vérifier sa réception.
 
+## 6 bis. Assistant virtuel
+
+- La bibliothèque `anthropic-ai/sdk` est dans `vendor/` (installée sur le
+  site de test et versionnée) : rien à installer.
+- Reporter la clé d'API dans `settings.local.php`
+  (`$settings['gouvernorat_assistant_cle_api']`).
+- Vérifier que le serveur peut joindre `api.anthropic.com` (HTTPS sortant),
+  puis poser une question dans la bulle « Une question ? ».
+- Réglages : `/admin/config/services/assistant`.
+
 ## 7. Tâches planifiées (Manager › Tâches planifiées)
 
 | Commande | Fréquence |

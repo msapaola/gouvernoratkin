@@ -1,0 +1,17 @@
+gouvernorat_assistant.message:
+  path: '/assistant/message'
+  defaults:
+    _controller: '\Drupal\gouvernorat_assistant\Controller\AssistantController::message'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+gouvernorat_assistant.reglages:
+  path: '/admin/config/services/assistant'
+  defaults:
+    _form: '\Drupal\gouvernorat_assistant\Form\ReglagesForm'
+    _title: 'Assistant virtuel'
+  requirements:
+    _permission: 'administer gouvernorat assistant'

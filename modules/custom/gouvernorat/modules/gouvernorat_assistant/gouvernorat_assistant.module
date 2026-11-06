@@ -1,0 +1,47 @@
+<?php
+
+/**
+ * @file
+ * Assistant virtuel du site du Gouvernorat de Kinshasa.
+ *
+ * Une bulle « Une question ? » en bas à droite de chaque page publique ouvre
+ * une fenêtre de discussion. Les questions partent vers /assistant/message,
+ * qui interroge Claude (modèle Haiku) avec le catalogue des pages du site
+ * et répond en orientant vers les bonnes pages.
+ *
+ * Mise en service :
+ * 1. composer require anthropic-ai/sdk (bibliothèque officielle d'Anthropic) ;
+ * 2. clé d'API dans settings.php :
+ *    $settings['gouvernorat_assistant_cle_api'] = 'sk-ant-…';
+ * 3. réglages : Configuration › Services web › Assistant virtuel.
+ * Sans bibliothèque ou sans clé, la bulle n'apparaît pas.
+ */
+
+use Drupal\gouvernorat_assistant\Service\Assistant;
+
+/**
+ * Implements hook_page_attachments().
+ */
+function gouvernorat_assistant_page_attachments(array &$attachments) {
+  $config = \Drupal::config('gouvernorat_assistant.settings');
+  $attachments['#cache']['tags'][] = 'config:gouvernorat_assistant.settings';
+
+  if (\Drupal::service('router.admin_context')->isAdminRoute() || !Assistant::disponible()) {
+    return;
+  }
+
+  $attachments['#attached']['library'][] = 'gouvernorat_assistant/assistant';
+  $attachments['#attached']['drupalSettings']['gouvernoratAssistant'] = [
+    'adresse' => \Drupal\Core\Url::fromRoute('gouvernorat_assistant.message')->toString(),
+    'accueil' => $config->get('message_accueil'),
+  ];
+}
+
+/**
+ * Implements hook_help().
+ */
+function gouvernorat_assistant_help($route_name) {
+  if ($route_name === 'gouvernorat_assistant.reglages') {
+    return '<p>' . t("L'assistant répond aux visiteurs avec Claude (Anthropic) en s'appuyant uniquement sur les pages publiées du site. Les questions ne sont pas enregistrées sur le site ; elles sont transmises à Anthropic pour produire la réponse.") . '</p>';
+  }
+}

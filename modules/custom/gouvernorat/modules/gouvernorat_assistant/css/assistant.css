@@ -1,0 +1,313 @@
+/**
+ * Assistant virtuel — bulle et fenêtre de discussion.
+ *
+ * Couleurs et polices : variables de la charte du thème (style.css), avec
+ * une valeur de repli si le thème change.
+ */
+
+.assistant {
+  --assistant-bleu: var(--mainColor, #104293);
+  --assistant-bleu-fonce: var(--mainColorDark, #0A3D7E);
+  --assistant-rouge: var(--accentColor, #DB3832);
+  font-family: var(--fontFamily-body, 'Poppins', sans-serif);
+}
+
+/* Le bouton « retour en haut » du thème occupe le même coin : il se décale
+   à gauche de la bulle. */
+body.avec-assistant .go-top {
+  right: 200px;
+}
+
+/* ==========================================================================
+   Bulle
+   ========================================================================== */
+
+.assistant__bulle {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.15rem 0.75rem 0.8rem;
+  border: 0;
+  border-radius: 999px;
+  background-color: var(--assistant-bleu);
+  color: #fff;
+  font: inherit;
+  font-size: 0.98rem;
+  font-weight: 600;
+  box-shadow: 0 10px 28px rgba(9, 36, 46, 0.28);
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+}
+
+.assistant__bulle:hover,
+.assistant__bulle:focus-visible {
+  background-color: var(--assistant-bleu-fonce);
+  transform: translateY(-2px);
+}
+
+.assistant__bulle:focus-visible {
+  outline: 3px solid var(--highlightColor, #FFF248);
+  outline-offset: 3px;
+}
+
+.assistant__bulle-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.16);
+  font-size: 1rem;
+}
+
+.assistant--ouvert .assistant__bulle {
+  display: none;
+}
+
+/* ==========================================================================
+   Fenêtre
+   ========================================================================== */
+
+.assistant__fenetre {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  width: min(390px, calc(100vw - 40px));
+  height: min(580px, calc(100vh - 110px));
+  background-color: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(9, 36, 46, 0.3);
+}
+
+.assistant__fenetre[hidden] {
+  display: none;
+}
+
+.assistant__entete {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem 0.9rem;
+  background-color: var(--assistant-bleu);
+  color: #fff;
+  border-bottom: 4px solid transparent;
+  border-image: linear-gradient(90deg, var(--secondaryColor, #0095C9), var(--highlightColor, #FFF248), var(--assistant-rouge)) 1;
+}
+
+.assistant__titre {
+  font-family: var(--fontFamily-heading, sans-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.15rem;
+}
+
+.assistant__sous-titre {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+}
+
+.assistant__fermer {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.assistant__fermer:hover,
+.assistant__fermer:focus-visible {
+  background-color: rgba(255, 255, 255, 0.28);
+}
+
+/* ==========================================================================
+   Fil de la discussion
+   ========================================================================== */
+
+.assistant__fil {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  background-color: #f5f7fa;
+}
+
+.assistant__message {
+  max-width: 88%;
+  padding: 0.7rem 0.9rem;
+  border-radius: 14px;
+  font-size: 0.93rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.assistant__message p {
+  margin: 0 0 0.5rem;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+.assistant__message p:last-child,
+.assistant__message ul:last-child {
+  margin-bottom: 0;
+}
+
+.assistant__message ul {
+  margin: 0 0 0.5rem;
+  padding-left: 1.15rem;
+}
+
+.assistant__message li {
+  margin-bottom: 0.2rem;
+}
+
+.assistant__message--assistant {
+  align-self: flex-start;
+  background-color: #fff;
+  color: var(--blackColor, #1f2428);
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(9, 36, 46, 0.06);
+}
+
+.assistant__message--assistant a {
+  color: var(--assistant-bleu);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.assistant__message--user {
+  align-self: flex-end;
+  background-color: var(--assistant-bleu);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+  white-space: pre-wrap;
+}
+
+.assistant__message--attente {
+  color: var(--paragraphColor, #555);
+  font-style: italic;
+}
+
+.assistant__message--erreur {
+  border-left: 4px solid var(--assistant-rouge);
+}
+
+/* ==========================================================================
+   Saisie
+   ========================================================================== */
+
+.assistant__formulaire {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid #e3e8ef;
+  background-color: #fff;
+}
+
+.assistant__champ {
+  flex: 1;
+  min-height: 44px;
+  max-height: 120px;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #c9d1dc;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  resize: none;
+}
+
+.assistant__champ:focus {
+  border-color: var(--assistant-bleu);
+  box-shadow: 0 0 0 3px rgba(16, 66, 147, 0.18);
+  outline: none;
+}
+
+.assistant__envoyer {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background-color: var(--assistant-rouge);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.assistant__envoyer:hover,
+.assistant__envoyer:focus-visible {
+  background-color: var(--darkRed, #872025);
+}
+
+.assistant__envoyer:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.assistant__mention {
+  margin: 0;
+  padding: 0 0.85rem 0.7rem;
+  background-color: #fff;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--paragraphColor, #555);
+}
+
+/* ==========================================================================
+   Téléphones : fenêtre plein écran, bulle réduite à l'icône
+   ========================================================================== */
+
+@media (max-width: 575.98px) {
+  .assistant__bulle {
+    right: 14px;
+    bottom: 14px;
+    padding: 0.7rem;
+  }
+
+  .assistant__bulle-texte {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  body.avec-assistant .go-top {
+    right: 80px;
+  }
+
+  .assistant__fenetre {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assistant__bulle {
+    transition: none;
+  }
+}

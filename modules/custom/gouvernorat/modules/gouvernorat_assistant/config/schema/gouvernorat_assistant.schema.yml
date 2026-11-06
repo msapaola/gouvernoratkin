@@ -1,0 +1,19 @@
+gouvernorat_assistant.settings:
+  type: config_object
+  label: "Réglages de l'assistant virtuel"
+  mapping:
+    active:
+      type: boolean
+      label: 'Assistant affiché sur le site'
+    modele:
+      type: string
+      label: 'Modèle Claude'
+    message_accueil:
+      type: text
+      label: "Message d'accueil"
+    limite_heure:
+      type: integer
+      label: 'Questions par heure et par visiteur'
+    limite_jour_total:
+      type: integer
+      label: 'Questions par jour pour tout le site'

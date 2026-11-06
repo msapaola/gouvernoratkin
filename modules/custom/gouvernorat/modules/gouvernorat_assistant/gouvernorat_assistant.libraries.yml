@@ -1,0 +1,10 @@
+assistant:
+  css:
+    component:
+      css/assistant.css: {}
+  js:
+    js/assistant.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupalSettings
+    - core/once
