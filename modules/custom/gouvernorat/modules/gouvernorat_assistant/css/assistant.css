@@ -265,15 +265,6 @@ body.avec-assistant .go-top {
   cursor: wait;
 }
 
-.assistant__mention {
-  margin: 0;
-  padding: 0 0.85rem 0.7rem;
-  background-color: #fff;
-  font-size: 0.72rem;
-  line-height: 1.4;
-  color: var(--paragraphColor, #555);
-}
-
 /* ==========================================================================
    Téléphones : fenêtre plein écran, bulle réduite à l'icône
    ========================================================================== */

@@ -176,6 +176,180 @@ class Catalogue {
   }
 
   /**
+   * Recherche en direct dans tous les contenus publiés (outil de l'assistant).
+   *
+   * Contrairement au catalogue, sans limite de date ni de nombre : un
+   * article ancien est trouvé. La requête lit la base au moment de la
+   * question ; seuls les contenus publiés sont concernés.
+   *
+   * @param string $requete
+   *   Mots-clés choisis par l'assistant.
+   * @param string $type
+   *   « tout », « demarche », « actualite », « page » ou « membre ».
+   *
+   * @return array[]
+   *   Au plus 8 résultats : titre, url, type, date, resume.
+   */
+  public function rechercherDansLeSite(string $requete, string $type = 'tout'): array {
+    $mots = array_slice($this->mots($requete), 0, 6);
+    if (!$mots) {
+      return [];
+    }
+    $types = [
+      'demarche' => ['service_au_citoyen'],
+      'actualite' => ['article', 'evenement'],
+      'page' => ['page', 'page_a_propos'],
+      'membre' => ['membre'],
+    ][$type] ?? array_keys(self::TYPES);
+
+    $sql = $this->base->select('node_field_data', 'n');
+    $sql->leftJoin('node__body', 'b', 'b.entity_id = n.nid AND b.deleted = 0');
+    $sql->fields('n', ['nid', 'title', 'type', 'created']);
+    $sql->addField('b', 'body_value', 'corps');
+    $sql->condition('n.status', 1)
+      ->condition('n.default_langcode', 1)
+      ->condition('n.type', $types, 'IN');
+    $ou = $sql->orConditionGroup();
+    foreach ($mots as $mot) {
+      $motif = '%' . $this->base->escapeLike($mot) . '%';
+      $ou->condition('n.title', $motif, 'LIKE')->condition('b.body_value', $motif, 'LIKE');
+    }
+    $sql->condition($ou)->orderBy('n.created', 'DESC')->range(0, 300);
+
+    $resultats = [];
+    foreach ($sql->execute() as $ligne) {
+      $titre = $this->normaliser($ligne->title);
+      $corps = $this->normaliser($this->texteBrut((string) $ligne->corps));
+      $score = 0;
+      foreach ($mots as $mot) {
+        $score += (str_contains($titre, $mot) ? 6 : 0) + min(4, substr_count($corps, $mot));
+      }
+      if ($score > 0) {
+        $resultats[] = [$score, $ligne];
+      }
+    }
+    usort($resultats, fn($a, $b) => $b[0] <=> $a[0] ?: $b[1]->created <=> $a[1]->created);
+
+    $libelles = array_map(fn($t) => $t[0], self::TYPES);
+    $sortie = [];
+    foreach (array_slice($resultats, 0, 8) as [, $ligne]) {
+      $sortie[] = [
+        'titre' => $ligne->title,
+        'url' => Url::fromRoute('entity.node.canonical', ['node' => $ligne->nid])->toString(),
+        'type' => $libelles[$ligne->type] ?? $ligne->type,
+        'date' => date('d/m/Y', (int) $ligne->created),
+        'resume' => Unicode::truncate($this->texteBrut((string) $ligne->corps), 220, TRUE, TRUE),
+      ];
+    }
+    return $sortie;
+  }
+
+  /**
+   * Texte complet d'une page publiée du site (outil de l'assistant).
+   *
+   * @param string $chemin
+   *   Adresse de la page sur le site, par exemple /demarches/….
+   *
+   * @return array|null
+   *   titre, url, type, date, texte ; NULL si la page n'existe pas ou n'est
+   *   pas publiée.
+   */
+  public function lirePage(string $chemin): ?array {
+    $chemin = '/' . ltrim(rawurldecode((string) strtok(trim($chemin), '?#')), '/');
+    if (str_contains($chemin, '\\') || str_contains($chemin, '..')) {
+      return NULL;
+    }
+
+    // Une rubrique des services : sa présentation et la liste de ses
+    // démarches.
+    if (preg_match('#^/services-aux-citoyens/(\d+)$#', $chemin, $m)) {
+      return $this->lireRubrique((int) $m[1]);
+    }
+
+    $systeme = \Drupal::service('path_alias.manager')->getPathByAlias($chemin);
+    if (preg_match('#^/node/(\d+)$#', $systeme, $m)) {
+      $node = $this->entityTypeManager->getStorage('node')->load($m[1]);
+      if (!$node instanceof NodeInterface || !$node->isPublished() || !isset(self::TYPES[$node->bundle()])) {
+        return NULL;
+      }
+      $entree = $this->entreeContenu($node, self::TYPES[$node->bundle()][0]);
+      return [
+        'titre' => $entree['titre'],
+        'url' => $entree['url'],
+        'type' => $entree['type'] . ($entree['rubrique'] !== '' ? ' — ' . $entree['rubrique'] : ''),
+        'date' => date('d/m/Y', $node->getCreatedTime()),
+        'texte' => Unicode::truncate($this->texteBrut(implode("\n\n", array_filter([
+          $node->hasField('field_membre_fonction') ? $node->get('field_membre_fonction')->value : '',
+          $node->hasField('field_membre_description') ? $node->get('field_membre_description')->value : '',
+          $node->hasField('body') ? $node->get('body')->value : '',
+          $node->hasField('field_membre_biographie') ? $node->get('field_membre_biographie')->value : '',
+        ]))), 15000, TRUE, TRUE),
+      ];
+    }
+
+    // Pages de l'exécutif et du cabinet : la liste des membres en fonction.
+    $instances = [
+      '/executif-provincial' => ['Exécutif provincial', ['gouvernorat', 'ministres', 'secretariat']],
+      '/cabinet-du-gouverneur' => ['Cabinet du gouverneur', ['cabinet']],
+    ];
+    if (isset($instances[$chemin])) {
+      [$titre, $valeurs] = $instances[$chemin];
+      $stockage = $this->entityTypeManager->getStorage('node');
+      $ids = $stockage->getQuery()->accessCheck(FALSE)
+        ->condition('type', 'membre')->condition('status', 1)
+        ->condition('field_membre_instance', $valeurs, 'IN')
+        ->sort('field_membre_ordre')->sort('title')->execute();
+      $lignes = [];
+      foreach ($stockage->loadMultiple($ids) as $membre) {
+        $lignes[] = '- [' . $membre->label() . '](' . $membre->toUrl()->toString() . ') : ' . $membre->get('field_membre_fonction')->value;
+      }
+      return ['titre' => $titre, 'url' => $chemin, 'type' => 'Page principale', 'date' => '', 'texte' => "Membres en fonction :\n" . implode("\n", $lignes)];
+    }
+
+    // Une page principale (liste, page institutionnelle) : sa description.
+    foreach ($this->entrees() as $entree) {
+      if (rawurldecode($entree['url']) === $chemin) {
+        return ['titre' => $entree['titre'], 'url' => $entree['url'], 'type' => $entree['type'], 'date' => '', 'texte' => $entree['texte']];
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Présentation d'une rubrique et liste de ses démarches publiées.
+   */
+  protected function lireRubrique(int $tid): ?array {
+    $stockage = $this->entityTypeManager->getStorage('taxonomy_term');
+    $terme = $stockage->load($tid);
+    if (!$terme || $terme->bundle() !== 'service_au_citoyen' || !$terme->isPublished()) {
+      return NULL;
+    }
+    $tids = [$tid];
+    foreach ($stockage->loadTree('service_au_citoyen', $tid, NULL, FALSE) as $enfant) {
+      $tids[] = (int) $enfant->tid;
+    }
+    $ids = $this->entityTypeManager->getStorage('node')->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('type', 'service_au_citoyen')
+      ->condition('status', 1)
+      ->condition('field_service_au_citoyen', $tids, 'IN')
+      ->sort('title')
+      ->range(0, 80)
+      ->execute();
+    $lignes = [];
+    foreach ($this->entityTypeManager->getStorage('node')->loadMultiple($ids) as $node) {
+      $lignes[] = '- [' . $node->label() . '](' . $node->toUrl()->toString() . ')';
+    }
+    return [
+      'titre' => $terme->label(),
+      'url' => Url::fromUserInput('/services-aux-citoyens/' . $tid)->toString(),
+      'type' => 'Rubrique des services aux citoyens',
+      'date' => '',
+      'texte' => trim($this->texteBrut((string) $terme->getDescription()) . "\n\nDémarches de cette rubrique :\n" . ($lignes ? implode("\n", $lignes) : 'aucune')),
+    ];
+  }
+
+  /**
    * Rubriques publiées des services aux citoyens.
    */
   protected function rubriques(): array {

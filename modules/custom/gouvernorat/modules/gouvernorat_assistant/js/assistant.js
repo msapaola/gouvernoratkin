@@ -122,7 +122,6 @@
             '<textarea id="assistant-question" class="assistant__champ" rows="1" maxlength="' + MAX_QUESTION + '" placeholder="' + Drupal.t('Écrivez votre question…') + '"></textarea>' +
             '<button type="submit" class="assistant__envoyer" aria-label="' + Drupal.t('Envoyer') + '"><i class="fas fa-paper-plane" aria-hidden="true"></i></button>' +
           '</form>' +
-          '<p class="assistant__mention">' + Drupal.t('N’écrivez pas d’informations personnelles. Vos questions sont traitées par Claude (Anthropic) et ne sont pas conservées sur ce site.') + '</p>' +
         '</section>';
       document.body.appendChild(racine);
 
