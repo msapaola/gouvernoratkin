@@ -1,0 +1,19 @@
+uuid: 150f7bba-47a7-468f-9ed1-b89ce2cd840f
+langcode: fr
+status: true
+dependencies:
+  module:
+    - node
+    - text
+id: node.field_membre_biographie
+field_name: field_membre_biographie
+entity_type: node
+type: text_long
+settings: {  }
+module: text
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -9,6 +9,8 @@ label: 'Single Post Gallery'
 code: |2-
    document.addEventListener('DOMContentLoaded', function() {
               const govModal = document.getElementById('gov-fullscreen-modal');
+              // Pages de contenu sans galerie (articles, démarches, membres) : rien à faire.
+              if (!govModal) { return; }
               const govModalImg = govModal.querySelector('.gov-fullscreen-img');
               const govCloseBtn = govModal.querySelector('.gov-fullscreen-close');
               const govPrevBtn = govModal.querySelector('.gov-prev-btn');

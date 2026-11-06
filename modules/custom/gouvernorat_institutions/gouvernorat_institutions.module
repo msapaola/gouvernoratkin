@@ -27,6 +27,16 @@ const GOUVERNORAT_INSTITUTIONS_ROUTES = [
 ];
 
 /**
+ * Libellé de chaque instance, pour le surtitre de la page d'un membre.
+ */
+const GOUVERNORAT_INSTITUTIONS_LIBELLES = [
+  'gouvernorat' => 'Gouvernorat',
+  'ministres' => 'Ministres provinciaux',
+  'secretariat' => 'Secrétariat exécutif',
+  'cabinet' => 'Cabinet du gouverneur',
+];
+
+/**
  * Renvoie les membres publiés d'une instance, dans l'ordre d'affichage.
  *
  * @return \Drupal\node\NodeInterface[]
@@ -111,7 +121,31 @@ function gouvernorat_institutions_preprocess_page(array &$variables) {
 function gouvernorat_institutions_preprocess_node(array &$variables) {
   $node = $variables['node'] ?? NULL;
   if ($node instanceof NodeInterface && $node->bundle() === 'membre') {
+    $instance = $node->get('field_membre_instance')->value;
     $variables['membre'] = gouvernorat_institutions_carte($node);
-    $variables['membre']['instance'] = $node->get('field_membre_instance')->value;
+    $variables['membre']['instance'] = $instance;
+    $variables['membre']['instance_libelle'] = GOUVERNORAT_INSTITUTIONS_LIBELLES[$instance] ?? '';
+    // Invitation à compléter la fiche, pour les personnes qui peuvent la modifier.
+    $variables['peut_modifier'] = $node->access('update');
+    $variables['#cache']['contexts'][] = 'user.permissions';
+
+    // Biographie (texte mis en forme), si elle est remplie.
+    if ($node->hasField('field_membre_biographie') && !$node->get('field_membre_biographie')->isEmpty()) {
+      $biographie = $node->get('field_membre_biographie')->first();
+      $variables['membre']['biographie'] = [
+        '#type' => 'processed_text',
+        '#text' => $biographie->value,
+        '#format' => $biographie->format,
+      ];
+    }
+
+    // Les autres membres de la même instance, sous la fiche : la page ne
+    // s'arrête plus sur un vide, et l'on passe d'une personne à l'autre.
+    // Pour le gouverneur et le vice-gouverneur, ce sont les ministres.
+    $voisins = $instance === 'gouvernorat' ? 'ministres' : $instance;
+    $autres = array_filter(gouvernorat_institutions_membres($voisins), fn($m) => $m->id() !== $node->id());
+    $variables['autres_membres'] = array_map('gouvernorat_institutions_carte', array_values($autres));
+    $variables['autres_titre'] = $instance === 'gouvernorat' ? 'Les ministres provinciaux' : 'Les autres membres';
+    $variables['#cache']['tags'][] = 'node_list';
   }
 }

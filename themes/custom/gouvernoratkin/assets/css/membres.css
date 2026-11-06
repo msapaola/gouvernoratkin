@@ -42,10 +42,39 @@
   padding: 0;
 }
 
-/* Gouverneur et vice-gouverneur : deux cartes plus larges. */
+/* Gouverneur et vice-gouverneur : deux cartes horizontales qui occupent
+   toute la largeur (photo à gauche, texte à droite). Dans la grille à quatre
+   colonnes, elles laissaient à droite un grand vide (rapport, § 10.2). */
 .membres-grille--large {
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  max-width: 820px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+}
+
+@media (min-width: 576px) {
+  .membres-grille--large .membre-carte {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .membres-grille--large .membre-carte__photo {
+    flex: 0 0 42%;
+    aspect-ratio: 4 / 5;
+  }
+
+  .membres-grille--large .membre-carte__corps {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1.75rem 1.75rem 1.75rem 1.6rem;
+    text-align: left;
+  }
+
+  .membres-grille--large .membre-carte__nom {
+    font-size: 1.4rem;
+  }
+
+  .membres-grille--large .membre-carte__fonction {
+    font-size: 1rem;
+  }
 }
 
 .membres-grille__item {
@@ -252,43 +281,97 @@
    Page d'un membre
    ========================================================================== */
 
-.membre-fiche {
-  padding: 2.5rem 0 3.5rem;
+.membre-fiche__entete {
+  padding-bottom: 2rem;
 }
 
 .membre-fiche__nom {
-  margin-bottom: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.membre-fiche__fonction {
+  font-family: var(--fontFamily-heading);
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--secondaryColorDark, #00719A);
+  margin: 0;
+  max-width: 60ch;
+}
+
+.membre-fiche__corps {
+  background-color: #f5f7fa;
+  padding: 3rem 0 3.5rem;
 }
 
 .membre-fiche__grille {
   display: grid;
-  grid-template-columns: minmax(200px, 300px) 1fr;
-  gap: 2.5rem;
+  grid-template-columns: minmax(220px, 340px) 1fr;
+  gap: 3rem;
   align-items: start;
 }
 
 .membre-fiche__photo {
   border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(9, 36, 46, 0.12);
 }
 
-.membre-fiche__fonction {
+.membre-fiche__texte {
+  max-width: 70ch;
+}
+
+.membre-fiche__texte p,
+.membre-fiche__biographie li {
+  font-size: 1.02rem;
+  line-height: 1.8;
+  color: var(--blackColor);
+}
+
+.membre-fiche__chapo {
+  font-size: 1.15rem !important;
+  line-height: 1.7 !important;
+  padding-left: 1.1rem;
+  border-left: 4px solid var(--secondaryColor);
+  margin: 0 0 2rem;
+}
+
+.membre-fiche__biographie h2 {
   font-family: var(--fontFamily-heading);
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--secondaryColorDark, #00719A);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--mainColor);
+  margin: 0 0 1rem;
 }
 
-.membre-fiche__texte p {
-  line-height: 1.75;
+.membre-fiche__biographie {
+  margin-bottom: 2rem;
+}
+
+.membre-fiche__aide {
+  font-size: 0.92rem !important;
+  color: var(--paragraphColor) !important;
+  background-color: var(--whiteColor);
+  border: 1px dashed #c9d1dc;
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+}
+
+.membre-fiche__retour {
+  margin-top: 2rem;
+}
+
+.membre-fiche__autres {
+  padding: 2.5rem 0 3.5rem;
 }
 
 @media (max-width: 767.98px) {
   .membre-fiche__grille {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
 
   .membre-fiche__photo {
-    max-width: 240px;
+    max-width: 260px;
   }
 }
 

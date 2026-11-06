@@ -1,0 +1,189 @@
+<?php
+
+/**
+ * @file
+ * Données structurées schema.org (JSON-LD) pour les moteurs de recherche.
+ *
+ * Constat R5 du diagnostic : aucune donnée structurée. Chaque page reçoit
+ * désormais un bloc <script type="application/ld+json"> décrivant :
+ * - l'institution (GovernmentOrganization) et le site (WebSite), partout ;
+ * - l'article (NewsArticle), sur la page d'une actualité ;
+ * - le fil d'Ariane (BreadcrumbList), hors page d'accueil.
+ *
+ * Les coordonnées viennent du bloc « Coordonnées du Gouvernorat » (module
+ * gouvernorat_contact) quand il existe : les modifier dans Contenu › Blocs
+ * met aussi à jour ces données.
+ *
+ * Contrôle : https://search.google.com/test/rich-results
+ */
+
+use Drupal\Core\Url;
+use Drupal\node\NodeInterface;
+
+/**
+ * Comptes officiels du Gouvernorat sur les réseaux sociaux.
+ */
+const GOUVERNORAT_SEO_RESEAUX = [
+  'https://x.com/gouvernoratk',
+  'https://www.facebook.com/GouvKinshasa',
+  'https://www.instagram.com/gouvernoratk',
+  'https://www.youtube.com/@GouvernoratdeKinshasa',
+  'https://www.tiktok.com/@gouvernoratk',
+];
+
+/**
+ * Implements hook_page_attachments().
+ */
+function gouvernorat_seo_page_attachments(array &$attachments) {
+  if (\Drupal::service('router.admin_context')->isAdminRoute()) {
+    return;
+  }
+
+  $accueil = Url::fromRoute('<front>')->setAbsolute()->toString();
+  $organisation_id = $accueil . '#organisation';
+  $graphe = [];
+
+  $graphe[] = gouvernorat_seo_organisation($organisation_id, $accueil);
+  $graphe[] = [
+    '@type' => 'WebSite',
+    '@id' => $accueil . '#site',
+    'url' => $accueil,
+    'name' => \Drupal::config('system.site')->get('name'),
+    'inLanguage' => 'fr',
+    'publisher' => ['@id' => $organisation_id],
+  ];
+
+  $route = \Drupal::routeMatch();
+  $node = $route->getParameter('node');
+  if ($route->getRouteName() === 'entity.node.canonical' && $node instanceof NodeInterface && $node->bundle() === 'article' && $node->isPublished()) {
+    $graphe[] = gouvernorat_seo_article($node, $organisation_id);
+    $attachments['#cache']['tags'] = array_merge($attachments['#cache']['tags'] ?? [], $node->getCacheTags());
+  }
+
+  if (!\Drupal::service('path.matcher')->isFrontPage() && ($fil = gouvernorat_seo_fil_ariane())) {
+    $graphe[] = $fil;
+  }
+
+  $attachments['#attached']['html_head'][] = [[
+    '#type' => 'html_tag',
+    '#tag' => 'script',
+    '#attributes' => ['type' => 'application/ld+json'],
+    '#value' => json_encode(['@context' => 'https://schema.org', '@graph' => $graphe], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG),
+  ], 'gouvernorat_seo_jsonld'];
+
+  $attachments['#cache']['tags'][] = 'block_content_list';
+  $attachments['#cache']['tags'][] = 'config:system.site';
+  $attachments['#cache']['contexts'][] = 'url.path';
+  $attachments['#cache']['contexts'][] = 'url.site';
+}
+
+/**
+ * Décrit l'institution.
+ */
+function gouvernorat_seo_organisation(string $id, string $accueil): array {
+  $chemin_logo = \Drupal::service('extension.list.theme')->getPath('gouvernoratkin') . '/assets/images/logo1.png';
+  $organisation = [
+    '@type' => 'GovernmentOrganization',
+    '@id' => $id,
+    'name' => 'Gouvernorat de la Ville-Province de Kinshasa',
+    'alternateName' => 'Gouvernorat de Kinshasa',
+    'url' => $accueil,
+    'logo' => \Drupal::service('file_url_generator')->generateAbsoluteString($chemin_logo),
+    'areaServed' => [
+      '@type' => 'City',
+      'name' => 'Kinshasa',
+      'containedInPlace' => ['@type' => 'Country', 'name' => 'République démocratique du Congo'],
+    ],
+    'sameAs' => GOUVERNORAT_SEO_RESEAUX,
+  ];
+
+  if (function_exists('gouvernorat_contact_coordonnees') && ($coordonnees = gouvernorat_contact_coordonnees())) {
+    if ($coordonnees['adresse']) {
+      $organisation['address'] = [
+        '@type' => 'PostalAddress',
+        'streetAddress' => $coordonnees['adresse'][0],
+        'addressLocality' => 'Kinshasa',
+        'addressCountry' => 'CD',
+      ];
+    }
+    if ($coordonnees['courriel']) {
+      $organisation['email'] = $coordonnees['courriel'];
+    }
+    if ($coordonnees['telephone']) {
+      $organisation['telephone'] = $coordonnees['telephone'];
+    }
+  }
+
+  return $organisation;
+}
+
+/**
+ * Décrit une actualité.
+ */
+function gouvernorat_seo_article(NodeInterface $node, string $organisation_id): array {
+  $url = $node->toUrl()->setAbsolute()->toString();
+  $article = [
+    '@type' => 'NewsArticle',
+    '@id' => $url . '#article',
+    'mainEntityOfPage' => $url,
+    'headline' => mb_substr($node->label(), 0, 110),
+    'datePublished' => date('c', $node->getCreatedTime()),
+    'dateModified' => date('c', $node->getChangedTime()),
+    'inLanguage' => 'fr',
+    'author' => ['@id' => $organisation_id],
+    'publisher' => ['@id' => $organisation_id],
+  ];
+
+  if ($node->hasField('body') && !$node->get('body')->isEmpty()) {
+    $corps = $node->get('body')->first();
+    $texte = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($corps->summary ?: $corps->value), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+    if ($texte !== '') {
+      $article['description'] = \Drupal\Component\Utility\Unicode::truncate($texte, 300, TRUE, TRUE);
+    }
+  }
+
+  if ($node->hasField('field_image_media') && ($media = $node->get('field_image_media')->entity)
+    && $media->hasField('field_media_image') && ($fichier = $media->get('field_media_image')->entity)) {
+    $article['image'] = [\Drupal::service('file_url_generator')->generateAbsoluteString($fichier->getFileUri())];
+  }
+
+  return $article;
+}
+
+/**
+ * Fil d'Ariane de la page courante, d'après le constructeur de Drupal.
+ */
+function gouvernorat_seo_fil_ariane(): ?array {
+  $route = \Drupal::routeMatch();
+  $liens = \Drupal::service('breadcrumb')->build($route)->getLinks();
+  $elements = [];
+  $position = 1;
+  foreach ($liens as $lien) {
+    $url = $lien->getUrl();
+    if ($url->isRouted() && $url->getRouteName() === '<none>') {
+      continue;
+    }
+    $elements[] = [
+      '@type' => 'ListItem',
+      'position' => $position++,
+      'name' => strip_tags((string) $lien->getText()),
+      'item' => $url->setAbsolute()->toString(),
+    ];
+  }
+
+  $requete = \Drupal::request();
+  $titre = \Drupal::service('title_resolver')->getTitle($requete, $route->getRouteObject());
+  $titre = is_array($titre) ? \Drupal::service('renderer')->renderInIsolation($titre) : $titre;
+  $titre = trim(strip_tags((string) $titre));
+  if ($titre === '' || !$elements) {
+    return NULL;
+  }
+  $elements[] = [
+    '@type' => 'ListItem',
+    'position' => $position,
+    'name' => html_entity_decode($titre, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+    'item' => Url::fromRoute('<current>')->setAbsolute()->toString(),
+  ];
+
+  return ['@type' => 'BreadcrumbList', 'itemListElement' => $elements];
+}

@@ -306,6 +306,18 @@
         $form.find(".newsletter-statut").text(message);
     });
 
+    // Liens ouverts dans un nouvel onglet (constat S10 du diagnostic) : la page
+    // ouverte ne doit pas pouvoir agir sur celle du site. Le script de
+    // déploiement corrige les textes enregistrés ; ceci couvre les formats de
+    // texte qui retirent l'attribut rel à l'affichage.
+    $('a[target="_blank"]').each(function () {
+        var rel = (this.getAttribute('rel') || '').split(/\s+/).filter(Boolean);
+        ['noopener', 'noreferrer'].forEach(function (valeur) {
+            if (rel.indexOf(valeur) === -1) { rel.push(valeur); }
+        });
+        this.setAttribute('rel', rel.join(' '));
+    });
+
     // Go to Top
     $(function () {
         // Scroll Event

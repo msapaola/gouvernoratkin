@@ -3,6 +3,7 @@ langcode: fr
 status: true
 dependencies:
   config:
+    - field.field.node.membre.field_membre_biographie
     - field.field.node.membre.field_membre_description
     - field.field.node.membre.field_membre_fonction
     - field.field.node.membre.field_membre_instance
@@ -19,6 +20,7 @@ mode: default
 content: {  }
 hidden:
   addtoany: true
+  field_membre_biographie: true
   field_membre_description: true
   field_membre_fonction: true
   field_membre_instance: true

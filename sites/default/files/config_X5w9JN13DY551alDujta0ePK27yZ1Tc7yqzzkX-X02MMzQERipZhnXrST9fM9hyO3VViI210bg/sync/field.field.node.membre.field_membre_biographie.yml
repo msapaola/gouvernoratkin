@@ -1,0 +1,24 @@
+uuid: f7c45663-2161-4dbb-8a6e-909abedab5c5
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_membre_biographie
+    - filter.format.basic_html
+    - node.type.membre
+  module:
+    - text
+id: node.membre.field_membre_biographie
+field_name: field_membre_biographie
+entity_type: node
+bundle: membre
+label: 'Biographie et parcours'
+description: "Facultatif. Présentation détaillée affichée sur la page de la personne : parcours, formation, attributions, priorités. Plusieurs paragraphes possibles."
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - basic_html
+field_type: text_long

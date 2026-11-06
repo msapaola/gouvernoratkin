@@ -79,7 +79,7 @@ function gouvernorat_accueil_deploy_contenu_initial() {
       'type' => 'chiffres_cles',
       'info' => 'Accueil : chiffres clés',
       'field_chiffres' => $paragraphes,
-      'field_chiffres_source' => 'Source : à compléter — institut et année de référence.',
+      'field_chiffres_source' => '',
       'reusable' => TRUE,
     ])->save();
     $messages[] = 'Bloc « Chiffres clés » créé.';

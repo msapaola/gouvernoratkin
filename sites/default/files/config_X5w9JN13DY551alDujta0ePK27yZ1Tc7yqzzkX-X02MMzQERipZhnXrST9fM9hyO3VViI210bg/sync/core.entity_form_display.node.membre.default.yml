@@ -3,6 +3,7 @@ langcode: fr
 status: true
 dependencies:
   config:
+    - field.field.node.membre.field_membre_biographie
     - field.field.node.membre.field_membre_description
     - field.field.node.membre.field_membre_fonction
     - field.field.node.membre.field_membre_instance
@@ -14,11 +15,20 @@ dependencies:
   module:
     - image
     - path
+    - text
 id: node.membre.default
 targetEntityType: node
 bundle: membre
 mode: default
 content:
+  field_membre_biographie:
+    type: text_textarea
+    weight: 6
+    region: content
+    settings:
+      rows: 12
+      placeholder: ''
+    third_party_settings: {  }
   field_membre_description:
     type: string_textarea
     weight: 5
@@ -43,7 +53,7 @@ content:
     third_party_settings: {  }
   field_membre_mot:
     type: string_textarea
-    weight: 6
+    weight: 7
     region: content
     settings:
       rows: 6
