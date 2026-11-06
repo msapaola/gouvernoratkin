@@ -31,8 +31,11 @@ class ComposerStaticInitf2bbc4e4e4d432259f4297fd2d96ec9c
         '2f69d3914119f042cca9e44442d5ce95' => __DIR__ . '/../..' . '/core/includes/bootstrap.inc',
         '38a4a83ee9437fa4c0c7a481bbf0d2a0' => __DIR__ . '/../..' . '/core/includes/guzzle_file_cookie_jar_shim.php',
         '23c18046f52bef3eea034657bafda50f' => __DIR__ . '/..' . '/symfony/polyfill-php81/bootstrap.php',
+        '8e92226780215d0ec758aa7b73e0ede9' => __DIR__ . '/..' . '/open-telemetry/context/fiber/initialize_fiber_handler.php',
         '47e1160838b5e5a10346ac4084b58c23' => __DIR__ . '/..' . '/laravel/prompts/src/helpers.php',
+        'c7b4a5d8b94d270f0f9a84f81e1dd63d' => __DIR__ . '/..' . '/open-telemetry/api/Trace/functions.php',
         '801c31d8ed748cfa537fa45402288c95' => __DIR__ . '/..' . '/psy/psysh/src/functions.php',
+        '4b3d45d99f6e4eb65ea80c00519736e4' => __DIR__ . '/..' . '/anthropic-ai/sdk/src/Version.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -85,6 +88,7 @@ class ComposerStaticInitf2bbc4e4e4d432259f4297fd2d96ec9c
             'Symfony\\Component\\DependencyInjection\\' => 38,
             'Symfony\\Component\\Console\\' => 26,
             'Symfony\\Bridge\\PsrHttpMessage\\' => 30,
+            'StandardWebhooks\\' => 17,
         ),
         'R' =>
         array (
@@ -105,6 +109,11 @@ class ComposerStaticInitf2bbc4e4e4d432259f4297fd2d96ec9c
             'Peast\\' => 6,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
+        'O' =>
+        array (
+            'OpenTelemetry\\Context\\' => 22,
+            'OpenTelemetry\\API\\' => 18,
+        ),
         'M' =>
         array (
             'Masterminds\\' => 12,
@@ -118,6 +127,10 @@ class ComposerStaticInitf2bbc4e4e4d432259f4297fd2d96ec9c
         'J' =>
         array (
             'JsonSchema\\' => 11,
+        ),
+        'H' =>
+        array (
+            'Http\\Discovery\\' => 15,
         ),
         'G' =>
         array (
@@ -161,6 +174,7 @@ class ComposerStaticInitf2bbc4e4e4d432259f4297fd2d96ec9c
         'A' =>
         array (
             'Asm89\\Stack\\' => 12,
+            'Anthropic\\' => 10,
         ),
     );
 
@@ -329,6 +343,10 @@ class ComposerStaticInitf2bbc4e4e4d432259f4297fd2d96ec9c
         array (
             0 => __DIR__ . '/..' . '/symfony/psr-http-message-bridge',
         ),
+        'StandardWebhooks\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/standard-webhooks/standard-webhooks/libraries/php/src',
+        ),
         'Robo\\' =>
         array (
             0 => __DIR__ . '/..' . '/consolidation/robo/src',
@@ -382,6 +400,14 @@ class ComposerStaticInitf2bbc4e4e4d432259f4297fd2d96ec9c
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
+        'OpenTelemetry\\Context\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/open-telemetry/context',
+        ),
+        'OpenTelemetry\\API\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/open-telemetry/api',
+        ),
         'Masterminds\\' =>
         array (
             0 => __DIR__ . '/..' . '/masterminds/html5/src',
@@ -401,6 +427,10 @@ class ComposerStaticInitf2bbc4e4e4d432259f4297fd2d96ec9c
         'JsonSchema\\' =>
         array (
             0 => __DIR__ . '/..' . '/justinrainbow/json-schema/src/JsonSchema',
+        ),
+        'Http\\Discovery\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/php-http/discovery/src',
         ),
         'GuzzleHttp\\Psr7\\' =>
         array (
@@ -514,6 +544,10 @@ class ComposerStaticInitf2bbc4e4e4d432259f4297fd2d96ec9c
         'Asm89\\Stack\\' =>
         array (
             0 => __DIR__ . '/..' . '/asm89/stack-cors/src',
+        ),
+        'Anthropic\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/anthropic-ai/sdk/src',
         ),
     );
 

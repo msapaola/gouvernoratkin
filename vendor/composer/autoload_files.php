@@ -30,6 +30,9 @@ return array(
     '2f69d3914119f042cca9e44442d5ce95' => $baseDir . '/core/includes/bootstrap.inc',
     '38a4a83ee9437fa4c0c7a481bbf0d2a0' => $baseDir . '/core/includes/guzzle_file_cookie_jar_shim.php',
     '23c18046f52bef3eea034657bafda50f' => $vendorDir . '/symfony/polyfill-php81/bootstrap.php',
+    '8e92226780215d0ec758aa7b73e0ede9' => $vendorDir . '/open-telemetry/context/fiber/initialize_fiber_handler.php',
     '47e1160838b5e5a10346ac4084b58c23' => $vendorDir . '/laravel/prompts/src/helpers.php',
+    'c7b4a5d8b94d270f0f9a84f81e1dd63d' => $vendorDir . '/open-telemetry/api/Trace/functions.php',
     '801c31d8ed748cfa537fa45402288c95' => $vendorDir . '/psy/psysh/src/functions.php',
+    '4b3d45d99f6e4eb65ea80c00519736e4' => $vendorDir . '/anthropic-ai/sdk/src/Version.php',
 );

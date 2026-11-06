@@ -77,6 +77,7 @@ Disallow: /index.php/user/logout
 Disallow: /index.php/media/oembed
 Disallow: /index.php/*/media/oembed
 
+
 # Plan du site (module gouvernorat_seo). Ajouté par Composer à chaque
 # mise à jour de Drupal : voir deploiement/scaffold/robots-ajout.txt.
 Sitemap: https://kinshasa.cd/sitemap.xml

@@ -15,6 +15,7 @@
         }
     ],
     "require": {
+        "anthropic-ai/sdk": "^1.6",
         "composer/installers": "^2.0",
         "drupal/addtoany": "^2.0",
         "drupal/admin_toolbar": "^3.5",
