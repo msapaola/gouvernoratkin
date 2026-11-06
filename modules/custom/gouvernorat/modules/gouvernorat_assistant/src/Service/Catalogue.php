@@ -140,6 +140,11 @@ class Catalogue {
       return [];
     }
 
+    // Question sur une personne en fonction : les fiches des membres font
+    // foi, les actualités (datées, parfois reprises de la presse) passent
+    // après.
+    $personne = (bool) preg_match('/\b(qui|ministre|gouverneur|vice|nom|appel\w*|directeur|directrice|cabinet|secretaire|conseiller|responsable|titulaire|charge)\b/', $this->normaliser($question));
+
     $scores = [];
     foreach ($this->entrees() as $i => $e) {
       $score = 0;
@@ -148,9 +153,17 @@ class Catalogue {
           $score += 6;
         }
         if (str_contains($e['cle_rubrique'], $mot)) {
-          $score += 3;
+          $score += 5;
         }
         $score += min(4, substr_count($e['cle'], $mot));
+      }
+      if ($score > 0 && $personne) {
+        if ($e['type'] === self::TYPES['membre'][0]) {
+          $score = $score * 2 + 10;
+        }
+        elseif ($e['type'] === self::TYPES['article'][0]) {
+          $score = intdiv($score, 2);
+        }
       }
       if ($score > 0) {
         $scores[$i] = $score;
@@ -223,7 +236,10 @@ class Catalogue {
     $rubrique = '';
 
     if ($node->hasField('field_membre_fonction') && !$node->get('field_membre_fonction')->isEmpty()) {
-      $morceaux[] = $node->get('field_membre_fonction')->value;
+      // La fonction d'un membre sert de rubrique : « ministre des travaux
+      // publics » doit trouver la fiche du ministre, pas un article.
+      $rubrique = $node->get('field_membre_fonction')->value;
+      $morceaux[] = $rubrique;
     }
     foreach (['field_membre_description', 'body', 'field_membre_biographie'] as $champ) {
       if ($node->hasField($champ) && !$node->get($champ)->isEmpty()) {
@@ -231,7 +247,7 @@ class Catalogue {
       }
     }
     foreach (['field_service_au_citoyen', 'field_categorie'] as $champ) {
-      if ($node->hasField($champ) && ($terme = $node->get($champ)->entity)) {
+      if ($rubrique === '' && $node->hasField($champ) && ($terme = $node->get($champ)->entity)) {
         $rubrique = $terme->label();
         break;
       }
@@ -240,7 +256,9 @@ class Catalogue {
     $texte = $this->texteBrut(implode("\n\n", $morceaux));
     $resume = Unicode::truncate($texte, 140, TRUE, TRUE);
     if ($libelle === 'Actualité') {
-      $resume = trim(date('d/m/Y', $node->getCreatedTime()) . ' ' . $resume);
+      $date = date('d/m/Y', $node->getCreatedTime());
+      $resume = trim($date . ' ' . $resume);
+      $texte = 'Publié le ' . $date . ".\n" . $texte;
     }
 
     return $this->entree($node->label(), $node->toUrl()->toString(), $libelle, $rubrique, $resume, $texte);
