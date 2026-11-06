@@ -1,6 +1,6 @@
 name: Gouvernorat Institutions
 description: "Pages Exécutif provincial et Cabinet du gouverneur construites à partir des fiches « Membre »."
-package: Custom
+package: 'Gouvernorat de Kinshasa'
 type: module
 core_version_requirement: ^10.1 || ^11
 dependencies:

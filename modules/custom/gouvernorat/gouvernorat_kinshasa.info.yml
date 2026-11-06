@@ -1,0 +1,14 @@
+name: Gouvernorat de Kinshasa
+description: "Fonctions propres au site du Gouvernorat de Kinshasa. Active l'ensemble des sous-modules rangés dans modules/ de ce dossier."
+package: 'Gouvernorat de Kinshasa'
+type: module
+core_version_requirement: ^10.1 || ^11
+dependencies:
+  - gouvernorat_accueil
+  - gouvernorat_contact
+  - gouvernorat_institutions
+  - gouvernorat_partage
+  - gouvernorat_securite
+  - gouvernorat_seo
+  - gouvernorat_services
+  - gouvernorat_videos

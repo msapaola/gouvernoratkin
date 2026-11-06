@@ -1,5 +1,5 @@
 name: Gouvernorat Sécurité
 description: "Site de test non indexé, et version de Drupal non annoncée (diagnostic du 1er novembre 2026)."
-package: Custom
+package: 'Gouvernorat de Kinshasa'
 type: module
 core_version_requirement: ^10.1 || ^11

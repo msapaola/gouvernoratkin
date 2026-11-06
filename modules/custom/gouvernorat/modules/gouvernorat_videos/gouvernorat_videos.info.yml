@@ -1,6 +1,6 @@
 name: Gouvernorat Vidéos
 description: "Vidéos YouTube du Gouvernorat : identifiant, miniature et lecteur pour le type de contenu Vidéo."
-package: Custom
+package: 'Gouvernorat de Kinshasa'
 type: module
 core_version_requirement: ^10 || ^11
 dependencies:

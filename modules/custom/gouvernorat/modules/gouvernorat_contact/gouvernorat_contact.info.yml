@@ -1,6 +1,6 @@
 name: Gouvernorat Contact
 description: "Page Contact : coordonnées modifiables par la rédaction et formulaire allégé."
-package: Custom
+package: 'Gouvernorat de Kinshasa'
 type: module
 core_version_requirement: ^10.1 || ^11
 dependencies:

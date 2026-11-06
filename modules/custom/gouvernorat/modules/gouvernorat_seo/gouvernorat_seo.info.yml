@@ -1,6 +1,6 @@
 name: Gouvernorat SEO
 description: "Une seule adresse par page : redirections 301 des adresses brutes vers les alias, adresses lisibles des contenus."
-package: Custom
+package: 'Gouvernorat de Kinshasa'
 type: module
 core_version_requirement: ^10.1 || ^11
 dependencies:
