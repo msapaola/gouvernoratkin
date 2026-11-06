@@ -81,8 +81,9 @@
     return texte
       .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
       .replace(/\[([^\]]+)\]\((\/[^)\s]*)\)/g, function (tout, libelle, chemin) {
-        // Chemins internes seulement (« / » mais pas « // »).
-        if (chemin.indexOf('//') === 0) {
+        // Chemins internes seulement : « / » mais ni « // » ni « \ », que
+        // certains navigateurs lisent comme l'adresse d'un autre site.
+        if (chemin.indexOf('//') === 0 || chemin.indexOf('\\') !== -1) {
           return libelle;
         }
         return '<a href="' + chemin + '">' + libelle + '</a>';
@@ -227,7 +228,9 @@
             attente.remove();
             if (donnees.reponse) {
               ajouter('assistant', donnees.reponse);
-              conversation.push({ role: 'assistant', content: donnees.reponse });
+              // La signature du serveur accompagne la réponse quand elle est
+              // renvoyée avec la suite de la conversation.
+              conversation.push({ role: 'assistant', content: donnees.reponse, signature: donnees.signature || '' });
             }
             else {
               // La question restée sans réponse est retirée de l'historique

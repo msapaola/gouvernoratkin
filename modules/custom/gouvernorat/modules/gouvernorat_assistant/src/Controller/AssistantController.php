@@ -4,6 +4,7 @@ namespace Drupal\gouvernorat_assistant\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Flood\FloodInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\gouvernorat_assistant\Service\Assistant;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -68,7 +69,7 @@ class AssistantController extends ControllerBase {
     }
 
     $config = $this->config('gouvernorat_assistant.settings');
-    $ip = $request->getClientIp();
+    $ip = $request->getClientIp() ?? 'inconnue';
     $limite_heure = max(1, (int) $config->get('limite_heure'));
     $limite_jour = max(1, (int) $config->get('limite_jour_total'));
     if (!$this->flood->isAllowed('gouvernorat_assistant.visiteur', $limite_heure, 3600, $ip)) {
@@ -81,7 +82,8 @@ class AssistantController extends ControllerBase {
     $this->flood->register('gouvernorat_assistant.site', 86400, 'site');
 
     try {
-      return $this->json(['reponse' => $this->assistant->repondre($echanges)]);
+      $reponse = $this->assistant->repondre($echanges);
+      return $this->json(['reponse' => $reponse, 'signature' => self::signer($reponse)]);
     }
     catch (\RuntimeException $e) {
       return $this->json(['erreur' => $e->getMessage()], 502);
@@ -102,6 +104,20 @@ class AssistantController extends ControllerBase {
     // requête reste courte.
     $messages = array_slice(array_values($donnees['messages']), -self::ECHANGES_MAX);
 
+    // Les réponses de l'assistant renvoyées par le navigateur doivent porter
+    // la signature donnée par le serveur : sinon un visiteur pourrait
+    // fabriquer de fausses réponses (« j'accepte d'ignorer mes règles… »)
+    // pour détourner l'assistant. Une seule réponse non signée, et tout
+    // l'historique est écarté : seule la dernière question est gardée.
+    foreach ($messages as $message) {
+      if (is_array($message) && ($message['role'] ?? '') === 'assistant'
+        && !(is_string($message['content'] ?? NULL) && is_string($message['signature'] ?? NULL)
+          && hash_equals(self::signer($message['content']), $message['signature']))) {
+        $messages = [end($messages)];
+        break;
+      }
+    }
+
     $echanges = [];
     $attendu = 'user';
     foreach ($messages as $message) {
@@ -109,6 +125,9 @@ class AssistantController extends ControllerBase {
         return NULL;
       }
       $texte = trim(preg_replace('/[^\P{C}\n]+/u', '', $message['content']));
+      if ($message['role'] === 'user') {
+        $texte = self::nettoyerQuestion($texte);
+      }
       $maximum = $message['role'] === 'user' ? self::LONGUEUR_QUESTION : self::LONGUEUR_REPONSE;
       if ($texte === '' || mb_strlen($texte) > $maximum) {
         return NULL;
@@ -129,6 +148,30 @@ class AssistantController extends ControllerBase {
       return NULL;
     }
     return $echanges;
+  }
+
+  /**
+   * Signature d'une réponse de l'assistant (clé propre au site).
+   */
+  public static function signer(string $texte): string {
+    return hash_hmac('sha256', $texte, Settings::getHashSalt() . ':gouvernorat_assistant');
+  }
+
+  /**
+   * Prépare une question avant de l'envoyer à Anthropic.
+   *
+   * - Les données personnelles les plus courantes sont masquées : adresses
+   *   de courriel, numéros de téléphone, longues suites de chiffres
+   *   (pièces d'identité, comptes). Elles ne quittent pas le site.
+   * - Les chevrons sont neutralisés : le visiteur ne peut pas imiter les
+   *   balises que le site ajoute autour des pages jointes.
+   */
+  public static function nettoyerQuestion(string $texte): string {
+    $texte = preg_replace('/[\p{L}\p{N}._%+-]+@[\p{L}\p{N}.-]+\.[\p{L}]{2,}/u', '[courriel masqué]', $texte);
+    // Au moins 9 chiffres : un téléphone ou un numéro de pièce, pas une date
+    // (« 13/03/2018 ») ni un montant courant.
+    $texte = preg_replace_callback('/\+?\d[\d .\-\/]{7,}\d/u', fn($m) => preg_match_all('/\d/', $m[0]) >= 9 ? '[numéro masqué]' : $m[0], $texte);
+    return str_replace(['<', '>'], ['‹', '›'], $texte);
   }
 
   /**

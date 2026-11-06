@@ -33,7 +33,7 @@ class Catalogue {
     'service_au_citoyen' => ['Démarche', NULL],
     'page' => ['Page', NULL],
     'page_a_propos' => ['Page', NULL],
-    'membre' => ['Membre du gouvernement provincial', NULL],
+    'membre' => ['Fiche officielle d\'un membre (exécutif provincial ou cabinet)', NULL],
     'article' => ['Actualité', 120],
     'evenement' => ['Événement', 30],
     'video' => ['Vidéo', 30],
@@ -122,7 +122,7 @@ class Catalogue {
    *   Les chemins en clés.
    */
   public function adresses(): array {
-    return array_fill_keys(array_column($this->entrees(), 'url'), TRUE);
+    return array_fill_keys(array_map('rawurldecode', array_column($this->entrees(), 'url')), TRUE);
   }
 
   /**
@@ -183,8 +183,11 @@ class Catalogue {
     $stockage = $this->entityTypeManager->getStorage('taxonomy_term');
     $arbre = $stockage->loadTree('service_au_citoyen', 0, NULL, FALSE);
     $noms = array_column(array_map(fn($t) => ['tid' => $t->tid, 'name' => $t->name], $arbre), 'name', 'tid');
+    $pleines = $this->rubriquesPleines($arbre);
     foreach ($arbre as $terme) {
-      if (isset($terme->status) && !$terme->status) {
+      // Rubrique dépubliée, ou sans aucune démarche publiée : sa page
+      // afficherait « Aucune démarche trouvée ».
+      if ((isset($terme->status) && !$terme->status) || !isset($pleines[(int) $terme->tid])) {
         continue;
       }
       $parent = (int) ($terme->parents[0] ?? 0);
@@ -198,6 +201,41 @@ class Catalogue {
       );
     }
     return $entrees;
+  }
+
+  /**
+   * Rubriques qui contiennent au moins une démarche publiée, sous-rubriques
+   * comprises.
+   *
+   * @return array
+   *   Identifiants des rubriques non vides, en clés.
+   */
+  protected function rubriquesPleines(array $arbre): array {
+    $requete = $this->base->select('node__field_service_au_citoyen', 'r');
+    $requete->join('node_field_data', 'n', 'n.nid = r.entity_id AND n.default_langcode = 1');
+    $requete->condition('n.status', 1);
+    $requete->condition('r.deleted', 0);
+    $requete->addField('r', 'field_service_au_citoyen_target_id', 'tid');
+    $requete->distinct();
+    $directes = $requete->execute()->fetchCol();
+
+    $parents = [];
+    foreach ($arbre as $terme) {
+      $parents[(int) $terme->tid] = array_filter(array_map('intval', $terme->parents));
+    }
+    $pleines = [];
+    $pile = array_map('intval', $directes);
+    while ($pile) {
+      $tid = array_pop($pile);
+      if (isset($pleines[$tid])) {
+        continue;
+      }
+      $pleines[$tid] = TRUE;
+      foreach ($parents[$tid] ?? [] as $parent) {
+        $pile[] = $parent;
+      }
+    }
+    return $pleines;
   }
 
   /**
