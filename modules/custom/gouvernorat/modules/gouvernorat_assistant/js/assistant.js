@@ -112,7 +112,7 @@
           '<header class="assistant__entete">' +
             '<div>' +
               '<h2 class="assistant__titre" id="assistant-titre">' + Drupal.t('Assistant du Gouvernorat') + '</h2>' +
-              '<p class="assistant__sous-titre">' + Drupal.t('Réponses automatiques, à vérifier sur les pages indiquées') + '</p>' +
+              '<p class="assistant__sous-titre">' + Drupal.t('Réponses automatiques, à vérifier sur le site') + '</p>' +
             '</div>' +
             '<button type="button" class="assistant__fermer" aria-label="' + Drupal.t('Fermer l’assistant') + '"><i class="fas fa-times" aria-hidden="true"></i></button>' +
           '</header>' +
@@ -152,20 +152,73 @@
         conversation.forEach(function (m) {
           ajouter(m.role, m.content);
         });
+        if (!conversation.length && (reglages.suggestions || []).length) {
+          var liste = document.createElement('ul');
+          liste.className = 'assistant__suggestions';
+          liste.setAttribute('aria-label', Drupal.t('Questions suggérées'));
+          reglages.suggestions.forEach(function (texte) {
+            var element = document.createElement('li');
+            var bouton = document.createElement('button');
+            bouton.type = 'button';
+            bouton.className = 'assistant__suggestion';
+            bouton.textContent = texte;
+            bouton.addEventListener('click', function () {
+              liste.remove();
+              champ.value = texte;
+              formulaire.requestSubmit();
+            });
+            element.appendChild(bouton);
+            liste.appendChild(element);
+          });
+          fil.appendChild(liste);
+        }
+      }
+
+      // Téléphones : fenêtre plein écran, ajustée à la zone visible.
+      var telephone = window.matchMedia('(max-width: 575.98px)');
+      var vue = window.visualViewport;
+
+      // Quand le clavier s'ouvre, la zone visible rétrécit : la fenêtre la
+      // suit pour que le champ de saisie et la dernière réponse restent
+      // visibles au-dessus du clavier.
+      function ajuster() {
+        if (!telephone.matches || !vue || fenetre.hidden) {
+          fenetre.style.height = '';
+          fenetre.style.top = '';
+          return;
+        }
+        fenetre.style.height = vue.height + 'px';
+        fenetre.style.top = vue.offsetTop + 'px';
+        fil.scrollTop = fil.scrollHeight;
+      }
+      if (vue) {
+        vue.addEventListener('resize', ajuster);
+        vue.addEventListener('scroll', ajuster);
       }
 
       function ouvrir() {
         fenetre.hidden = false;
         bulle.setAttribute('aria-expanded', 'true');
         racine.classList.add('assistant--ouvert');
+        document.body.classList.toggle('assistant-plein-ecran', telephone.matches);
         afficherConversation();
-        champ.focus();
+        ajuster();
+        // Sur téléphone, le clavier n'est pas ouvert d'office : il cacherait
+        // le message d'accueil et les questions suggérées.
+        if (telephone.matches) {
+          racine.querySelector('.assistant__fermer').focus();
+        }
+        else {
+          champ.focus();
+        }
       }
 
       function fermer() {
         fenetre.hidden = true;
         bulle.setAttribute('aria-expanded', 'false');
         racine.classList.remove('assistant--ouvert');
+        document.body.classList.remove('assistant-plein-ecran');
+        ajuster();
         bulle.focus();
       }
 
@@ -205,6 +258,10 @@
         }
         occupe = true;
         envoyer.disabled = true;
+        var suggestions = fil.querySelector('.assistant__suggestions');
+        if (suggestions) {
+          suggestions.remove();
+        }
         champ.value = '';
         champ.style.height = 'auto';
 

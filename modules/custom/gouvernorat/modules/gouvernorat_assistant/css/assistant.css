@@ -211,6 +211,36 @@ body.avec-assistant .go-top {
   border-left: 4px solid var(--assistant-rouge);
 }
 
+/* Questions suggérées sous le message d'accueil. */
+.assistant__suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.15rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.assistant__suggestion {
+  padding: 0.5rem 0.8rem;
+  border: 1px solid #c9d6ea;
+  border-radius: 999px;
+  background-color: #fff;
+  color: var(--assistant-bleu);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+
+.assistant__suggestion:hover,
+.assistant__suggestion:focus-visible {
+  background-color: #eaf0fa;
+  border-color: var(--assistant-bleu);
+}
+
 /* ==========================================================================
    Saisie
    ========================================================================== */
@@ -226,13 +256,18 @@ body.avec-assistant .go-top {
 
 .assistant__champ {
   flex: 1;
+  /* Sans min-width: 0, un champ de formulaire refuse de rétrécir sous sa
+     largeur naturelle et pousse le bouton d'envoi hors de l'écran. */
+  min-width: 0;
   min-height: 44px;
   max-height: 120px;
   padding: 0.65rem 0.8rem;
   border: 1px solid #c9d1dc;
   border-radius: 10px;
   font: inherit;
-  font-size: 0.95rem;
+  /* 16 px au minimum : en dessous, l'iPhone zoome sur le champ quand on le
+     touche et la fenêtre déborde de l'écran. */
+  font-size: 16px;
   line-height: 1.4;
   resize: none;
 }
@@ -272,7 +307,7 @@ body.avec-assistant .go-top {
 @media (max-width: 575.98px) {
   .assistant__bulle {
     right: 14px;
-    bottom: 14px;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
     padding: 0.7rem;
   }
 
@@ -289,11 +324,56 @@ body.avec-assistant .go-top {
     right: 80px;
   }
 
+  /* Plein écran sur la partie réellement visible : la hauteur suit les
+     barres du navigateur (dvh) ; quand le clavier s'ouvre, le script règle
+     la hauteur sur la zone restée visible. */
   .assistant__fenetre {
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: auto;
+    left: 0;
     width: 100%;
-    height: 100%;
+    max-width: 100vw;
+    height: 100vh;
+    height: 100dvh;
     border-radius: 0;
+    box-shadow: none;
+  }
+
+  .assistant__entete {
+    align-items: center;
+    padding: calc(0.7rem + env(safe-area-inset-top, 0px)) 0.85rem 0.65rem 1rem;
+  }
+
+  .assistant__titre {
+    font-size: 1.05rem;
+  }
+
+  .assistant__sous-titre {
+    font-size: 0.72rem;
+  }
+
+  .assistant__fermer {
+    width: 40px;
+    height: 40px;
+  }
+
+  .assistant__fil {
+    padding: 0.85rem;
+    overscroll-behavior: contain;
+  }
+
+  .assistant__message {
+    max-width: 92%;
+  }
+
+  .assistant__formulaire {
+    padding: 0.6rem 0.75rem calc(0.6rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* La page derrière ne défile pas pendant la discussion. */
+  body.assistant-plein-ecran {
+    overflow: hidden;
   }
 }
 

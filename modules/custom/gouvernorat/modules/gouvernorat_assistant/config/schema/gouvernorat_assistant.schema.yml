@@ -17,3 +17,9 @@ gouvernorat_assistant.settings:
     limite_jour_total:
       type: integer
       label: 'Questions par jour pour tout le site'
+    suggestions:
+      type: sequence
+      label: "Questions suggérées sous le message d'accueil"
+      sequence:
+        type: string
+        label: 'Question'

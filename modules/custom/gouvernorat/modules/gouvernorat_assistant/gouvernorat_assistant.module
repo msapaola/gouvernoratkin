@@ -34,6 +34,7 @@ function gouvernorat_assistant_page_attachments(array &$attachments) {
   $attachments['#attached']['drupalSettings']['gouvernoratAssistant'] = [
     'adresse' => \Drupal\Core\Url::fromRoute('gouvernorat_assistant.message')->toString(),
     'accueil' => $config->get('message_accueil'),
+    'suggestions' => array_values(array_filter((array) $config->get('suggestions'))),
   ];
 }
 

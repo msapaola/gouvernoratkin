@@ -3,3 +3,8 @@ modele: claude-haiku-5-5
 message_accueil: "Bonjour ! Je suis l'assistant virtuel du Gouvernorat de Kinshasa. Posez-moi une question sur une démarche, un service ou l'actualité de la Ville : je vous réponds et vous indique la bonne page du site."
 limite_heure: 20
 limite_jour_total: 2000
+suggestions:
+  - 'Quelles démarches pour payer une taxe ?'
+  - "Qui sont les membres de l'exécutif provincial ?"
+  - 'Quelles sont les dernières actualités ?'
+  - 'Comment contacter le Gouvernorat ?'

@@ -61,6 +61,13 @@ class ReglagesForm extends ConfigFormBase {
       '#rows' => 3,
       '#required' => TRUE,
     ];
+    $form['suggestions'] = [
+      '#type' => 'textarea',
+      '#title' => $this->t('Questions suggérées'),
+      '#description' => $this->t("Une question par ligne (quatre au plus conseillé). Elles s'affichent sous le message d'accueil ; un clic les pose directement. Laisser vide pour n'en afficher aucune."),
+      '#default_value' => implode("\n", (array) $config->get('suggestions')),
+      '#rows' => 4,
+    ];
     $form['limite_heure'] = [
       '#type' => 'number',
       '#title' => $this->t('Questions par heure et par visiteur'),
@@ -96,6 +103,7 @@ class ReglagesForm extends ConfigFormBase {
     $this->config('gouvernorat_assistant.settings')
       ->set('active', (bool) $form_state->getValue('active'))
       ->set('message_accueil', trim($form_state->getValue('message_accueil')))
+      ->set('suggestions', array_values(array_filter(array_map(fn($l) => mb_substr(trim($l), 0, 120), preg_split('/\R/u', (string) $form_state->getValue('suggestions'))), 'strlen')))
       ->set('limite_heure', (int) $form_state->getValue('limite_heure'))
       ->set('limite_jour_total', (int) $form_state->getValue('limite_jour_total'))
       ->set('modele', trim($form_state->getValue('modele')))
