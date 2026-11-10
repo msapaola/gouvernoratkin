@@ -72,18 +72,11 @@ $settings['gouvernorat_noindex'] = FALSE;
 // ---------------------------------------------------------------------------
 // Envoi des courriels (module SMTP)
 // ---------------------------------------------------------------------------
-// Infomaniak : Manager › Service Mail › adresse contact@… › « Configurer
-// un appareil » donne le serveur et le port. Valeurs usuelles :
-// mail.infomaniak.com, port 465 (SSL) ou 587 (STARTTLS).
-$config['smtp.settings']['smtp_on'] = TRUE;
-$config['smtp.settings']['smtp_host'] = 'mail.infomaniak.com';
-$config['smtp.settings']['smtp_port'] = '465';
-$config['smtp.settings']['smtp_protocol'] = 'ssl';
-$config['smtp.settings']['smtp_username'] = '<ADRESSE_EXPEDITRICE>';
-$config['smtp.settings']['smtp_password'] = '<MOT_DE_PASSE_DE_LA_BOITE>';
-$config['smtp.settings']['smtp_from'] = '<ADRESSE_EXPEDITRICE>';
-$config['smtp.settings']['smtp_fromname'] = 'Gouvernorat de Kinshasa';
-$config['system.site']['mail'] = '<ADRESSE_EXPEDITRICE>';
+// Le serveur, le port, le chiffrement et l'adresse d'expédition
+// (site@kinshasa.cd via mail.kinshasa.cd, port 465, SSL) sont dans la
+// configuration exportée (smtp.settings.yml). Seul le mot de passe du
+// compte site@kinshasa.cd est ici, hors du dépôt.
+$config['smtp.settings']['smtp_password'] = '<MOT_DE_PASSE_DE_site@kinshasa.cd>';
 
 // ---------------------------------------------------------------------------
 // Assistant virtuel (module gouvernorat_assistant)

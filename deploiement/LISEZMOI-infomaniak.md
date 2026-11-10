@@ -22,8 +22,10 @@ Ce dossier est fermé aux visiteurs (`.htaccess` : `Require all denied`).
 - [ ] Activer l'accès **SSH** et noter l'utilisateur et le chemin du site.
 - [ ] Créer la **base MySQL** et son utilisateur ; noter le serveur, le nom,
       l'utilisateur et le mot de passe.
-- [ ] Créer la boîte **contact@…** (ou une adresse d'expédition dédiée) et
-      noter son mot de passe : il servira à l'envoi des courriels du site.
+- [ ] Envoi des courriels : le site envoie par le compte **site@kinshasa.cd**
+      (serveur mail.kinshasa.cd, port 465, SSL). Reporter son mot de passe
+      dans `settings.local.php` et vérifier que l'hébergement autorise les
+      connexions sortantes vers mail.kinshasa.cd sur le port 465.
 - [ ] Créer la boîte **securite@kinshasa.cd** (ou équivalent) pour
       `security.txt`, et désigner qui la relève.
 
