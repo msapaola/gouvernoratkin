@@ -1,0 +1,28 @@
+uuid: 1d19147a-8723-4d75-8472-e5ec38d9a68e
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_elements
+    - paragraphs.paragraphs_type.sec_chronologie
+    - paragraphs.paragraphs_type.sec_etape
+  module:
+    - entity_reference_revisions
+id: paragraph.sec_chronologie.field_sec_elements
+field_name: field_sec_elements
+entity_type: paragraph
+bundle: sec_chronologie
+label: Étapes
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      sec_etape: sec_etape
+    negate: 0
+    target_bundles_drag_drop: {  }
+field_type: entity_reference_revisions

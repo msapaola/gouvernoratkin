@@ -1,0 +1,19 @@
+uuid: 5298a446-cc56-42d2-98af-8b536eb5c31e
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_titre
+    - paragraphs.paragraphs_type.sec_chronologie
+id: paragraph.sec_chronologie.field_sec_titre
+field_name: field_sec_titre
+entity_type: paragraph
+bundle: sec_chronologie
+label: Titre
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

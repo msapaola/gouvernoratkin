@@ -1,0 +1,19 @@
+uuid: f86db1f7-8709-4de6-8d27-ce62cba434f1
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_liste
+    - paragraphs.paragraphs_type.sec_carte
+id: paragraph.sec_carte.field_sec_liste
+field_name: field_sec_liste
+entity_type: paragraph
+bundle: sec_carte
+label: Liste
+description: "Facultatif. Un élément par ligne (par exemple les communes d'un district)."
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

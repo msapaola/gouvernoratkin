@@ -1,0 +1,76 @@
+{#
+/**
+ * @file
+ * Page de base, affichage complet : pages institutionnelles (À propos,
+ * Culture et patrimoine, Structures de la ville…) et pages simples.
+ *
+ * Tout le texte vient du contenu : titre, surtitre, chapô, corps et
+ * sections (paragraphes, gabarits paragraph--sec-*.html.twig). Le gabarit ne
+ * porte que la mise en page.
+ *
+ * Variable sommaire (module gouvernorat_pages) : sections dont le libellé
+ * de sommaire est rempli.
+ */
+#}
+{{ attach_library('gouvernoratkin/apropos') }}
+
+<article{{ attributes.addClass('page-sections') }}>
+
+  <header class="page-entete">
+    <div class="container">
+      <nav aria-label="{{ 'Fil d’Ariane'|t }}">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ label }}</li>
+        </ol>
+      </nav>
+      <div class="page-entete__contenu">
+        <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
+        {% if node.field_page_surtitre.value %}
+          <p class="surtitre">{{ node.field_page_surtitre.value }}</p>
+        {% endif %}
+        {{ title_prefix }}
+        <h1 class="page-entete__titre">{{ label }}</h1>
+        {{ title_suffix }}
+        {% if node.field_page_chapo.value %}
+          <p class="page-entete__accroche">{{ node.field_page_chapo.value }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  {% if sommaire|length > 1 %}
+    <nav class="ap-sommaire" aria-label="{{ 'Sommaire de la page'|t }}">
+      <div class="container">
+        <ul class="ap-sommaire__liste">
+          {% for entree in sommaire %}
+            <li><a class="ap-sommaire__lien" href="#{{ entree.ancre }}">{{ entree.libelle }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </nav>
+  {% endif %}
+
+  {% if content.body|render|striptags|trim %}
+    <section class="ap-section">
+      <div class="container page-corps">
+        {{ content.body }}
+      </div>
+    </section>
+  {% endif %}
+
+  {# Une section sur deux sur fond clair, comme sur l'ancienne page. Les
+     bandes « chiffres » et « appel » ont leur propre fond : elles ne
+     comptent pas dans l'alternance. #}
+  {% set sections = content.field_page_sections|filter((v, k) => k|first != '#') %}
+  {% set rang = 0 %}
+  {% for section in sections %}
+    {% set type = section['#paragraph'] ? section['#paragraph'].bundle() : '' %}
+    {% set alterne = type not in ['sec_chiffres', 'sec_appel'] %}
+    {% if alterne %}{% set rang = rang + 1 %}{% endif %}
+    <div class="page-section{{ alterne and rang is even ? ' page-section--clair' }}">
+      {{ section }}
+    </div>
+  {% endfor %}
+
+</article>

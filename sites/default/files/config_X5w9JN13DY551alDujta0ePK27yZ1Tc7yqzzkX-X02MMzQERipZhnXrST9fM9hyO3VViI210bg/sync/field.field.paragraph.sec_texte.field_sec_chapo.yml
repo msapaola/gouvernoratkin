@@ -1,0 +1,19 @@
+uuid: ca030de4-86a6-4343-ac3a-dd6bdb4f9a91
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_chapo
+    - paragraphs.paragraphs_type.sec_texte
+id: paragraph.sec_texte.field_sec_chapo
+field_name: field_sec_chapo
+entity_type: paragraph
+bundle: sec_texte
+label: Chapô
+description: "Phrase d'introduction mise en valeur. Facultatif."
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

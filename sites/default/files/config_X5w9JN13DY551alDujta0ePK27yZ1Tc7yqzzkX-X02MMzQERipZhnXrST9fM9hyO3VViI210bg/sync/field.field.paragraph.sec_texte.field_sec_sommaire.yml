@@ -1,0 +1,19 @@
+uuid: 5068765b-bf5a-4bfa-ac64-d7d9d9cb726c
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_sommaire
+    - paragraphs.paragraphs_type.sec_texte
+id: paragraph.sec_texte.field_sec_sommaire
+field_name: field_sec_sommaire
+entity_type: paragraph
+bundle: sec_texte
+label: 'Libellé dans le sommaire'
+description: 'Facultatif. Si rempli, la section apparaît dans le sommaire en haut de la page.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,19 @@
+uuid: 2813cd38-8b64-4e41-a112-e4525d7c0217
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_surtitre
+    - paragraphs.paragraphs_type.sec_chiffres
+id: paragraph.sec_chiffres.field_sec_surtitre
+field_name: field_sec_surtitre
+entity_type: paragraph
+bundle: sec_chiffres
+label: Surtitre
+description: 'Petit texte en capitales au-dessus du titre. Facultatif.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

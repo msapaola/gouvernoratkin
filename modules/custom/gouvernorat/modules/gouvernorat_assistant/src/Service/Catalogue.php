@@ -48,7 +48,6 @@ class Catalogue {
     '/actualites' => ['Actualités', 'Communiqués, décisions et annonces officielles du Gouvernorat.'],
     '/videos' => ['Vidéos', 'Vidéos officielles du Gouvernorat (chaîne YouTube).'],
     '/all-gallery' => ['Galerie', 'Photos des activités du Gouvernorat.'],
-    '/a-propos' => ['À propos', 'Présentation de la Ville-Province de Kinshasa et du Gouvernorat.'],
     '/executif-provincial' => ['Exécutif provincial', 'Le gouverneur, le vice-gouverneur et les ministres provinciaux.'],
     '/cabinet-du-gouverneur' => ['Cabinet du gouverneur', 'Les membres du cabinet du gouverneur.'],
     '/structuresville' => ['Structures et services de la ville', 'Les structures et services rattachés à la Ville-Province.'],
@@ -60,7 +59,7 @@ class Catalogue {
    * Pages principales dont le texte affiché est repris dans le catalogue
    * (les autres sont des listes : actualités, démarches, vidéos…).
    */
-  const PAGES_A_LIRE = ['/', '/a-propos', '/executif-provincial', '/cabinet-du-gouverneur', '/structuresville', '/culture-et-patrimoine'];
+  const PAGES_A_LIRE = ['/', '/executif-provincial', '/cabinet-du-gouverneur', '/structuresville', '/culture-et-patrimoine'];
 
   /**
    * Types de contenu de référence : quand ils répondent à la question, ils
@@ -605,9 +604,15 @@ class Catalogue {
       $rubrique = $node->get('field_membre_fonction')->value;
       $morceaux[] = $rubrique;
     }
-    foreach (['field_membre_description', 'body', 'field_membre_biographie'] as $champ) {
+    foreach (['field_page_surtitre', 'field_page_chapo', 'field_membre_description', 'body', 'field_membre_biographie'] as $champ) {
       if ($node->hasField($champ) && !$node->get($champ)->isEmpty()) {
         $morceaux[] = $node->get($champ)->value;
+      }
+    }
+    // Pages à sections : le texte de chaque section, dans l'ordre.
+    if ($node->hasField('field_page_sections')) {
+      foreach ($node->get('field_page_sections')->referencedEntities() as $section) {
+        $morceaux[] = $this->texteParagraphe($section);
       }
     }
     foreach (['field_service_au_citoyen', 'field_categorie'] as $champ) {
@@ -626,6 +631,28 @@ class Catalogue {
     }
 
     return $this->entree($node->label(), $node->toUrl()->toString(), $libelle, $rubrique, $resume, $texte);
+  }
+
+  /**
+   * Texte d'une section de page et de ses éléments (cartes, étapes,
+   * chiffres), dans l'ordre d'affichage.
+   */
+  protected function texteParagraphe($paragraphe, int $profondeur = 0): string {
+    $morceaux = [];
+    foreach (['field_sec_surtitre', 'field_sec_titre', 'field_sec_date', 'field_sec_compte', 'field_chiffre_valeur', 'field_chiffre_libelle', 'field_sec_chapo', 'field_sec_texte', 'field_sec_corps', 'field_sec_legende'] as $champ) {
+      if ($paragraphe->hasField($champ) && !$paragraphe->get($champ)->isEmpty()) {
+        $morceaux[] = $paragraphe->get($champ)->value;
+      }
+    }
+    if ($paragraphe->hasField('field_sec_liste') && !$paragraphe->get('field_sec_liste')->isEmpty()) {
+      $morceaux[] = implode(', ', array_column($paragraphe->get('field_sec_liste')->getValue(), 'value'));
+    }
+    if ($profondeur < 2 && $paragraphe->hasField('field_sec_elements')) {
+      foreach ($paragraphe->get('field_sec_elements')->referencedEntities() as $element) {
+        $morceaux[] = $this->texteParagraphe($element, $profondeur + 1);
+      }
+    }
+    return implode("\n", $morceaux);
   }
 
   /**

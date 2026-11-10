@@ -1,0 +1,31 @@
+{#
+/**
+ * @file
+ * Section « texte et image » d'une page de base.
+ * Variable s : préparée par gouvernorat_pages_preprocess_paragraph().
+ */
+#}
+<section class="ap-section ap-presentation" id="{{ s.ancre }}" aria-labelledby="{{ s.ancre }}-titre">
+  <div class="container">
+    <div class="ap-section__entete">
+      {% if s.surtitre %}<p class="surtitre">{{ s.surtitre }}</p>{% endif %}
+      <h2 class="ap-section__titre" id="{{ s.ancre }}-titre">{{ s.titre }}</h2>
+      {% if s.chapo %}<p class="ap-section__chapo">{{ s.chapo }}</p>{% endif %}
+    </div>
+
+    <div class="{{ s.image ? 'ap-presentation__grille' }}">
+      <div class="ap-presentation__texte sec-corps">
+        {{ s.corps }}
+        {% for lien in s.liens %}
+          <p><a href="{{ lien.url }}" class="lien-suite">{{ lien.titre }} <i class="fas fa-arrow-right" aria-hidden="true"></i></a></p>
+        {% endfor %}
+      </div>
+      {% if s.image %}
+        <figure class="ap-visuel">
+          <img src="{{ s.image.url }}" alt="{{ s.image.alt }}" width="{{ s.image.largeur }}" height="{{ s.image.hauteur }}" loading="lazy" decoding="async">
+          {% if s.legende %}<figcaption>{{ s.legende }}</figcaption>{% endif %}
+        </figure>
+      {% endif %}
+    </div>
+  </div>
+</section>

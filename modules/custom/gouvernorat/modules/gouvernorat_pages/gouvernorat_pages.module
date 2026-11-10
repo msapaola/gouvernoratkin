@@ -1,0 +1,109 @@
+<?php
+
+/**
+ * @file
+ * Pages institutionnelles construites en sections.
+ *
+ * Les textes des pages À propos, Culture et patrimoine, Structures de la
+ * ville… étaient écrits dans les gabarits du thème : seule une personne
+ * modifiant le code pouvait les changer, et l'assistant du site n'en
+ * voyait qu'un résumé. Ce sont désormais des contenus « Page de base » :
+ * - surtitre et chapô (champs de la page) ;
+ * - corps (facultatif) ;
+ * - sections (paragraphes) : texte et image, chiffres, cartes, chronologie,
+ *   appel. Chaque section a ses champs simples ; la mise en page est dans
+ *   le thème (node--page--full.html.twig, paragraph--sec-*.html.twig).
+ *
+ * Les textes de départ sont recopiés mot pour mot depuis les anciens
+ * gabarits par gouvernorat_pages.deploy.php.
+ */
+
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_preprocess_HOOK() for node templates.
+ *
+ * Fournit à la page le sommaire : les sections dont le champ « Libellé dans
+ * le sommaire » est rempli, avec l'ancre de leur section.
+ */
+function gouvernorat_pages_preprocess_node(array &$variables) {
+  $node = $variables['node'] ?? NULL;
+  if (!$node instanceof NodeInterface || $node->bundle() !== 'page' || !$node->hasField('field_page_sections')) {
+    return;
+  }
+  $sommaire = [];
+  foreach ($node->get('field_page_sections')->referencedEntities() as $section) {
+    if ($section->hasField('field_sec_sommaire') && ($libelle = trim((string) $section->get('field_sec_sommaire')->value)) !== '') {
+      $sommaire[] = ['libelle' => $libelle, 'ancre' => 'section-' . $section->id()];
+    }
+  }
+  $variables['sommaire'] = $sommaire;
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for paragraph templates.
+ *
+ * Variables simples pour les gabarits des sections : textes mis en forme
+ * déjà filtrés, image et liens prêts à afficher, éléments (cartes, étapes,
+ * chiffres) sous forme de tableaux.
+ */
+function gouvernorat_pages_preprocess_paragraph(array &$variables) {
+  $paragraphe = $variables['paragraph'];
+  if (!str_starts_with($paragraphe->bundle(), 'sec_')) {
+    return;
+  }
+  $valeur = fn($champ) => $paragraphe->hasField($champ) ? trim((string) $paragraphe->get($champ)->value) : '';
+  $texte_formate = function ($entite, $champ) {
+    if (!$entite->hasField($champ) || $entite->get($champ)->isEmpty()) {
+      return NULL;
+    }
+    $item = $entite->get($champ)->first();
+    return ['#type' => 'processed_text', '#text' => $item->value, '#format' => $item->format];
+  };
+
+  $s = [
+    'ancre' => 'section-' . $paragraphe->id(),
+    'surtitre' => $valeur('field_sec_surtitre'),
+    'titre' => $valeur('field_sec_titre'),
+    'chapo' => $valeur('field_sec_chapo'),
+    'texte' => $valeur('field_sec_texte'),
+    'disposition' => $valeur('field_sec_disposition'),
+    'corps' => $texte_formate($paragraphe, 'field_sec_corps'),
+    'image' => NULL,
+    'legende' => $valeur('field_sec_legende'),
+    'liens' => [],
+    'elements' => [],
+  ];
+
+  if ($paragraphe->hasField('field_sec_image') && ($image = $paragraphe->get('field_sec_image')->first()) && $image->entity) {
+    $s['image'] = [
+      'url' => \Drupal::service('file_url_generator')->generateString($image->entity->getFileUri()),
+      'alt' => $image->alt,
+      'largeur' => $image->width,
+      'hauteur' => $image->height,
+    ];
+  }
+  if ($paragraphe->hasField('field_sec_liens')) {
+    foreach ($paragraphe->get('field_sec_liens') as $lien) {
+      $s['liens'][] = ['url' => $lien->getUrl()->toString(), 'titre' => $lien->title ?: $lien->getUrl()->toString()];
+    }
+  }
+  if ($paragraphe->hasField('field_sec_elements')) {
+    foreach ($paragraphe->get('field_sec_elements')->referencedEntities() as $element) {
+      $champ = fn($nom) => $element->hasField($nom) ? trim((string) $element->get($nom)->value) : '';
+      $s['elements'][] = [
+        'titre' => $champ('field_sec_titre'),
+        'icone' => $champ('field_sec_icone'),
+        'compte' => $champ('field_sec_compte'),
+        'date' => $champ('field_sec_date'),
+        'texte' => $champ('field_sec_texte'),
+        'corps' => $texte_formate($element, 'field_sec_corps'),
+        'liste' => $element->hasField('field_sec_liste') ? array_column($element->get('field_sec_liste')->getValue(), 'value') : [],
+        // Paragraphe « chiffre clé » (sections chiffres).
+        'valeur' => $champ('field_chiffre_valeur'),
+        'libelle' => $champ('field_chiffre_libelle'),
+      ];
+    }
+  }
+  $variables['s'] = $s;
+}

@@ -1,0 +1,30 @@
+uuid: afa663ce-6956-4619-b8d1-31e571785459
+langcode: fr
+status: true
+dependencies:
+  module:
+    - options
+    - paragraphs
+id: paragraph.field_sec_disposition
+field_name: field_sec_disposition
+entity_type: paragraph
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: piliers
+      label: 'Piliers avec icône'
+    -
+      value: cartes
+      label: Cartes
+    -
+      value: districts
+      label: 'Districts (liste de communes)'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

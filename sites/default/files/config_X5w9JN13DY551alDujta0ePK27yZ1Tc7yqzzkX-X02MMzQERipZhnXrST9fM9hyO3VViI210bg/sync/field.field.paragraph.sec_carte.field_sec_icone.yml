@@ -1,0 +1,19 @@
+uuid: 9ae5d501-6207-4f8a-8d20-36eab00cde4d
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_icone
+    - paragraphs.paragraphs_type.sec_carte
+id: paragraph.sec_carte.field_sec_icone
+field_name: field_sec_icone
+entity_type: paragraph
+bundle: sec_carte
+label: Icône
+description: "Facultatif. Nom d'icône Font Awesome, par exemple « fas fa-bullseye »."
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

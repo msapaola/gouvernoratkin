@@ -1,0 +1,19 @@
+uuid: 2b90fd69-efb8-47b1-b351-7df38a57cd60
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_titre
+    - paragraphs.paragraphs_type.sec_carte
+id: paragraph.sec_carte.field_sec_titre
+field_name: field_sec_titre
+entity_type: paragraph
+bundle: sec_carte
+label: Titre
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,23 @@
+uuid: 99764100-d4b7-443a-849f-bdd3bbd1c3e2
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_liens
+    - paragraphs.paragraphs_type.sec_texte
+  module:
+    - link
+id: paragraph.sec_texte.field_sec_liens
+field_name: field_sec_liens
+entity_type: paragraph
+bundle: sec_texte
+label: Liens
+description: 'Facultatif. Liens « En savoir plus » affichés sous le texte.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 2
+  link_type: 17
+field_type: link

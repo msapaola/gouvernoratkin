@@ -1,0 +1,24 @@
+uuid: 9bb4d37d-6b61-4356-9952-e4fd68208047
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_corps
+    - filter.format.basic_html
+    - paragraphs.paragraphs_type.sec_carte
+  module:
+    - text
+id: paragraph.sec_carte.field_sec_corps
+field_name: field_sec_corps
+entity_type: paragraph
+bundle: sec_carte
+label: Texte
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - basic_html
+field_type: text_long

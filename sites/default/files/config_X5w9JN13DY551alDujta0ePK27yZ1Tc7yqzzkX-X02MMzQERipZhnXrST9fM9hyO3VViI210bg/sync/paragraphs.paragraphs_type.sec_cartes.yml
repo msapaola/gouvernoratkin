@@ -1,0 +1,10 @@
+uuid: a9109ae8-531e-411d-b7eb-b2d60a84dfc5
+langcode: fr
+status: true
+dependencies: {  }
+id: sec_cartes
+label: 'Section : cartes'
+icon_uuid: null
+icon_default: null
+description: 'Une série de cartes : piliers avec icône, cartes simples, ou districts avec la liste de leurs communes.'
+behavior_plugins: {  }

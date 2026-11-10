@@ -1,0 +1,19 @@
+uuid: af7ff2e3-6fd5-4b22-9618-03b8ae590af7
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_sommaire
+    - paragraphs.paragraphs_type.sec_chronologie
+id: paragraph.sec_chronologie.field_sec_sommaire
+field_name: field_sec_sommaire
+entity_type: paragraph
+bundle: sec_chronologie
+label: 'Libellé dans le sommaire'
+description: Facultatif.
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,19 @@
+uuid: a98ed546-ab53-4f8a-b038-7dc8398dff05
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_date
+    - paragraphs.paragraphs_type.sec_etape
+id: paragraph.sec_etape.field_sec_date
+field_name: field_sec_date
+entity_type: paragraph
+bundle: sec_etape
+label: Date
+description: 'Par exemple « 1881 ».'
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

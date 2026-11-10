@@ -575,3 +575,105 @@
     padding: 1.5rem 1.25rem;
   }
 }
+
+/* ==========================================================================
+   Pages de base à sections (node--page--full.html.twig)
+   Le texte des sections est saisi dans l'éditeur : listes et intertitres
+   reçoivent ici le style des anciennes listes de la page À propos.
+   ========================================================================== */
+
+/* Une section sur deux sur fond clair (bandes « chiffres » et « appel »
+   exclues du décompte : elles ont leur propre fond). */
+.page-section--clair .ap-section {
+  background-color: #f6f8fc;
+}
+
+.sec-corps ul {
+  list-style: none;
+  margin: 0 0 1.4rem;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.sec-corps ul li {
+  position: relative;
+  padding-left: 1.9rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--blackColor);
+}
+
+.sec-corps ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 2px;
+  background-color: var(--secondaryColor);
+}
+
+.sec-corps h3 {
+  font-family: var(--fontFamily-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--mainColor);
+  margin: 1.4rem 0 0.9rem;
+}
+
+.sec-corps h3:first-child {
+  margin-top: 0;
+}
+
+.sec-corps p {
+  line-height: 1.75;
+}
+
+/* Valeurs des piliers : liste sans puce, terme en gras (comme l'ancienne
+   liste .ap-pilier__valeurs). */
+.sec-corps--pilier ul {
+  gap: 0.7rem;
+  margin: 0;
+}
+
+.sec-corps--pilier ul li {
+  padding-left: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+.sec-corps--pilier ul li::before {
+  content: none;
+}
+
+.sec-corps--pilier strong {
+  color: var(--blackColor);
+}
+
+/* Liste placée sous un intertitre (par exemple « Responsabilités ») :
+   coches vertes, comme l'ancienne liste .ap-liste-cochee. */
+.sec-corps h3 + ul li {
+  padding-left: 1.75rem;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--paragraphColor);
+}
+
+.sec-corps h3 + ul li::before {
+  content: '\f00c';
+  font-family: 'Font Awesome 6 Free', 'Font Awesome 5 Free', 'FontAwesome';
+  font-weight: 900;
+  top: 0.1em;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  background: none;
+  font-size: 0.8rem;
+  color: var(--green);
+}
+
+.page-corps {
+  max-width: 820px;
+}

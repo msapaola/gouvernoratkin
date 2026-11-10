@@ -1,0 +1,19 @@
+uuid: 48900c71-6f57-433f-bd17-60dbcd9ed25d
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_texte
+    - paragraphs.paragraphs_type.sec_etape
+id: paragraph.sec_etape.field_sec_texte
+field_name: field_sec_texte
+entity_type: paragraph
+bundle: sec_etape
+label: Texte
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

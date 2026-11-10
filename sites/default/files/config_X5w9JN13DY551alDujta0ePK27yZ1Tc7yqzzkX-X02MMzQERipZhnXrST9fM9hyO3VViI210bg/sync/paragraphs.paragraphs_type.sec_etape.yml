@@ -1,0 +1,10 @@
+uuid: 78f73822-feb5-4278-9447-5c3588408e6c
+langcode: fr
+status: true
+dependencies: {  }
+id: sec_etape
+label: 'Élément : étape'
+icon_uuid: null
+icon_default: null
+description: "Une étape d'une section « chronologie »."
+behavior_plugins: {  }

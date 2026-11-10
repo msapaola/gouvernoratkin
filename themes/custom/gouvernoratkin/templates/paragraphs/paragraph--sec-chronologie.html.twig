@@ -1,0 +1,25 @@
+{#
+/**
+ * @file
+ * Section « chronologie » d'une page de base : une liste ordonnée, pour que
+ * l'ordre des étapes soit porté par le balisage et non par la mise en page.
+ */
+#}
+<section class="ap-section" id="{{ s.ancre }}" aria-labelledby="{{ s.ancre }}-titre">
+  <div class="container">
+    <div class="ap-section__entete ap-section__entete--centre">
+      {% if s.surtitre %}<p class="surtitre">{{ s.surtitre }}</p>{% endif %}
+      <h2 class="ap-section__titre" id="{{ s.ancre }}-titre">{{ s.titre }}</h2>
+      {% if s.chapo %}<p class="ap-section__chapo">{{ s.chapo }}</p>{% endif %}
+    </div>
+    <ol class="ap-chrono">
+      {% for e in s.elements %}
+        <li class="ap-chrono__etape">
+          <span class="ap-chrono__date">{{ e.date }}</span>
+          <h3 class="ap-chrono__titre">{{ e.titre }}</h3>
+          {% if e.texte %}<p>{{ e.texte }}</p>{% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>

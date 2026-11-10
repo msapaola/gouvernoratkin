@@ -1,0 +1,19 @@
+uuid: 5457d259-bb52-4da3-bda5-fb4635596dfb
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_compte
+    - paragraphs.paragraphs_type.sec_carte
+id: paragraph.sec_carte.field_sec_compte
+field_name: field_sec_compte
+entity_type: paragraph
+bundle: sec_carte
+label: Mention
+description: 'Facultatif. Petite mention sous le titre, par exemple « 7 communes ».'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,10 @@
+uuid: b06051cd-d8f5-442f-837e-f5745fe24617
+langcode: fr
+status: true
+dependencies: {  }
+id: sec_appel
+label: 'Section : appel'
+icon_uuid: null
+icon_default: null
+description: 'Un encadré final avec un titre, un texte et des boutons.'
+behavior_plugins: {  }

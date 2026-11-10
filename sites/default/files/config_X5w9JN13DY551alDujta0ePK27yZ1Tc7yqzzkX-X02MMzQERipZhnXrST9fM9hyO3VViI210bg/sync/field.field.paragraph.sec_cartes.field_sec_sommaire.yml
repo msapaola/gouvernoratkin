@@ -1,0 +1,19 @@
+uuid: 73ed33e3-56f6-4a3f-a3a8-6f471b001d72
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_sommaire
+    - paragraphs.paragraphs_type.sec_cartes
+id: paragraph.sec_cartes.field_sec_sommaire
+field_name: field_sec_sommaire
+entity_type: paragraph
+bundle: sec_cartes
+label: 'Libellé dans le sommaire'
+description: Facultatif.
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

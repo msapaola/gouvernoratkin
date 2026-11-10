@@ -4,8 +4,12 @@ status: true
 dependencies:
   config:
     - field.field.node.page.body
+    - field.field.node.page.field_page_chapo
+    - field.field.node.page.field_page_sections
+    - field.field.node.page.field_page_surtitre
     - node.type.page
   module:
+    - paragraphs
     - path
     - text
 _core:
@@ -30,6 +34,40 @@ content:
     weight: 10
     region: content
     settings: {  }
+    third_party_settings: {  }
+  field_page_chapo:
+    type: string_textarea
+    weight: -3
+    region: content
+    settings:
+      rows: 3
+      placeholder: ''
+    third_party_settings: {  }
+  field_page_sections:
+    type: paragraphs
+    weight: 5
+    region: content
+    settings:
+      title: Section
+      title_plural: Sections
+      edit_mode: closed
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: _none
+      features:
+        collapse_edit_all: collapse_edit_all
+        duplicate: duplicate
+    third_party_settings: {  }
+  field_page_surtitre:
+    type: string_textfield
+    weight: -4
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
     third_party_settings: {  }
   langcode:
     type: language_select

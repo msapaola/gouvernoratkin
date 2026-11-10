@@ -1,0 +1,54 @@
+{#
+/**
+ * @file
+ * Section « cartes » d'une page de base. Trois présentations :
+ * - piliers : icône ronde, titre et texte ;
+ * - districts : titre, mention (« 7 communes ») et liste ;
+ * - cartes : titre précédé d'une icône, et texte.
+ */
+#}
+<section class="ap-section" id="{{ s.ancre }}" aria-labelledby="{{ s.ancre }}-titre">
+  <div class="container">
+    <div class="ap-section__entete ap-section__entete--centre">
+      {% if s.surtitre %}<p class="surtitre">{{ s.surtitre }}</p>{% endif %}
+      <h2 class="ap-section__titre" id="{{ s.ancre }}-titre">{{ s.titre }}</h2>
+      {% if s.chapo %}<p class="ap-section__chapo">{{ s.chapo }}</p>{% endif %}
+    </div>
+
+    {% if s.disposition == 'piliers' %}
+      <ul class="ap-piliers">
+        {% for e in s.elements %}
+          <li class="ap-pilier">
+            {% if e.icone %}<span class="ap-pilier__icone" aria-hidden="true"><i class="{{ e.icone }}"></i></span>{% endif %}
+            <h3 class="ap-pilier__titre">{{ e.titre }}</h3>
+            <div class="sec-corps sec-corps--pilier">{{ e.corps }}</div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% elseif s.disposition == 'districts' %}
+      <ul class="ap-districts">
+        {% for e in s.elements %}
+          <li class="ap-district">
+            <h3 class="ap-district__titre">{{ e.titre }}</h3>
+            {% if e.compte %}<span class="ap-district__compte">{{ e.compte }}</span>{% endif %}
+            {% if e.liste %}
+              <ul class="ap-district__communes">
+                {% for element in e.liste %}<li>{{ element }}</li>{% endfor %}
+              </ul>
+            {% endif %}
+            {% if e.corps %}<div class="sec-corps">{{ e.corps }}</div>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <ul class="ap-cartes">
+        {% for e in s.elements %}
+          <li class="ap-carte">
+            <h3 class="ap-carte__titre">{% if e.icone %}<i class="{{ e.icone }}" aria-hidden="true"></i> {% endif %}{{ e.titre }}</h3>
+            <div class="sec-corps">{{ e.corps }}</div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+</section>

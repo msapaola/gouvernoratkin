@@ -1,0 +1,36 @@
+uuid: c26d9636-1435-4422-afa8-0af847417863
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_page_sections
+    - node.type.page
+    - paragraphs.paragraphs_type.sec_appel
+    - paragraphs.paragraphs_type.sec_cartes
+    - paragraphs.paragraphs_type.sec_chiffres
+    - paragraphs.paragraphs_type.sec_chronologie
+    - paragraphs.paragraphs_type.sec_texte
+  module:
+    - entity_reference_revisions
+id: node.page.field_page_sections
+field_name: field_page_sections
+entity_type: node
+bundle: page
+label: Sections
+description: "Les sections de la page, dans l'ordre d'affichage. Le corps (ci-dessus) s'affiche avant les sections."
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      sec_texte: sec_texte
+      sec_chiffres: sec_chiffres
+      sec_cartes: sec_cartes
+      sec_chronologie: sec_chronologie
+      sec_appel: sec_appel
+    negate: 0
+    target_bundles_drag_drop: {  }
+field_type: entity_reference_revisions

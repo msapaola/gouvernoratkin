@@ -1,0 +1,24 @@
+uuid: 5dc5a671-b996-430e-a737-9f8a124405ae
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_corps
+    - filter.format.basic_html
+    - paragraphs.paragraphs_type.sec_texte
+  module:
+    - text
+id: paragraph.sec_texte.field_sec_corps
+field_name: field_sec_corps
+entity_type: paragraph
+bundle: sec_texte
+label: Texte
+description: 'Paragraphes, listes, intertitres et liens.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - basic_html
+field_type: text_long

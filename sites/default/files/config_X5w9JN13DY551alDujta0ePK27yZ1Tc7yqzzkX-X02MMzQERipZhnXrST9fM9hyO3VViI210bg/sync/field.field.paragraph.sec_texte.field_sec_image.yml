@@ -1,0 +1,38 @@
+uuid: e84dc475-bb44-4479-bf75-32de634009f9
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_image
+    - paragraphs.paragraphs_type.sec_texte
+  module:
+    - image
+id: paragraph.sec_texte.field_sec_image
+field_name: field_sec_image
+entity_type: paragraph
+bundle: sec_texte
+label: Image
+description: 'Facultatif. Affichée à côté du texte.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: 'pages/[date:custom:Y]-[date:custom:m]'
+  file_extensions: 'png jpg jpeg webp'
+  max_filesize: '2 MB'
+  max_resolution: ''
+  min_resolution: ''
+  alt_field: true
+  alt_field_required: true
+  title_field: false
+  title_field_required: false
+  default_image:
+    uuid: null
+    alt: ''
+    title: ''
+    width: null
+    height: null
+field_type: image

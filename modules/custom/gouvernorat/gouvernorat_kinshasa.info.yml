@@ -8,6 +8,7 @@ dependencies:
   - gouvernorat_assistant
   - gouvernorat_contact
   - gouvernorat_institutions
+  - gouvernorat_pages
   - gouvernorat_partage
   - gouvernorat_securite
   - gouvernorat_seo

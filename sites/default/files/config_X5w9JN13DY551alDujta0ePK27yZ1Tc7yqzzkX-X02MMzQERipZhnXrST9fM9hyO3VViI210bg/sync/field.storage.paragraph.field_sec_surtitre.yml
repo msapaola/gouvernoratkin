@@ -1,0 +1,21 @@
+uuid: 4ebb2c91-501e-4fd2-b875-5cb614ffbc38
+langcode: fr
+status: true
+dependencies:
+  module:
+    - paragraphs
+id: paragraph.field_sec_surtitre
+field_name: field_sec_surtitre
+entity_type: paragraph
+type: string
+settings:
+  max_length: 255
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

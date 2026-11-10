@@ -15,6 +15,7 @@ désactiver une fonction sans toucher aux autres.
 | `gouvernorat_assistant` | Assistant virtuel (Claude, modèle Haiku) qui répond aux visiteurs et les oriente vers les pages du site |
 | `gouvernorat_contact` | Page Contact : coordonnées modifiables, formulaire allégé |
 | `gouvernorat_institutions` | Fiches « Membre », pages Exécutif provincial et Cabinet du gouverneur |
+| `gouvernorat_pages` | Pages institutionnelles en « Page de base » à sections (À propos…) : textes dans la base, plus dans les gabarits |
 | `gouvernorat_partage` | Image et description de repli au partage sur les réseaux sociaux |
 | `gouvernorat_securite` | En-têtes de sécurité, `noindex` sur les sites de test |
 | `gouvernorat_seo` | Redirections 301, adresses lisibles, `sitemap.xml`, données JSON-LD |

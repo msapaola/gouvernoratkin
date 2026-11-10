@@ -1,0 +1,19 @@
+uuid: c6297dad-5bd3-4178-b0fb-58c3e40b1a59
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_page_chapo
+    - node.type.page
+id: node.page.field_page_chapo
+field_name: field_page_chapo
+entity_type: node
+bundle: page
+label: Chapô
+description: "Phrase d'introduction affichée sous le titre. Facultatif."
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

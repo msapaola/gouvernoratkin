@@ -1,0 +1,28 @@
+uuid: fb9707ea-cf1c-4b2d-9748-546259ef6dd1
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_elements
+    - paragraphs.paragraphs_type.chiffre_cle
+    - paragraphs.paragraphs_type.sec_chiffres
+  module:
+    - entity_reference_revisions
+id: paragraph.sec_chiffres.field_sec_elements
+field_name: field_sec_elements
+entity_type: paragraph
+bundle: sec_chiffres
+label: Chiffres
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      chiffre_cle: chiffre_cle
+    negate: 0
+    target_bundles_drag_drop: {  }
+field_type: entity_reference_revisions

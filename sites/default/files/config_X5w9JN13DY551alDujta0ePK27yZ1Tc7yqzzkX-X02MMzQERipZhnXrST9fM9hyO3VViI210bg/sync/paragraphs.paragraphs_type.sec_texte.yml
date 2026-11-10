@@ -1,0 +1,10 @@
+uuid: 10c751eb-71f9-4e47-8880-99423137cf10
+langcode: fr
+status: true
+dependencies: {  }
+id: sec_texte
+label: 'Section : texte et image'
+icon_uuid: null
+icon_default: null
+description: 'Un bloc de texte mis en forme (paragraphes, listes, liens), avec une image facultative à côté.'
+behavior_plugins: {  }

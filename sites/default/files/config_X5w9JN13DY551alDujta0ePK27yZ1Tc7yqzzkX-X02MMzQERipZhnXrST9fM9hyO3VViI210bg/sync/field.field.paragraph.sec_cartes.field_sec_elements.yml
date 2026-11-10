@@ -1,0 +1,28 @@
+uuid: 10f80e14-ae97-4b0a-a4a6-6b1c32f9e2f4
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_elements
+    - paragraphs.paragraphs_type.sec_carte
+    - paragraphs.paragraphs_type.sec_cartes
+  module:
+    - entity_reference_revisions
+id: paragraph.sec_cartes.field_sec_elements
+field_name: field_sec_elements
+entity_type: paragraph
+bundle: sec_cartes
+label: Cartes
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      sec_carte: sec_carte
+    negate: 0
+    target_bundles_drag_drop: {  }
+field_type: entity_reference_revisions

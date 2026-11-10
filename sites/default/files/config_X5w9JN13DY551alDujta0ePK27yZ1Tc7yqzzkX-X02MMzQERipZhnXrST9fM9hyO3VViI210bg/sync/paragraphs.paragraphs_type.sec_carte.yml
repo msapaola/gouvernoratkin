@@ -1,0 +1,10 @@
+uuid: 430ef470-e6ee-406d-a932-41cd2c6852f3
+langcode: fr
+status: true
+dependencies: {  }
+id: sec_carte
+label: 'Élément : carte'
+icon_uuid: null
+icon_default: null
+description: "Une carte d'une section « cartes »."
+behavior_plugins: {  }

@@ -1,0 +1,19 @@
+uuid: 83d58fb6-b190-4ea5-8c00-e4f20cea2695
+langcode: fr
+status: true
+dependencies:
+  module:
+    - paragraphs
+id: paragraph.field_sec_chapo
+field_name: field_sec_chapo
+entity_type: paragraph
+type: string_long
+settings:
+  case_sensitive: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

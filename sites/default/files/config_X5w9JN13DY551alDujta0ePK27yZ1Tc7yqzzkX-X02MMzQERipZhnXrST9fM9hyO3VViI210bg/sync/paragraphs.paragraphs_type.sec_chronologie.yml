@@ -1,0 +1,10 @@
+uuid: bca3f95c-4c3e-456a-93c0-f8857328e371
+langcode: fr
+status: true
+dependencies: {  }
+id: sec_chronologie
+label: 'Section : chronologie'
+icon_uuid: null
+icon_default: null
+description: "Des étapes datées, dans l'ordre."
+behavior_plugins: {  }

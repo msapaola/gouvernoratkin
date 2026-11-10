@@ -1,0 +1,20 @@
+{#
+/**
+ * @file
+ * Section « chiffres » d'une page de base : bande de repères chiffrés.
+ */
+#}
+<section class="ap-reperes" id="{{ s.ancre }}" aria-labelledby="{{ s.ancre }}-titre">
+  <div class="container">
+    {% if s.surtitre %}<p class="surtitre surtitre--clair">{{ s.surtitre }}</p>{% endif %}
+    <h2 class="ap-reperes__titre" id="{{ s.ancre }}-titre">{{ s.titre }}</h2>
+    <dl class="ap-reperes__liste">
+      {% for e in s.elements %}
+        <div class="ap-reperes__item">
+          <dt class="ap-reperes__valeur">{{ e.valeur }}</dt>
+          <dd class="ap-reperes__libelle">{{ e.libelle }}</dd>
+        </div>
+      {% endfor %}
+    </dl>
+  </div>
+</section>

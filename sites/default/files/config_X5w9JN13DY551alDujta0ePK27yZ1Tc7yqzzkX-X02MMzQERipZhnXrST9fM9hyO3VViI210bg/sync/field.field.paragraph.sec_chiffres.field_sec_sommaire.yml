@@ -1,0 +1,19 @@
+uuid: 5fe4d543-cfa2-4d72-bdd0-b0547fac7489
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_sommaire
+    - paragraphs.paragraphs_type.sec_chiffres
+id: paragraph.sec_chiffres.field_sec_sommaire
+field_name: field_sec_sommaire
+entity_type: paragraph
+bundle: sec_chiffres
+label: 'Libellé dans le sommaire'
+description: Facultatif.
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

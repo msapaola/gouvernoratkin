@@ -1,0 +1,19 @@
+{#
+/**
+ * @file
+ * Section « appel » d'une page de base : encadré final avec boutons.
+ */
+#}
+<section class="page-appel" id="{{ s.ancre }}" aria-labelledby="{{ s.ancre }}-titre">
+  <div class="container">
+    <h2 class="page-appel__titre" id="{{ s.ancre }}-titre">{{ s.titre }}</h2>
+    {% if s.texte %}<p class="page-appel__texte">{{ s.texte }}</p>{% endif %}
+    {% if s.liens %}
+      <div class="page-appel__actions">
+        {% for lien in s.liens %}
+          <a href="{{ lien.url }}" class="bouton {{ loop.first ? 'bouton--clair' : 'bouton--fantome' }}">{{ lien.titre }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>

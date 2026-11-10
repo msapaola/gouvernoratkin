@@ -1,0 +1,9 @@
+name: Gouvernorat Pages
+description: "Pages institutionnelles en contenus « Page de base » à sections (À propos, Culture et patrimoine, Structures de la ville…) : tout le texte est dans la base, modifiable et lisible par l'assistant."
+package: 'Gouvernorat de Kinshasa'
+type: module
+core_version_requirement: ^10.1 || ^11
+dependencies:
+  - drupal:node
+  - drupal:path_alias
+  - paragraphs:paragraphs

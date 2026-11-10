@@ -1,0 +1,19 @@
+uuid: ffedf9b3-d922-4b4d-abc8-64f43ff62616
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_legende
+    - paragraphs.paragraphs_type.sec_texte
+id: paragraph.sec_texte.field_sec_legende
+field_name: field_sec_legende
+entity_type: paragraph
+bundle: sec_texte
+label: "Légende de l'image"
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

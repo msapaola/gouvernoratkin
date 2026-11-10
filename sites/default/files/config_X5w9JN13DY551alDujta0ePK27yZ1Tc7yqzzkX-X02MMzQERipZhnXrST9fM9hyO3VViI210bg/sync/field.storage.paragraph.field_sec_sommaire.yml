@@ -1,0 +1,21 @@
+uuid: 765bd59f-d27f-4e84-b6bc-d5107e1a4ae9
+langcode: fr
+status: true
+dependencies:
+  module:
+    - paragraphs
+id: paragraph.field_sec_sommaire
+field_name: field_sec_sommaire
+entity_type: paragraph
+type: string
+settings:
+  max_length: 255
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

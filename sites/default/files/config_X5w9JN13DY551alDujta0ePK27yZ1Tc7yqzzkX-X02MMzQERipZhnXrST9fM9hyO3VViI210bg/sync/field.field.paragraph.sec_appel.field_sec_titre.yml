@@ -1,0 +1,19 @@
+uuid: ba0718f0-2698-4637-9976-e075388535fc
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_titre
+    - paragraphs.paragraphs_type.sec_appel
+id: paragraph.sec_appel.field_sec_titre
+field_name: field_sec_titre
+entity_type: paragraph
+bundle: sec_appel
+label: Titre
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

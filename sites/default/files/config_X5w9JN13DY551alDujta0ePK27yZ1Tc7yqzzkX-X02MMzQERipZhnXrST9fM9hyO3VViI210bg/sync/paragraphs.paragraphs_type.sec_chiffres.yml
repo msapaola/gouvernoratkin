@@ -1,0 +1,10 @@
+uuid: 0a8274af-6b70-44cc-b5d0-9e7de3732386
+langcode: fr
+status: true
+dependencies: {  }
+id: sec_chiffres
+label: 'Section : chiffres'
+icon_uuid: null
+icon_default: null
+description: 'Une bande de repères chiffrés (valeur et libellé).'
+behavior_plugins: {  }

@@ -1,0 +1,21 @@
+uuid: dc1c2a42-fbf8-4f3e-9318-1b51c85d0aeb
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_disposition
+    - paragraphs.paragraphs_type.sec_cartes
+  module:
+    - options
+id: paragraph.sec_cartes.field_sec_disposition
+field_name: field_sec_disposition
+entity_type: paragraph
+bundle: sec_cartes
+label: Présentation
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string
