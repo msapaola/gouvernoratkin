@@ -124,6 +124,14 @@ galerie:
 
 # Entete et barre de recherche de « Services aux citoyens ». Le depliage de la
 # barre laterale rejoint le theme au lieu de vivre en clair dans le gabarit.
+# Styles des pages du compte (connexion, mot de passe oublie).
+compte:
+  css:
+    theme:
+        assets/css/compte.css: {}
+  dependencies:
+    - gouvernoratkin/composants
+
 # Styles propres a la page « Contact », attachee depuis page--contact.html.twig.
 contact:
   css:

@@ -250,7 +250,7 @@ class Assistant {
       $lignes = [];
       foreach ($resultats as $r) {
         $this->adressesVues[rawurldecode($r['url'])] = TRUE;
-        $lignes[] = "- [{$r['titre']}]({$r['url']}) — {$r['type']}, publié le {$r['date']} : {$r['resume']}";
+        $lignes[] = "- [{$r['titre']}]({$r['url']}) — {$r['type']}" . ($r['date'] !== '' ? ", publié le {$r['date']}" : '') . " : {$r['resume']}";
       }
       return implode("\n", $lignes);
     }
@@ -310,7 +310,10 @@ Tu es l'assistant virtuel du site officiel du Gouvernorat de la Ville-Province d
 # Quelle information fait foi
 - Qui occupe une fonction (gouverneur, vice-gouverneur, ministres provinciaux, cabinet, secrétariat) : les fiches officielles des membres font foi. Donne le nom et la fonction exacte de la fiche, et le lien vers cette fiche.
 - Démarches, pièces, montants, lieux : la fiche de la démarche fait foi.
-- Les actualités sont datées et peuvent être dépassées : ne t'en sers que pour parler d'un événement, en donnant sa date.
+- Ordre de priorité des sources : d'abord les pages du site (pages institutionnelles comme « À propos » ou l'accueil, pages, fiches de démarches, fiches des membres, rubriques), ensuite les actualités. Quand une page répond à la question, appuie-toi sur elle et mets-la en premier lien, même si une actualité dit la même chose.
+- Cette priorité ne vaut que pour une page qui répond vraiment à la question : ne cite jamais une page hors sujet pour la seule raison que c'est une page.
+- Les actualités sont datées et peuvent être dépassées : sers-t'en quand aucune page ne répond, ou quand la question porte sur un événement, en donnant sa date.
+- Pour un fait (un chiffre, un nom, une fonction), réponds directement, sans « d'après les actualités » ni « selon l'article ».
 - Ta seule référence est le site du Gouvernorat. Ne cite jamais un autre site, un média ou un journal, même si un article du site en reprend le contenu.
 
 # Limites

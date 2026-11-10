@@ -57,6 +57,18 @@ class Catalogue {
   ];
 
   /**
+   * Pages principales dont le texte affiché est repris dans le catalogue
+   * (les autres sont des listes : actualités, démarches, vidéos…).
+   */
+  const PAGES_A_LIRE = ['/', '/a-propos', '/executif-provincial', '/cabinet-du-gouverneur', '/structuresville', '/culture-et-patrimoine'];
+
+  /**
+   * Types de contenu de référence : quand ils répondent à la question, ils
+   * passent devant les actualités.
+   */
+  const TYPES_DE_REFERENCE = ['Page principale', 'Page', 'Démarche', "Fiche officielle d'un membre (exécutif provincial ou cabinet)", 'Rubrique des services aux citoyens'];
+
+  /**
    * Mots trop courants pour aider à la recherche.
    */
   const MOTS_VIDES = ['les', 'des', 'une', 'pour', 'que', 'qui', 'est', 'sur', 'dans', 'par', 'avec', 'pas', 'plus', 'son', 'ses', 'aux', 'mon', 'mes', 'votre', 'vos', 'nous', 'vous', 'comment', 'quoi', 'quel', 'quelle', 'quels', 'quelles', 'faire', 'faut', 'peux', 'peut', 'puis', 'avoir', 'etre', 'cette', 'ces', 'tout', 'tous', 'bonjour', 'merci', 'svp', 'ville', 'kinshasa', 'gouvernorat', 'veux', 'voudrais', 'aimerais', 'besoin', 'savoir', 'obtenir', 'donne', 'moi', 'leur', 'elle', 'ils', 'sont', 'ont', 'aussi', 'mais', 'ou', 'et', 'je', 'il', 'la', 'le', 'du', 'de', 'un'];
@@ -87,13 +99,18 @@ class Catalogue {
     foreach (self::PAGES as $chemin => [$titre, $resume]) {
       $url = $chemin === '/' ? Url::fromRoute('<front>') : $this->validateur->getUrlIfValidWithoutAccessCheck($chemin);
       if ($url) {
-        $entrees[] = $this->entree($titre, $url->toString(), 'Page principale', '', $resume, $resume);
+        // Pages institutionnelles : leur texte est écrit dans les gabarits du
+        // thème, pas dans la base ; il est lu tel qu'un visiteur le voit.
+        $texte = in_array($chemin, self::PAGES_A_LIRE, TRUE) ? $this->texteAffiche($chemin) : '';
+        $entrees[] = $this->entree($titre, $url->toString(), 'Page principale', '', $resume, trim($resume . "\n" . $texte));
       }
     }
 
     $entrees = array_merge($entrees, $this->rubriques(), $this->contenus());
 
-    $this->cache->set(self::CLE_CACHE, $entrees, Cache::PERMANENT, ['node_list', 'taxonomy_term_list']);
+    // block_content_list : le texte des pages institutionnelles comprend des
+    // blocs modifiables (chiffres clés, mot du gouverneur, coordonnées).
+    $this->cache->set(self::CLE_CACHE, $entrees, Cache::PERMANENT, ['node_list', 'taxonomy_term_list', 'block_content_list']);
     return $entrees;
   }
 
@@ -145,17 +162,44 @@ class Catalogue {
     // après.
     $personne = (bool) preg_match('/\b(qui|ministre|gouverneur|vice|nom|appel\w*|directeur|directrice|cabinet|secretaire|conseiller|responsable|titulaire|charge)\b/', $this->normaliser($question));
 
+    // Règles de classement :
+    // 1. score de base : mots de la question trouvés dans le titre (6), la
+    //    rubrique ou la fonction (5), le texte (1 par occurrence, 4 au plus) ;
+    // 2. une page de référence (page institutionnelle, page, démarche, fiche
+    //    d'un membre, rubrique) passe devant les actualités, MAIS seulement
+    //    si elle répond à la question : elle doit contenir au moins la moitié
+    //    des mots importants de la question. Sinon elle garde son score de
+    //    base, et une actualité plus pertinente reste devant elle ;
+    // 3. les actualités pertinentes restent utilisables, en second rang.
+    $seuil = max(1, (int) ceil(count($mots) / 2));
     $scores = [];
     foreach ($this->entrees() as $i => $e) {
       $score = 0;
+      $trouves = 0;
       foreach ($mots as $mot) {
+        $present = FALSE;
         if (str_contains($e['cle_titre'], $mot)) {
           $score += 6;
+          $present = TRUE;
         }
         if (str_contains($e['cle_rubrique'], $mot)) {
           $score += 5;
+          $present = TRUE;
         }
-        $score += min(4, substr_count($e['cle'], $mot));
+        $occurrences = substr_count($e['cle'], $mot);
+        $score += min(4, $occurrences);
+        if ($present || $occurrences > 0) {
+          $trouves++;
+        }
+      }
+      $repond = $trouves >= $seuil;
+      if ($score > 0 && $repond) {
+        if (in_array($e['type'], self::TYPES_DE_REFERENCE, TRUE)) {
+          $score = (int) round($score * 1.5) + 8;
+        }
+        elseif ($e['type'] === self::TYPES['article'][0] || $e['type'] === self::TYPES['evenement'][0]) {
+          $score = (int) round($score * 0.8);
+        }
       }
       if ($score > 0 && $personne) {
         if ($e['type'] === self::TYPES['membre'][0]) {
@@ -232,10 +276,31 @@ class Catalogue {
 
     $libelles = array_map(fn($t) => $t[0], self::TYPES);
     $sortie = [];
-    foreach (array_slice($resultats, 0, 8) as [, $ligne]) {
+    $vues = [];
+
+    // D'abord les pages de référence qui répondent (pages institutionnelles
+    // comprises, dont le texte n'est pas dans la base), selon le même
+    // classement que les pages jointes à la question.
+    if ($type === 'tout' || $type === 'page') {
+      foreach ($this->rechercher($requete, 4) as $e) {
+        if (in_array($e['type'], self::TYPES_DE_REFERENCE, TRUE)) {
+          $sortie[] = ['titre' => $e['titre'], 'url' => $e['url'], 'type' => $e['type'], 'date' => '', 'resume' => Unicode::truncate($e['texte'], 220, TRUE, TRUE)];
+          $vues[$e['url']] = TRUE;
+        }
+      }
+    }
+
+    foreach ($resultats as [, $ligne]) {
+      if (count($sortie) >= 8) {
+        break;
+      }
+      $url = Url::fromRoute('entity.node.canonical', ['node' => $ligne->nid])->toString();
+      if (isset($vues[$url])) {
+        continue;
+      }
       $sortie[] = [
         'titre' => $ligne->title,
-        'url' => Url::fromRoute('entity.node.canonical', ['node' => $ligne->nid])->toString(),
+        'url' => $url,
         'type' => $libelles[$ligne->type] ?? $ligne->type,
         'date' => date('d/m/Y', (int) $ligne->created),
         'resume' => Unicode::truncate($this->texteBrut((string) $ligne->corps), 220, TRUE, TRUE),
@@ -347,6 +412,93 @@ class Catalogue {
       'date' => '',
       'texte' => trim($this->texteBrut((string) $terme->getDescription()) . "\n\nDémarches de cette rubrique :\n" . ($lignes ? implode("\n", $lignes) : 'aucune')),
     ];
+  }
+
+  /**
+   * Texte visible d'une page du site, tel qu'un visiteur anonyme le voit.
+   *
+   * La page est construite par une sous-requête interne, sous l'identité
+   * d'un visiteur anonyme ; seul le contenu principal (<main>) est gardé.
+   * Les messages en attente de la personne connectée sont préservés. En
+   * cas d'échec, le texte est vide et seule la description de la page sert.
+   */
+  protected function texteAffiche(string $chemin): string {
+    $permutateur = \Drupal::service('account_switcher');
+    $messager = \Drupal::messenger();
+    $messages = $messager->all();
+    $permutateur->switchTo(new \Drupal\Core\Session\AnonymousUserSession());
+    // Drupal retient, le temps d'une requête, si la page en cours est
+    // l'accueil. Sans remise à zéro, après la lecture de l'accueil, toutes
+    // les pages suivantes seraient construites avec le gabarit de l'accueil.
+    // Le service est un décorateur (path_alias) qui enveloppe celui du
+    // cœur : chacun garde sa propre mémoire, les deux sont remises à zéro.
+    $oublierAccueil = static function () {
+      $objet = \Drupal::service('path.matcher');
+      for ($niveau = 0; $objet && $niveau < 5; $niveau++) {
+        try {
+          $objet = \Closure::bind(function () {
+            if (property_exists($this, 'isCurrentFrontPage')) {
+              $this->isCurrentFrontPage = NULL;
+            }
+            return property_exists($this, 'decorated') ? $this->decorated : NULL;
+          }, $objet, get_class($objet))();
+        }
+        catch (\Throwable $e) {
+          // Structure différente dans une future version de Drupal : sans
+          // conséquence grave, seul le texte des pages en pâtirait.
+          $objet = NULL;
+        }
+      }
+    };
+    $oublierAccueil();
+    try {
+      $courante = \Drupal::request();
+      // Seule l'adresse est reprise : recopier les variables serveur de la
+      // requête en cours ferait servir la page d'accueil pour toute adresse.
+      $requete = \Symfony\Component\HttpFoundation\Request::create($courante->getSchemeAndHttpHost() . $courante->getBasePath() . $chemin, 'GET');
+      $reponse = \Drupal::service('http_kernel')->handle($requete, \Symfony\Component\HttpKernel\HttpKernelInterface::SUB_REQUEST, FALSE);
+      $html = $reponse->getStatusCode() === 200 ? (string) $reponse->getContent() : '';
+    }
+    catch (\Throwable $e) {
+      $html = '';
+    }
+    finally {
+      $oublierAccueil();
+      $permutateur->switchBack();
+      $messager->deleteAll();
+      foreach ($messages as $type => $liste) {
+        foreach ($liste as $message) {
+          $messager->addMessage($message, $type);
+        }
+      }
+    }
+
+    if ($html === '') {
+      return '';
+    }
+    // Seul le texte propre de la page compte : les listes automatiques
+    // (dernières actualités, vidéos, galerie, rendues par des vues) sont
+    // retirées, sans quoi l'accueil « contiendrait » le titre de chaque
+    // actualité récente et passerait devant l'article lui-même.
+    $document = new \DOMDocument();
+    libxml_use_internal_errors(TRUE);
+    $document->loadHTML('<?xml encoding="UTF-8">' . $html);
+    libxml_clear_errors();
+    $xpath = new \DOMXPath($document);
+    $principal = $xpath->query('//main')->item(0);
+    if (!$principal) {
+      return '';
+    }
+    $a_retirer = $xpath->query('.//script | .//style | .//noscript | .//svg | .//nav | .//form | .//*[contains(concat(" ", normalize-space(@class), " "), " views-element-container ")] | .//*[contains(concat(" ", normalize-space(@class), " "), " view ")]', $principal);
+    foreach (iterator_to_array($a_retirer) as $noeud) {
+      $noeud->parentNode?->removeChild($noeud);
+    }
+    $morceaux = [];
+    foreach ($xpath->query('.//text()', $principal) as $texte) {
+      $morceaux[] = $texte->nodeValue;
+    }
+    $texte = trim(preg_replace('/\s+/u', ' ', implode(' ', $morceaux)));
+    return Unicode::truncate($texte, 8000, TRUE, TRUE);
   }
 
   /**

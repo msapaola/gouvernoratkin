@@ -1,0 +1,149 @@
+/**
+ * Pages du compte : connexion et mot de passe oublié.
+ *
+ * Remplace la feuille Asset Injector « login_page_style », dont les
+ * sélecteurs génériques (.form-item, .form-text…) s'appliquaient à toute la
+ * page. Tout est ici limité à .compte-corps. Même langage visuel que la page
+ * Contact.
+ */
+
+.compte-corps {
+  background-color: #f5f7fa;
+  padding: 3rem 0 4rem;
+}
+
+.compte-carte {
+  max-width: 480px;
+  margin: 0 auto;
+  background-color: var(--whiteColor);
+  border-top: 4px solid var(--mainColor);
+  border-radius: 10px;
+  box-shadow: var(--boxShadow);
+  padding: 2rem 2rem 1.75rem;
+}
+
+/* Le titre est dans l'entête de la page : celui du bloc, s'il s'affiche,
+   ferait doublon. */
+.compte-carte .page-title,
+.compte-carte h1 {
+  display: none;
+}
+
+.compte-corps form .form-item {
+  margin-bottom: 1.25rem;
+}
+
+.compte-corps form label {
+  display: block;
+  font-family: var(--fontFamily-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--blackColor);
+  margin-bottom: 0.45rem;
+}
+
+.compte-corps .form-required::after {
+  content: " *";
+  color: var(--accentColor);
+}
+
+.compte-corps form input.form-text,
+.compte-corps form input.form-email,
+.compte-corps form input[type="password"] {
+  display: block;
+  width: 100%;
+  padding: 0.8rem 0.95rem;
+  font-family: var(--fontFamily-body);
+  /* 16 px : évite le zoom automatique de l'iPhone sur le champ. */
+  font-size: 16px;
+  color: var(--blackColor);
+  background-color: var(--whiteColor);
+  border: 1px solid #c9d1dc;
+  border-radius: 6px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.compte-corps form input:focus {
+  border-color: var(--mainColor);
+  box-shadow: 0 0 0 3px rgba(16, 66, 147, 0.18);
+  outline: none;
+}
+
+.compte-corps form .description {
+  font-size: 0.85rem;
+  color: var(--paragraphColor);
+  margin-top: 0.35rem;
+}
+
+.compte-corps .form-item--error-message {
+  color: var(--darkRed);
+  font-size: 0.88rem;
+  margin-top: 0.35rem;
+}
+
+.compte-corps .form-actions {
+  margin-top: 1.5rem;
+}
+
+.compte-corps .form-actions .btn,
+.compte-corps .form-actions .button {
+  width: 100%;
+  font-family: var(--fontFamily-body);
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: none;
+  padding: 0.9rem 1.5rem;
+  border: 0;
+  border-radius: 6px;
+  background-color: var(--mainColor);
+  color: var(--whiteColor);
+  transition: background-color 0.2s;
+}
+
+.compte-corps .form-actions .btn:hover,
+.compte-corps .form-actions .btn:focus-visible,
+.compte-corps .form-actions .button:hover,
+.compte-corps .form-actions .button:focus-visible {
+  background-color: var(--mainColorDark);
+  color: var(--whiteColor);
+}
+
+.compte-liens {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e3e8ef;
+  text-align: center;
+  font-size: 0.92rem;
+}
+
+.compte-liens a,
+.compte-aide a {
+  color: var(--mainColor);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.compte-liens a:hover,
+.compte-liens a:focus-visible,
+.compte-aide a:hover,
+.compte-aide a:focus-visible {
+  text-decoration: underline;
+}
+
+.compte-aide {
+  max-width: 480px;
+  margin: 1.5rem auto 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--paragraphColor);
+}
+
+@media (max-width: 575.98px) {
+  .compte-corps {
+    padding: 1.75rem 0 3rem;
+  }
+
+  .compte-carte {
+    padding: 1.5rem 1.25rem 1.25rem;
+  }
+}

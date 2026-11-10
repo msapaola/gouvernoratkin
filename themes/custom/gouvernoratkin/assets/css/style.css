@@ -5186,6 +5186,50 @@ blockquote p {
   border-bottom-color: var(--mainColor);
 }
 
+/* Onglets toujours sur une ligne : sur téléphone, ils s'empilaient en une
+   colonne de grands boutons. Ils défilent horizontalement s'ils ne tiennent
+   pas tous dans la largeur. */
+.tabs-wrapper .nav-tabs.onglets {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.25rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.tabs-wrapper .nav-tabs.onglets .nav-item {
+  flex: 0 0 auto;
+}
+
+.tabs-wrapper .nav-tabs.onglets .nav-link {
+  white-space: nowrap;
+  padding: 0.55rem 0.9rem;
+}
+
+@media (max-width: 575.98px) {
+  .tabs-wrapper .nav-tabs.onglets .nav-link {
+    font-size: 13px;
+    padding: 0.5rem 0.7rem;
+  }
+}
+
+/* Drupal entoure les titres cités dans les messages (« Le contenu Titre a
+   été créé ») d'un <em class="placeholder"> ; Bootstrap 5 donne à cette
+   même classe l'aspect d'un bloc de chargement (fond de la couleur du
+   texte, à demi transparent), ce qui rendait le titre illisible. */
+em.placeholder {
+  display: inline;
+  min-height: 0;
+  vertical-align: baseline;
+  background-color: transparent;
+  opacity: 1;
+  cursor: auto;
+  font-style: normal;
+  font-weight: 600;
+}
+
 /* ==========================================================================
    Bannière de titre de page
    ========================================================================== */

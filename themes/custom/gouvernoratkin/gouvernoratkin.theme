@@ -18,6 +18,12 @@ function gouvernoratkin_theme_suggestions_page_alter(array &$suggestions, array 
     $suggestions[] = 'page__services_aux_citoyens';
   }
 
+  // Pages du compte (connexion, mot de passe oublié) : gabarit
+  // page--compte.html.twig, aligné sur les pages institutionnelles.
+  if (in_array(\Drupal::routeMatch()->getRouteName(), ['user.login', 'user.pass'], TRUE)) {
+    $suggestions[] = 'page__compte';
+  }
+
   // Suggérer page--video pour la page d'un contenu « Vidéo » (pas pour ses
   // pages d'édition ou de révision, qui gardent le gabarit général).
   $route_match = \Drupal::routeMatch();
@@ -178,6 +184,17 @@ function _gouvernoratkin_get_services_categories_tree() {
  * Implements hook_preprocess_page().
  */
 function gouvernoratkin_preprocess_page(&$variables) {
+  // Titre et chapô des pages du compte (page--compte.html.twig).
+  $compte = [
+    'user.login' => ['Connexion', "Espace réservé aux équipes du Gouvernorat qui publient et mettent à jour le site."],
+    'user.pass' => ['Mot de passe oublié', "Indiquez l'adresse de courriel ou le nom d'utilisateur de votre compte : un lien pour choisir un nouveau mot de passe vous sera envoyé."],
+  ];
+  $route_compte = \Drupal::routeMatch()->getRouteName();
+  if (isset($compte[$route_compte])) {
+    [$variables['compte_titre'], $variables['compte_accroche']] = $compte[$route_compte];
+    $variables['compte_route'] = $route_compte;
+  }
+
   $current_path = \Drupal::service('path.current')->getPath();
   $alias = \Drupal::service('path_alias.manager')->getAliasByPath($current_path);
   

@@ -1,0 +1,64 @@
+{#
+/**
+ * @file
+ * Pages du compte : connexion (/user/login) et mot de passe oublié
+ * (/user/password).
+ *
+ * Même ouverture que les autres pages institutionnelles (entête sobre,
+ * filet tricolore), puis le formulaire dans une carte centrée. Le titre
+ * était dessiné en CSS (feuille Asset Injector « login_page_style »),
+ * invisible pour les lecteurs d'écran, et la page ne ressemblait à aucune
+ * autre.
+ *
+ * Variables (gouvernoratkin_preprocess_page) : compte_titre,
+ * compte_accroche, compte_route.
+ */
+#}
+{{ attach_library('gouvernoratkin/compte') }}
+
+{% include "@gouvernoratkin/layout/partials/site-header.html.twig" with { sans_fil_ariane: true } %}
+
+<main id="main-content" role="main">
+
+  <header class="page-entete">
+    <div class="container">
+      <nav aria-label="{{ 'Fil d’Ariane'|t }}">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ compte_titre }}</li>
+        </ol>
+      </nav>
+      <div class="page-entete__contenu">
+        <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
+        <p class="surtitre">Espace de la rédaction</p>
+        <h1 class="page-entete__titre">{{ compte_titre }}</h1>
+        <p class="page-entete__accroche">{{ compte_accroche }}</p>
+      </div>
+    </div>
+  </header>
+
+  <section class="compte-corps">
+    <div class="container">
+      <div class="compte-carte">
+        {{ page.content }}
+
+        <div class="compte-liens">
+          {% if compte_route == 'user.login' %}
+            <a href="{{ path('user.pass') }}">Mot de passe oublié ?</a>
+          {% else %}
+            <a href="{{ path('user.login') }}"><i class="fas fa-arrow-left" aria-hidden="true"></i> Retour à la connexion</a>
+          {% endif %}
+        </div>
+      </div>
+
+      <p class="compte-aide">
+        Vous êtes citoyen et cherchez une information ou une démarche ?
+        <a href="/services-aux-citoyens">Services aux citoyens</a> ·
+        <a href="/contact">Nous écrire</a>
+      </p>
+    </div>
+  </section>
+
+</main>
+
+{% include "@gouvernoratkin/layout/partials/site-footer.html.twig" %}
