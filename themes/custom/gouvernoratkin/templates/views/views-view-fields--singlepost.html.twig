@@ -1,0 +1,49 @@
+{#
+/**
+ * @file
+ * Page d'un article (vue singlepost).
+ *
+ * Le balisage était écrit dans la configuration de la vue ; il est ici, dans
+ * le thème. Variable article : voir
+ * gouvernoratkin_preprocess_views_view_fields__singlepost().
+ */
+#}
+{{ attach_library('gouvernoratkin/article') }}
+{% if article %}
+  <div class="blog-details-text-area details-text-area article">
+    {% if article.image %}
+      <div class="article-image">{{ article.image }}</div>
+    {% endif %}
+
+    <div class="article-meta">
+      {% if article.categorie %}
+        <a class="article-categorie" href="{{ article.categorie.url }}">{{ article.categorie.nom }}</a>
+      {% endif %}
+      <span class="article-date"><i class="far fa-calendar-alt" aria-hidden="true"></i> <time datetime="{{ article.date_iso }}">{{ article.date }}</time></span>
+      <span class="article-lecture">{{ article.lecture }} min de lecture</span>
+    </div>
+
+    <h1 class="article-titre">{{ article.titre }}</h1>
+
+    {% if article.corps %}
+      <div class="article-corps">{{ article.corps }}</div>
+    {% endif %}
+  </div>
+
+  <div class="blog-text-footer article-pied">
+    {% if article.tags %}
+      <div class="article-tags">
+        <i class="fas fa-tags" aria-hidden="true"></i>
+        <span class="visually-hidden">Mots-clés :</span>
+        <ul>
+          {% for tag in article.tags %}
+            <li><a href="{{ tag.url }}">{{ tag.nom }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+    {% if article.partage %}
+      <div class="social-icons">{{ article.partage }}</div>
+    {% endif %}
+  </div>
+{% endif %}

@@ -124,6 +124,13 @@ galerie:
 
 # Entete et barre de recherche de « Services aux citoyens ». Le depliage de la
 # barre laterale rejoint le theme au lieu de vivre en clair dans le gabarit.
+# Page d'un article (vue singlepost) : titre, méta et texte saisi dans
+# l'éditeur. Attachée depuis views-view-fields--singlepost.html.twig.
+article:
+  css:
+    theme:
+        assets/css/article.css: {}
+
 # Styles des pages du compte (connexion, mot de passe oublie).
 compte:
   css:

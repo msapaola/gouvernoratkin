@@ -419,3 +419,61 @@ function _gouvernoratkin_menu_principal_ajuster(array $items, int $niveau) {
   unset($item);
   return $items;
 }
+
+/**
+ * Implements hook_preprocess_HOOK() for views-view-fields--singlepost.
+ *
+ * Page d'un article. Le balisage était écrit dans la configuration de la vue
+ * (champ « Texte personnalisé »), avec deux défauts : le titre était un
+ * <h3> (aucun <h1> sur la page) et tout le texte de l'article était enfermé
+ * dans un <p>, que le navigateur cassait en paragraphes vides. Le gabarit
+ * views-view-fields--singlepost.html.twig reçoit ici des variables simples :
+ * article.titre, image, categorie { nom, url }, date, date_iso, lecture
+ * (minutes), corps (texte filtré), tags [{ nom, url }], partage.
+ */
+function gouvernoratkin_preprocess_views_view_fields__singlepost(array &$variables) {
+  $vue = $variables['view'];
+  $ligne = $variables['row'];
+  $node = $ligne->_entity ?? NULL;
+  if (!$node instanceof \Drupal\node\NodeInterface) {
+    return;
+  }
+
+  $champ_vue = function (string $nom) use ($vue, $ligne) {
+    $rendu = $vue->style_plugin->getField($ligne->index, $nom);
+    return ($rendu !== NULL && trim(strip_tags((string) $rendu, '<img><a><ul><li><span><i>')) !== '') ? $rendu : NULL;
+  };
+
+  $corps = NULL;
+  $mots = 0;
+  if ($node->hasField('body') && !$node->get('body')->isEmpty()) {
+    $item = $node->get('body')->first();
+    $corps = ['#type' => 'processed_text', '#text' => $item->value, '#format' => $item->format];
+    $mots = str_word_count(strip_tags($item->value), 0, 'àâäéèêëîïôöùûüçœÀÂÄÉÈÊËÎÏÔÖÙÛÜÇŒ’\'-');
+  }
+
+  $categorie = NULL;
+  if ($node->hasField('field_categorie') && ($terme = $node->get('field_categorie')->entity)) {
+    $categorie = ['nom' => $terme->label(), 'url' => $terme->toUrl()->toString()];
+  }
+  $tags = [];
+  if ($node->hasField('field_tags')) {
+    foreach ($node->get('field_tags')->referencedEntities() as $terme) {
+      $tags[] = ['nom' => $terme->label(), 'url' => $terme->toUrl()->toString()];
+    }
+  }
+
+  $variables['article'] = [
+    'titre' => $node->label(),
+    'image' => $champ_vue('field_image_media'),
+    'categorie' => $categorie,
+    'date' => \Drupal::service('date.formatter')->format($node->getCreatedTime(), 'custom', 'j F Y'),
+    'date_iso' => date('c', $node->getCreatedTime()),
+    // Temps de lecture : 200 mots par minute, une minute au moins.
+    'lecture' => max(1, (int) round($mots / 200)),
+    'corps' => $corps,
+    'tags' => $tags,
+    'partage' => $champ_vue('addtoany_share'),
+  ];
+  $variables['#cache']['tags'] = array_merge($variables['#cache']['tags'] ?? [], $node->getCacheTags());
+}
