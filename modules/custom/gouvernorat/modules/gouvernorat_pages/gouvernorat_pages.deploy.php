@@ -170,3 +170,71 @@ function gouvernorat_pages_deploy_a_propos() {
     'field_page_chapo' => "Institution dédiée à la gestion et au développement de la capitale de la République Démocratique du Congo, le Gouvernorat coordonne les services publics de la Ville-Province et conduit les politiques de développement urbain au service des Kinoises et des Kinois.",
   ], $sections);
 }
+
+/**
+ * Pages « Culture et patrimoine » et « Structures et services de la ville ».
+ *
+ * Leur corps est déjà dans la base : un bloc de contenu « basic » affiché par
+ * une vue (culture_et_patrimoine, structuresville). Il est recopié tel quel,
+ * mise en forme comprise, dans le corps d'une page de base ; l'entête et
+ * l'encadré final, écrits dans les gabarits, deviennent les champs et la
+ * section « appel » de la page. Le bloc d'origine n'est pas supprimé.
+ */
+function gouvernorat_pages_deploy_culture_structures() {
+  $pages = [
+    [
+      'vue' => 'culture_et_patrimoine',
+      'adresse' => '/culture-et-patrimoine',
+      'classe' => 'cu-corps',
+      'title' => 'Culture et patrimoine',
+      'field_page_surtitre' => 'Kinshasa vivante',
+      'field_page_chapo' => "Berceau de la rumba congolaise et carrefour culturel de l'Afrique centrale, Kinshasa se raconte par sa musique, ses langues, ses festivals et le patrimoine bâti d'une capitale en mouvement.",
+      'appel' => [
+        'field_sec_titre' => 'Vivre la ville',
+        'field_sec_texte' => "L'actualité du Gouvernorat et les images de la capitale prolongent cette découverte.",
+        'field_sec_liens' => [
+          ['uri' => 'internal:/actualites', 'title' => 'Les actualités'],
+          ['uri' => 'internal:/all-gallery', 'title' => 'La galerie photo'],
+        ],
+      ],
+    ],
+    [
+      'vue' => 'structuresville',
+      'adresse' => '/structuresville',
+      'classe' => 'st-corps',
+      'title' => 'Structures et services de la ville',
+      'field_page_surtitre' => 'Gouvernance',
+      'field_page_chapo' => "Le Gouvernorat de Kinshasa s'appuie sur des institutions, des ministères et des régies pour assurer le fonctionnement, le développement et le bien-être de la capitale. Voici les services à votre disposition.",
+      'appel' => [
+        'field_sec_titre' => 'Poursuivre la découverte',
+        'field_sec_texte' => "L'exécutif provincial et le cabinet du gouverneur complètent l'organisation du Gouvernorat de Kinshasa.",
+        'field_sec_liens' => [
+          ['uri' => 'internal:/executif-provincial', 'title' => "L'exécutif provincial"],
+          ['uri' => 'internal:/cabinet-du-gouverneur', 'title' => 'Le cabinet du gouverneur'],
+        ],
+      ],
+    ],
+  ];
+
+  $messages = [];
+  foreach ($pages as $page) {
+    // Le bloc affiché par la vue : son numéro est dans le filtre de la vue.
+    $vue = \Drupal::config('views.view.' . $page['vue'])->get('display.default.display_options.filters.id.value.value');
+    $bloc = $vue ? \Drupal::entityTypeManager()->getStorage('block_content')->load($vue) : NULL;
+    $corps = $bloc && $bloc->hasField('body') && !$bloc->get('body')->isEmpty() ? (string) $bloc->get('body')->value : '';
+    if ($corps === '') {
+      $messages[] = "Bloc de la vue {$page['vue']} introuvable ou vide : page {$page['adresse']} créée sans corps.";
+    }
+
+    $messages[] = _gouvernorat_pages_creer($page['adresse'], [
+      'title' => $page['title'],
+      'field_page_surtitre' => $page['field_page_surtitre'],
+      'field_page_chapo' => $page['field_page_chapo'],
+      // Le balisage d'origine (cartes, sections) est gardé tel quel : il est
+      // enveloppé de la classe que ses styles attendent, au format HTML
+      // complet pour qu'aucune classe ne soit retirée.
+      'body' => $corps !== '' ? ['value' => '<div class="' . $page['classe'] . '">' . "\n" . $corps . "\n</div>", 'format' => 'full_html'] : NULL,
+    ], [_gouvernorat_pages_section('sec_appel', $page['appel'])]);
+  }
+  return implode(' ', $messages);
+}

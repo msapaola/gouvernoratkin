@@ -50,8 +50,6 @@ class Catalogue {
     '/all-gallery' => ['Galerie', 'Photos des activités du Gouvernorat.'],
     '/executif-provincial' => ['Exécutif provincial', 'Le gouverneur, le vice-gouverneur et les ministres provinciaux.'],
     '/cabinet-du-gouverneur' => ['Cabinet du gouverneur', 'Les membres du cabinet du gouverneur.'],
-    '/structuresville' => ['Structures et services de la ville', 'Les structures et services rattachés à la Ville-Province.'],
-    '/culture-et-patrimoine' => ['Culture et patrimoine', "L'histoire, les lieux et la vie culturelle de la capitale."],
     '/contact' => ['Contact', 'Formulaire pour écrire au Gouvernorat, adresse et coordonnées.'],
   ];
 
@@ -59,7 +57,7 @@ class Catalogue {
    * Pages principales dont le texte affiché est repris dans le catalogue
    * (les autres sont des listes : actualités, démarches, vidéos…).
    */
-  const PAGES_A_LIRE = ['/', '/executif-provincial', '/cabinet-du-gouverneur', '/structuresville', '/culture-et-patrimoine'];
+  const PAGES_A_LIRE = ['/', '/executif-provincial', '/cabinet-du-gouverneur'];
 
   /**
    * Types de contenu de référence : quand ils répondent à la question, ils

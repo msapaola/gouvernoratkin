@@ -13,6 +13,11 @@
  */
 #}
 {{ attach_library('gouvernoratkin/apropos') }}
+{# Corps repris des anciennes pages Culture et patrimoine, Structures et
+   services : leur balisage (cartes, sections) a ses styles propres, portés
+   par .cu-corps et .st-corps. #}
+{{ attach_library('gouvernoratkin/culture') }}
+{{ attach_library('gouvernoratkin/structures') }}
 
 <article{{ attributes.addClass('page-sections') }}>
 
@@ -52,11 +57,20 @@
   {% endif %}
 
   {% if content.body|render|striptags|trim %}
-    <section class="ap-section">
-      <div class="container page-corps">
+    {# Un corps qui porte sa propre mise en page (sections, conteneurs)
+       s'affiche en pleine largeur ; un texte simple, dans une colonne de
+       lecture. #}
+    {% if node.body.value matches '/<section|class="container|class="(cu|st)-corps/' %}
+      <div class="page-corps-libre">
         {{ content.body }}
       </div>
-    </section>
+    {% else %}
+      <section class="ap-section">
+        <div class="container page-corps">
+          {{ content.body }}
+        </div>
+      </section>
+    {% endif %}
   {% endif %}
 
   {# Une section sur deux sur fond clair, comme sur l'ancienne page. Les
