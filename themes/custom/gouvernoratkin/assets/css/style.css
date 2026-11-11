@@ -1206,6 +1206,12 @@ p:last-child {
   z-index: 0;
 }
 
+/* Colonnes du pied de page centrées : depuis le retrait de la partie
+   « S'abonner », il en reste trois sur une grille de quatre. */
+.footer .footer-content > .row {
+  justify-content: center;
+}
+
 .footer .container {
   position: relative;
   z-index: 1;
