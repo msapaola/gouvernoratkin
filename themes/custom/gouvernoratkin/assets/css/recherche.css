@@ -1,0 +1,518 @@
+/**
+ * Recherche — Gouvernorat de Kinshasa
+ *
+ * Page de résultats (/search/node), champ de recherche réutilisable
+ * (.recherche-formulaire) et fenêtre de recherche de l'en-tête (.recherche-fenetre).
+ */
+
+/* ==========================================================================
+   Champ de recherche (page de résultats, colonne des articles, fenêtre)
+   ========================================================================== */
+
+.recherche-formulaire {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  margin: 0;
+  background-color: var(--whiteColor);
+  border: 2px solid #cdd7e6;
+  border-radius: 999px;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.recherche-formulaire:focus-within {
+  border-color: var(--mainColor);
+  box-shadow: 0 0 0 4px rgba(16, 66, 147, 0.12);
+}
+
+/* Les conteneurs de Drupal autour du champ et du bouton. */
+.recherche-formulaire > div,
+.recherche-formulaire .form-item,
+.recherche-formulaire .js-form-item,
+.recherche-formulaire .form-actions {
+  margin: 0 !important;
+  padding: 0;
+}
+
+.recherche-formulaire > div:first-child,
+.recherche-formulaire .form-item,
+.recherche-formulaire .js-form-item {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+}
+
+.recherche-formulaire .form-actions {
+  flex: 0 0 auto;
+  display: flex;
+}
+
+.recherche-formulaire input.recherche-champ,
+.recherche-formulaire input[type="search"] {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  margin: 0;
+  padding: 0.95rem 0.5rem 0.95rem 1.4rem;
+  border: 0 !important;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none !important;
+  font-size: 1.05rem;
+  color: var(--blackColor);
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.recherche-formulaire input[type="search"]:focus,
+.recherche-formulaire input[type="search"]:focus-visible {
+  outline: none !important;
+}
+
+.recherche-formulaire input[type="search"]::placeholder {
+  color: #7a8494;
+}
+
+.recherche-formulaire .recherche-bouton,
+.recherche-formulaire input[type="submit"],
+.recherche-formulaire button[type="submit"] {
+  margin: 0.3rem;
+  padding: 0 1.5rem;
+  border: 0;
+  border-radius: 999px;
+  background-color: var(--mainColor);
+  color: var(--whiteColor);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.recherche-formulaire .recherche-bouton:hover,
+.recherche-formulaire .recherche-bouton:focus-visible,
+.recherche-formulaire input[type="submit"]:hover {
+  background-color: var(--secondaryColorDark, #00719a);
+}
+
+.recherche-formulaire--compact input[type="search"] {
+  padding: 0.7rem 0.4rem 0.7rem 1.1rem;
+  font-size: 1rem;
+}
+
+.recherche-formulaire--compact .recherche-bouton,
+.recherche-formulaire--compact input[type="submit"] {
+  padding: 0 1rem;
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   Page de résultats
+   ========================================================================== */
+
+.recherche {
+  padding: 2.5rem 0 4rem;
+}
+
+.recherche .container {
+  max-width: 920px;
+}
+
+.recherche-barre {
+  margin-bottom: 1.5rem;
+}
+
+.recherche-bilan {
+  margin: 0 0 1.5rem;
+  font-size: 1rem;
+  color: #5b6472;
+}
+
+.recherche-bilan strong {
+  color: var(--mainColor);
+}
+
+.resultats-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.resultats-liste > li {
+  margin: 0;
+  padding: 0;
+}
+
+.resultat-carte {
+  position: relative;
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  padding: 1.25rem 1.4rem;
+  background-color: var(--whiteColor);
+  border: 1px solid #e1e7f0;
+  border-left: 4px solid var(--mainColor);
+  border-radius: 12px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.resultat-carte:hover,
+.resultat-carte:focus-within {
+  box-shadow: 0 10px 28px rgba(16, 66, 147, 0.1);
+  transform: translateY(-2px);
+}
+
+.resultat-carte--article,
+.resultat-carte--evenement {
+  border-left-color: var(--accentColor);
+}
+
+.resultat-carte--service-au-citoyen {
+  border-left-color: var(--secondaryColor);
+}
+
+.resultat-carte--membre {
+  border-left-color: #1f8a4c;
+}
+
+.resultat-texte {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.resultat-type {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.75rem;
+  margin: 0 0 0.45rem;
+  font-size: 0.8rem;
+}
+
+.resultat-badge {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background-color: #e8eef8;
+  color: var(--mainColor);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.resultat-precision {
+  color: #5b6472;
+}
+
+.recherche .resultat-titre {
+  margin: 0 0 0.45rem;
+  font-family: var(--fontFamily-heading);
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+
+.resultat-titre a {
+  color: var(--blackColor);
+  text-decoration: none;
+}
+
+/* Toute la carte est cliquable. */
+.resultat-titre a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+}
+
+.resultat-titre a:hover,
+.resultat-titre a:focus-visible {
+  color: var(--mainColor);
+  text-decoration: underline;
+}
+
+.resultat-titre a:focus-visible {
+  outline: none;
+}
+
+.resultat-carte:has(.resultat-titre a:focus-visible) {
+  outline: 3px solid var(--mainColor);
+  outline-offset: 2px;
+}
+
+.resultat-extrait {
+  margin: 0 0 0.5rem;
+  font-size: 0.97rem;
+  line-height: 1.65;
+  color: #3d4554;
+  overflow-wrap: anywhere;
+}
+
+/* Mots cherchés surlignés dans l'extrait. */
+.resultat-extrait strong {
+  padding: 0 0.15em;
+  border-radius: 3px;
+  background-color: #fff3c4;
+  color: var(--blackColor);
+  font-weight: 700;
+}
+
+.resultat-date {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #5b6472;
+}
+
+.resultat-date i {
+  color: var(--mainColor);
+  margin-right: 0.2rem;
+}
+
+.resultat-image {
+  flex: 0 0 160px;
+}
+
+.resultat-image img {
+  display: block;
+  width: 160px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Aucun résultat, ou page ouverte sans mot-clé. */
+.recherche-aide {
+  padding: 1.5rem 1.6rem;
+  background-color: #f4f7fc;
+  border-radius: 12px;
+}
+
+.recherche-aide h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+  color: var(--mainColor);
+}
+
+.recherche-aide ul {
+  margin: 0 0 1rem;
+  padding-left: 1.2rem;
+}
+
+.recherche-aide li,
+.recherche-aide p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #3d4554;
+}
+
+.recherche-raccourcis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.recherche-raccourcis a {
+  display: inline-block;
+  padding: 0.45rem 1rem;
+  border: 1px solid #cdd7e6;
+  border-radius: 999px;
+  background-color: var(--whiteColor);
+  color: var(--mainColor);
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+}
+
+.recherche-raccourcis a:hover,
+.recherche-raccourcis a:focus-visible {
+  border-color: var(--mainColor);
+  background-color: var(--mainColor);
+  color: var(--whiteColor);
+}
+
+/* Pagination. */
+.recherche .pagination {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 2rem;
+}
+
+.recherche .page-link {
+  border-radius: 8px !important;
+  color: var(--mainColor);
+}
+
+.recherche .page-item.active .page-link {
+  background-color: var(--mainColor);
+  border-color: var(--mainColor);
+  color: var(--whiteColor);
+}
+
+/* ==========================================================================
+   Fenêtre de recherche (loupe de l'en-tête)
+   ========================================================================== */
+
+.recherche-fenetre {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 18vh 16px 16px;
+  background-color: rgba(8, 20, 46, 0.82);
+  backdrop-filter: blur(3px);
+}
+
+.recherche-fenetre[hidden] {
+  display: none;
+}
+
+.recherche-fenetre__boite {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  animation: recherche-apparition 0.25s ease-out;
+}
+
+@keyframes recherche-apparition {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.recherche-fenetre__titre {
+  margin: 0 0 1rem;
+  font-family: var(--fontFamily-heading);
+  font-size: 1.6rem;
+  color: var(--whiteColor);
+}
+
+.recherche-fenetre .recherche-formulaire {
+  border-color: transparent;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.recherche-fenetre .recherche-formulaire:focus-within {
+  border-color: var(--whiteColor);
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.35), 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.recherche-fenetre__fermer {
+  position: absolute;
+  top: -0.25rem;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.12);
+  color: var(--whiteColor);
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.recherche-fenetre__fermer:hover,
+.recherche-fenetre__fermer:focus-visible {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.recherche-fenetre__raccourcis {
+  margin-top: 1.25rem;
+}
+
+.recherche-fenetre__raccourcis a {
+  border-color: rgba(255, 255, 255, 0.35);
+  background-color: transparent;
+  color: var(--whiteColor);
+}
+
+.recherche-fenetre__raccourcis a:hover,
+.recherche-fenetre__raccourcis a:focus-visible {
+  border-color: var(--whiteColor);
+  background-color: var(--whiteColor);
+  color: var(--mainColor);
+}
+
+body.recherche-ouverte {
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   Colonne des articles
+   ========================================================================== */
+
+.block-search .recherche-formulaire {
+  margin-bottom: 0;
+}
+
+/* ==========================================================================
+   Téléphones
+   ========================================================================== */
+
+@media (max-width: 767.98px) {
+  .recherche {
+    padding: 1.5rem 0 3rem;
+  }
+
+  .recherche-formulaire input[type="search"] {
+    padding: 0.85rem 0.4rem 0.85rem 1.1rem;
+    font-size: 16px;
+  }
+
+  /* Bouton réduit à une loupe pour laisser la place au champ. */
+  .recherche-formulaire .recherche-bouton {
+    padding: 0 1rem;
+  }
+
+  .resultat-carte {
+    flex-direction: column-reverse;
+    gap: 0.85rem;
+    padding: 1rem 1.1rem;
+  }
+
+  .resultat-image {
+    flex-basis: auto;
+    width: 100%;
+  }
+
+  .resultat-image img {
+    width: 100%;
+    height: 150px;
+  }
+
+  .recherche .resultat-titre {
+    font-size: 1.1rem;
+  }
+
+  .recherche-fenetre {
+    padding-top: 12vh;
+  }
+
+  .recherche-fenetre__titre {
+    font-size: 1.3rem;
+    padding-right: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recherche-fenetre__boite {
+    animation: none;
+  }
+
+  .resultat-carte {
+    transition: none;
+  }
+}

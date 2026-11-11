@@ -1,0 +1,68 @@
+{#
+/**
+ * @file
+ * Page « Rechercher sur le site » (vue page_de_recherche, /search/node).
+ *
+ * Variables ajoutées (gouvernoratkin.theme) :
+ * - recherche.cles : les mots cherchés ;
+ * - recherche.total : le nombre de résultats.
+ */
+#}
+{{ attach_library('gouvernoratkin/recherche') }}
+{%
+  set classes = [
+    'view',
+    'view-' ~ id|clean_class,
+    'view-id-' ~ id,
+    'view-display-id-' ~ display_id,
+    dom_id ? 'js-view-dom-id-' ~ dom_id,
+    'recherche',
+  ]
+%}
+<div{{ attributes.addClass(classes) }}>
+  <div class="container">
+    {{ title_prefix }}
+    {{ title_suffix }}
+
+    <div class="recherche-barre">
+      {{ exposed }}
+    </div>
+
+    {% if recherche.cles %}
+      <p class="recherche-bilan" role="status">
+        {% if recherche.total > 1 %}
+          <strong>{{ recherche.total }}</strong> résultats pour « {{ recherche.cles }} »
+        {% elseif recherche.total == 1 %}
+          <strong>1</strong> résultat pour « {{ recherche.cles }} »
+        {% else %}
+          Aucun résultat pour « {{ recherche.cles }} »
+        {% endif %}
+      </p>
+    {% endif %}
+
+    {% if rows %}
+      <div class="view-content">
+        {{ rows }}
+      </div>
+      {{ pager }}
+    {% else %}
+      <div class="recherche-aide">
+        {% if recherche.cles %}
+          <h2>Quelques pistes</h2>
+          <ul>
+            <li>Vérifiez l'orthographe des mots.</li>
+            <li>Essayez un mot plus général ou un synonyme (« permis » plutôt que « permis de bâtir »).</li>
+            <li>Les mots de moins de trois lettres ne sont pas pris en compte.</li>
+          </ul>
+        {% else %}
+          <p>Saisissez un ou plusieurs mots : une démarche, un service, une commune, le nom d'un responsable…</p>
+        {% endif %}
+        <p class="recherche-raccourcis">
+          <a href="{{ path('<front>') }}services-aux-citoyens">Services aux citoyens</a>
+          <a href="{{ path('<front>') }}actualites">Actualités</a>
+          <a href="{{ path('<front>') }}contact">Nous contacter</a>
+        </p>
+      </div>
+    {% endif %}
+  </div>
+</div>

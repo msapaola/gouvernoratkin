@@ -23,15 +23,39 @@
     }); 
     */
 
-    // popup button
-    $('.popup-button').click(function () {
-        $('.popup').css('visibility', 'visible');
-        $('.popup-content').addClass('hi');
-    })
-    $('#popup-close').click(function () {
-        $('.popup').css('visibility', 'hidden');
-        $('.popup-content').removeClass('hi');
-    })
+    // Fenêtre de recherche (loupe de l'en-tête) : ouverture, fermeture par
+    // le bouton, la touche Échap ou un clic à côté ; le curseur va dans le
+    // champ et revient sur la loupe à la fermeture.
+    var $fenetre = $("#recherche-fenetre");
+    var $declencheur = null;
+    var fermerRecherche = function () {
+        if ($fenetre.prop("hidden")) { return; }
+        $fenetre.prop("hidden", true);
+        $("body").removeClass("recherche-ouverte");
+        $(".popup-button").attr("aria-expanded", "false");
+        if ($declencheur) { $declencheur.trigger("focus"); }
+    };
+    $(".popup-button").on("click", function () {
+        $declencheur = $(this);
+        $fenetre.prop("hidden", false);
+        $("body").addClass("recherche-ouverte");
+        $(".popup-button").attr("aria-expanded", "true");
+        $("#recherche-fenetre-champ").trigger("focus");
+    });
+    $fenetre.on("click", ".recherche-fenetre__fermer", fermerRecherche);
+    $fenetre.on("click", function (event) {
+        if (event.target === this) { fermerRecherche(); }
+    });
+    $(document).on("keydown", function (event) {
+        if (event.key === "Escape") { fermerRecherche(); }
+        // Le curseur reste dans la fenêtre tant qu'elle est ouverte.
+        if (event.key === "Tab" && !$fenetre.prop("hidden")) {
+            var $cibles = $fenetre.find("input, button, a").filter(":visible");
+            var premier = $cibles.get(0), dernier = $cibles.get($cibles.length - 1);
+            if (event.shiftKey && document.activeElement === premier) { event.preventDefault(); dernier.focus(); }
+            else if (!event.shiftKey && document.activeElement === dernier) { event.preventDefault(); premier.focus(); }
+        }
+    });
 
     // Mean Menu
     $(".mean-menu").meanmenu({

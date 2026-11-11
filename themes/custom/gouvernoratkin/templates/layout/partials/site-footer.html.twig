@@ -26,13 +26,24 @@
 {% endif %}         
 <!-- Footer Area end -->
 
-<!-- popup area start -->
-{% if page.popup %}
-        <div class="popup">
-          {{ page.popup }}
-        </div>
-{% endif %}          
-<!-- popup area end -->
+<!-- Fenêtre de recherche (loupe de l'en-tête) -->
+{{ attach_library('gouvernoratkin/recherche') }}
+<div class="recherche-fenetre" id="recherche-fenetre" role="dialog" aria-modal="true" aria-labelledby="recherche-fenetre-titre" hidden>
+  <div class="recherche-fenetre__boite">
+    <h2 class="recherche-fenetre__titre" id="recherche-fenetre-titre">{{ 'Rechercher sur le site'|t }}</h2>
+    <button type="button" class="recherche-fenetre__fermer" aria-label="{{ 'Fermer la recherche'|t }}"><i class="fas fa-times" aria-hidden="true"></i></button>
+    <form class="recherche-formulaire" action="{{ path('view.page_de_recherche.page_1') }}" method="get" role="search">
+      <label class="visually-hidden" for="recherche-fenetre-champ">{{ 'Mots-clés'|t }}</label>
+      <input type="search" id="recherche-fenetre-champ" name="keys" class="recherche-champ" placeholder="{{ 'Une démarche, une actualité, un service…'|t }}" autocomplete="off" required minlength="3">
+      <button type="submit" class="recherche-bouton">{{ 'Rechercher'|t }}</button>
+    </form>
+    <p class="recherche-raccourcis recherche-fenetre__raccourcis">
+      <a href="{{ path('<front>') }}services-aux-citoyens">{{ 'Services aux citoyens'|t }}</a>
+      <a href="{{ path('<front>') }}actualites">{{ 'Actualités'|t }}</a>
+      <a href="{{ path('<front>') }}contact">{{ 'Nous contacter'|t }}</a>
+    </p>
+  </div>
+</div>
         
 <!--=== Start Go Top Button ===-->
 <button type="button" class="go-top" aria-label="{{ 'Revenir en haut de page'|t }}">

@@ -1,0 +1,29 @@
+{#
+/**
+ * @file
+ * Un résultat de la recherche. Variable « resultat » préparée dans
+ * gouvernoratkin.theme.
+ */
+#}
+{% if resultat %}
+<article class="resultat-carte resultat-carte--{{ resultat.type_classe }}">
+  <div class="resultat-texte">
+    <p class="resultat-type">
+      <span class="resultat-badge">{{ resultat.type }}</span>
+      {% if resultat.precision %}<span class="resultat-precision">{{ resultat.precision }}</span>{% endif %}
+    </p>
+    <h2 class="resultat-titre"><a href="{{ resultat.url }}">{{ resultat.titre }}</a></h2>
+    {% if resultat.extrait %}
+      <p class="resultat-extrait">{{ resultat.extrait }}</p>
+    {% endif %}
+    {% if resultat.date %}
+      <p class="resultat-date"><i class="far fa-calendar" aria-hidden="true"></i> <time datetime="{{ resultat.date.iso }}">{{ resultat.date.texte }}</time></p>
+    {% endif %}
+  </div>
+  {% if resultat.image %}
+    <a class="resultat-image" href="{{ resultat.url }}" tabindex="-1" aria-hidden="true">
+      <img src="{{ resultat.image }}" alt="" loading="lazy" width="160" height="110">
+    </a>
+  {% endif %}
+</article>
+{% endif %}

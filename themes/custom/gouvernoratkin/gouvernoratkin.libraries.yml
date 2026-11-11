@@ -132,6 +132,11 @@ article:
         assets/css/article.css: {}
 
 # Styles des pages du compte (connexion, mot de passe oublie).
+recherche:
+  css:
+    theme:
+        assets/css/recherche.css: {}
+
 compte:
   css:
     theme:

@@ -477,3 +477,140 @@ function gouvernoratkin_preprocess_views_view_fields__singlepost(array &$variabl
   ];
   $variables['#cache']['tags'] = array_merge($variables['#cache']['tags'] ?? [], $node->getCacheTags());
 }
+
+/**
+ * Page de résultats de la recherche : mots cherchés et nombre de résultats.
+ */
+function gouvernoratkin_preprocess_views_view__page_de_recherche(array &$variables): void {
+  $view = $variables['view'];
+  $variables['recherche'] = [
+    'cles' => trim((string) \Drupal::request()->query->get('keys', '')),
+    'total' => (int) ($view->total_rows ?? count($view->result)),
+  ];
+  $variables['#cache']['contexts'][] = 'url.query_args:keys';
+}
+
+/**
+ * Un résultat de recherche : type, titre, extrait surligné, date, image.
+ *
+ * L'extrait vient du texte indexé de la page (paragraphes et sections
+ * compris), avec les mots cherchés mis en évidence.
+ */
+function gouvernoratkin_preprocess_views_view_fields__page_de_recherche(array &$variables): void {
+  $node = $variables['row']->_entity ?? NULL;
+  if (!$node instanceof \Drupal\node\NodeInterface) {
+    return;
+  }
+  $types = [
+    'article' => 'Actualité',
+    'evenement' => 'Événement',
+    'gallery' => 'Galerie photos',
+    'video' => 'Vidéo',
+    'service_au_citoyen' => 'Démarche',
+    'membre' => 'Institutions',
+    'page' => 'Page',
+    'page_a_propos' => 'Page',
+  ];
+  $bundle = $node->bundle();
+  $cles = trim((string) \Drupal::request()->query->get('keys', ''));
+  $langue = $node->language()->getId();
+
+  // Extrait : texte de la page tel qu'il est indexé (affichage « index de
+  // recherche », sections comprises), avec accents et majuscules.
+  $extrait = NULL;
+  if ($cles !== '') {
+    $element = \Drupal::entityTypeManager()->getViewBuilder('node')->view($node, 'search_index', $langue);
+    $html = (string) \Drupal::service('renderer')->renderInIsolation($element);
+    // Espace entre les blocs, pour que les mots ne se collent pas.
+    $html = preg_replace('#<(/?(p|div|h[1-6]|li|td|th|br|section|article|figcaption)\b)#i', ' <$1', $html);
+    $texte = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+    if ($texte !== '') {
+      $extrait = search_excerpt($cles, $texte, $langue);
+    }
+  }
+
+  // Image : illustration de l'article ou photo du membre.
+  $image = NULL;
+  $style = \Drupal\image\Entity\ImageStyle::load('carte_teaser');
+  if ($node->hasField('field_image_media') && ($media = $node->get('field_image_media')->entity)) {
+    $fid = $media->getSource()->getSourceFieldValue($media);
+    $fichier = $fid ? \Drupal\file\Entity\File::load($fid) : NULL;
+    if ($fichier && $style) {
+      $image = $style->buildUrl($fichier->getFileUri());
+    }
+  }
+  elseif ($node->hasField('field_membre_photo') && ($fichier = $node->get('field_membre_photo')->entity) && $style) {
+    $image = $style->buildUrl($fichier->getFileUri());
+  }
+
+  // Précision sous le titre : catégorie d'un article, fonction d'un membre.
+  $precision = NULL;
+  if ($node->hasField('field_categorie') && ($terme = $node->get('field_categorie')->entity)) {
+    $precision = $terme->label();
+  }
+  elseif ($node->hasField('field_membre_fonction') && !$node->get('field_membre_fonction')->isEmpty()) {
+    $precision = $node->get('field_membre_fonction')->value;
+  }
+
+  $date = NULL;
+  if (in_array($bundle, ['article', 'evenement', 'gallery', 'video'], TRUE)) {
+    $date = [
+      'texte' => \Drupal::service('date.formatter')->format($node->getCreatedTime(), 'custom', 'j F Y'),
+      'iso' => date('Y-m-d', $node->getCreatedTime()),
+    ];
+  }
+
+  $variables['resultat'] = [
+    'type' => $types[$bundle] ?? 'Page',
+    'type_classe' => \Drupal\Component\Utility\Html::getClass($bundle),
+    'titre' => $node->label(),
+    'url' => $node->toUrl()->toString(),
+    'precision' => $precision,
+    'extrait' => $extrait,
+    'image' => $image,
+    'date' => $date,
+  ];
+  $variables['#cache']['tags'] = array_merge($variables['#cache']['tags'] ?? [], $node->getCacheTags());
+}
+
+/**
+ * Formulaires de recherche : champ « search », texte indicatif, bouton.
+ */
+function gouvernoratkin_form_alter(array &$form, \Drupal\Core\Form\FormStateInterface $form_state, string $form_id): void {
+  if ($form_id === 'views_exposed_form' && ($form['#id'] ?? '') === 'views-exposed-form-page-de-recherche-page-1') {
+    $form['#attributes']['class'][] = 'recherche-formulaire';
+    $form['#attributes']['role'] = 'search';
+    $form['keys']['#type'] = 'search';
+    $form['keys']['#title_display'] = 'invisible';
+    $form['keys']['#attributes']['placeholder'] = 'Une démarche, une actualité, un service…';
+    $form['keys']['#attributes']['class'][] = 'recherche-champ';
+    $form['keys']['#size'] = NULL;
+    $form['actions']['submit']['#attributes']['class'][] = 'recherche-bouton';
+  }
+  if ($form_id === 'search_block_form') {
+    $form['#attributes']['class'][] = 'recherche-formulaire';
+    $form['#attributes']['class'][] = 'recherche-formulaire--compact';
+    $form['keys']['#title_display'] = 'invisible';
+    $form['keys']['#attributes']['placeholder'] = 'Rechercher sur le site';
+    $form['keys']['#attributes']['class'][] = 'recherche-champ';
+    $form['keys']['#size'] = NULL;
+    $form['actions']['submit']['#value'] = 'Rechercher';
+    $form['actions']['submit']['#attributes']['class'][] = 'recherche-bouton';
+  }
+}
+
+/**
+ * Fil d'Ariane de la page de recherche : « Accueil › Rechercher sur le site ».
+ *
+ * Sans cela, il passait par /search, intitulé « Search » en anglais.
+ */
+function gouvernoratkin_preprocess_breadcrumb(array &$variables): void {
+  // La vue remplace la page de recherche de Drupal en gardant le nom de sa
+  // route (search.view_node_search).
+  if (!in_array(\Drupal::routeMatch()->getRouteName(), ['search.view_node_search', 'view.page_de_recherche.page_1'], TRUE)) {
+    return;
+  }
+  $variables['breadcrumb'] = array_slice($variables['breadcrumb'] ?? [], 0, 1);
+  $variables['breadcrumb'][] = ['text' => 'Rechercher sur le site', 'url' => NULL];
+  $variables['#cache']['contexts'][] = 'route';
+}
