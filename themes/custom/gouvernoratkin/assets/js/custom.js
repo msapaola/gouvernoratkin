@@ -284,28 +284,6 @@
         });
     });
 
-    // Formulaire d'abonnement du pied de page.
-    // Le thème d'origine envoyait les adresses saisies vers la liste Mailchimp
-    // de son éditeur (hibootstrap), et non vers le Gouvernorat : ce branchement
-    // est retiré. Tant qu'un service de lettre d'information n'est pas
-    // choisi, le formulaire n'envoie rien et le dit clairement.
-    // Le texte indicatif du champ était en anglais (« Your Email »), dans le
-    // bloc du pied de page.
-    $(".newsletter-form input[type=email], .newsletter-form input[name=EMAIL]")
-        .attr("placeholder", "Votre adresse de courriel")
-        .attr("aria-label", "Votre adresse de courriel");
-    $(".newsletter-form").on("submit", function (event) {
-        event.preventDefault();
-        var message = "Les inscriptions à la lettre d'information ouvriront prochainement.";
-        $("#validator-newsletter, #validator-newsletter-2")
-            .removeClass().addClass("validation-success").text(message);
-        var $form = $(this);
-        if (!$form.find(".newsletter-statut").length) {
-            $form.append('<p class="newsletter-statut" role="status"></p>');
-        }
-        $form.find(".newsletter-statut").text(message);
-    });
-
     // Liens ouverts dans un nouvel onglet (constat S10 du diagnostic) : la page
     // ouverte ne doit pas pouvoir agir sur celle du site. Le script de
     // déploiement corrige les textes enregistrés ; ceci couvre les formats de

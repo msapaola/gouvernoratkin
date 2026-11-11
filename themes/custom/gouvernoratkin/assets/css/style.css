@@ -1350,60 +1350,6 @@ p:last-child {
   text-decoration: underline;
 }
 
-.footer-newsletter {
-  margin-bottom: -10px;
-  margin-top: -2px;
-}
-
-.footer-newsletter p {
-  color: var(--whiteColor);
-  font-size: 15px;
-}
-
-.footer-newsletter .newsletter-form::-moz-placeholder {
-  color: var(--whiteColor) !important;
-}
-
-.footer-newsletter .newsletter-form::placeholder {
-  color: var(--whiteColor) !important;
-}
-
-.footer-newsletter .newsletter-form .form-control {
-  color: var(--whiteColor) !important;
-  background-color: transparent;
-  border: 0px;
-  padding: 10px 15px;
-  border: 1px solid rgba(238, 238, 238, 0.3137254902);
-  border-radius: 10px;
-  font-size: 15px;
-  font-family: var(--fontFamily-body);
-}
-
-.footer-newsletter .newsletter-form .form-control::-moz-placeholder {
-  color: var(--whiteColor);
-}
-
-.footer-newsletter .newsletter-form .form-control::placeholder {
-  color: var(--whiteColor);
-}
-
-.footer-newsletter .newsletter-form .news-btn {
-  width: 100%;
-  padding: 10px 15px;
-  margin-top: 10px;
-}
-
-.footer-newsletter .newsletter-form .news-btn:hover {
-  background-color: var(--blackColor);
-}
-
-/* Message affiché sous le formulaire d'abonnement (custom.js). */
-.footer-newsletter .newsletter-statut {
-  color: var(--whiteColor);
-  font-size: 14px;
-  margin: 10px 0 0;
-}
-
 .validation-danger {
   color: var(--accentColor);
 }

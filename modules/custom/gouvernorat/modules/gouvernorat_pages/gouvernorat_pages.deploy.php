@@ -238,3 +238,58 @@ function gouvernorat_pages_deploy_culture_structures() {
   }
   return implode(' ', $messages);
 }
+
+/**
+ * Retire le formulaire d'abonnement à la newsletter du pied de page.
+ *
+ * Le formulaire (hérité du thème d'origine) est écrit dans un bloc de
+ * contenu. Sont retirés : le formulaire, et les titres ou paragraphes qui
+ * parlent de la newsletter. Le reste du bloc est conservé. L'ancienne
+ * version reste dans les révisions du bloc.
+ */
+function gouvernorat_pages_deploy_retrait_newsletter(): string {
+  $stockage = \Drupal::entityTypeManager()->getStorage('block_content');
+  $ids = \Drupal::entityQuery('block_content')
+    ->accessCheck(FALSE)
+    ->condition('body.value', 'newsletter', 'CONTAINS')
+    ->execute();
+  $rapport = [];
+  foreach ($stockage->loadMultiple($ids) as $bloc) {
+    $dom = \Drupal\Component\Utility\Html::load($bloc->get('body')->value);
+    $xpath = new \DOMXPath($dom);
+    $retires = [];
+    $a_retirer = [];
+    foreach ($xpath->query('//form[contains(concat(" ", normalize-space(@class), " "), " newsletter-form ")]') as $noeud) {
+      $a_retirer[] = $noeud;
+    }
+    foreach ($xpath->query('//h1|//h2|//h3|//h4|//h5|//h6|//p') as $noeud) {
+      $texte = trim($noeud->textContent);
+      $dans_formulaire = $xpath->query('ancestor::form', $noeud)->length > 0;
+      if (!$dans_formulaire && preg_match("/newsletter|lettre d.information|abonne|inscri/iu", $texte) && $xpath->query('.//a', $noeud)->length === 0) {
+        $a_retirer[] = $noeud;
+      }
+    }
+    foreach ($a_retirer as $noeud) {
+      if ($noeud->parentNode) {
+        $retires[] = $noeud->nodeName === 'form' ? 'formulaire' : '« ' . mb_substr(trim($noeud->textContent), 0, 80) . ' »';
+        $noeud->parentNode->removeChild($noeud);
+      }
+    }
+    // Conteneurs devenus vides.
+    foreach (iterator_to_array($xpath->query('//*[contains(@class, "newsletter")]')) as $noeud) {
+      if (trim($noeud->textContent) === '' && $xpath->query('.//img|.//a|.//iframe', $noeud)->length === 0 && $noeud->parentNode) {
+        $noeud->parentNode->removeChild($noeud);
+      }
+    }
+    if ($retires) {
+      $bloc->get('body')->value = \Drupal\Component\Utility\Html::serialize($dom);
+      $bloc->setNewRevision(TRUE);
+      $bloc->setRevisionLogMessage('Formulaire de newsletter retiré.');
+      $bloc->save();
+      $rapport[] = $bloc->label() . ' : ' . implode(', ', $retires);
+    }
+  }
+  return $rapport
+    ? 'Newsletter retirée de ' . implode(' ; ', $rapport) . '. Ancienne version dans les révisions du bloc.'
+    : 'Aucun formulaire de newsletter trouvé dans les blocs de contenu.';
+}
