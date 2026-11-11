@@ -1,4 +1,0 @@
-gerer gouvernorat lettre:
-  title: "Gérer la lettre d'information"
-  description: "Voir et exporter la liste des abonnés, envoyer les lettres, régler l'expéditeur."
-  restrict access: true
