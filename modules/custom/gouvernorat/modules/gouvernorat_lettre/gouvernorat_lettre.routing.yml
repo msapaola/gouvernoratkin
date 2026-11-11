@@ -1,0 +1,106 @@
+gouvernorat_lettre.inscription:
+  path: '/lettre/inscription'
+  defaults:
+    _controller: '\Drupal\gouvernorat_lettre\Controller\LettreController::inscription'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+  options:
+    no_cache: TRUE
+
+gouvernorat_lettre.page:
+  path: '/lettre-d-information'
+  defaults:
+    _form: '\Drupal\gouvernorat_lettre\Form\InscriptionForm'
+    _title: "Lettre d'information"
+  requirements:
+    _access: 'TRUE'
+
+gouvernorat_lettre.confirmer:
+  path: '/lettre/confirmer/{jeton}'
+  defaults:
+    _form: '\Drupal\gouvernorat_lettre\Form\ConfirmerForm'
+    _title: 'Confirmer votre inscription'
+  requirements:
+    _access: 'TRUE'
+    jeton: '[A-Za-z0-9_-]{20,64}'
+  options:
+    no_cache: TRUE
+
+gouvernorat_lettre.desabonner:
+  path: '/lettre/desabonnement/{jeton}'
+  defaults:
+    _form: '\Drupal\gouvernorat_lettre\Form\DesabonnerForm'
+    _title: "Se désabonner de la lettre d'information"
+  requirements:
+    _access: 'TRUE'
+    jeton: '[A-Za-z0-9_-]{20,64}'
+  options:
+    no_cache: TRUE
+
+# Désabonnement « en un clic » des messageries (RFC 8058) : requête POST
+# envoyée par Gmail, Outlook… quand le lecteur clique sur « Se désabonner ».
+gouvernorat_lettre.un_clic:
+  path: '/lettre/desabonnement/{jeton}/un-clic'
+  defaults:
+    _controller: '\Drupal\gouvernorat_lettre\Controller\LettreController::unClic'
+  methods: [POST]
+  requirements:
+    _access: 'TRUE'
+    jeton: '[A-Za-z0-9_-]{20,64}'
+  options:
+    no_cache: TRUE
+
+gouvernorat_lettre.abonnes:
+  path: '/admin/content/lettre'
+  defaults:
+    _controller: '\Drupal\gouvernorat_lettre\Controller\AdminController::abonnes'
+    _title: "Lettre d'information"
+  requirements:
+    _permission: 'gerer gouvernorat lettre'
+
+gouvernorat_lettre.export:
+  path: '/admin/content/lettre/abonnes.csv'
+  defaults:
+    _controller: '\Drupal\gouvernorat_lettre\Controller\AdminController::export'
+  requirements:
+    _permission: 'gerer gouvernorat lettre'
+
+gouvernorat_lettre.ajout:
+  path: '/admin/content/lettre/ajouter'
+  defaults:
+    _form: '\Drupal\gouvernorat_lettre\Form\AjoutForm'
+    _title: 'Ajouter des abonnés'
+  requirements:
+    _permission: 'gerer gouvernorat lettre'
+
+gouvernorat_lettre.supprimer:
+  path: '/admin/content/lettre/supprimer/{aid}'
+  defaults:
+    _form: '\Drupal\gouvernorat_lettre\Form\SupprimerForm'
+    _title: 'Supprimer un abonné'
+  requirements:
+    _permission: 'gerer gouvernorat lettre'
+    aid: '\d+'
+
+gouvernorat_lettre.reglages:
+  path: '/admin/config/services/lettre'
+  defaults:
+    _form: '\Drupal\gouvernorat_lettre\Form\ReglagesForm'
+    _title: "Lettre d'information : réglages"
+  requirements:
+    _permission: 'gerer gouvernorat lettre'
+
+gouvernorat_lettre.envoi:
+  path: '/node/{node}/envoi'
+  defaults:
+    _form: '\Drupal\gouvernorat_lettre\Form\EnvoiForm'
+    _title: 'Envoyer la lettre'
+  requirements:
+    _custom_access: '\Drupal\gouvernorat_lettre\Form\EnvoiForm::acces'
+    node: '\d+'
+  options:
+    _admin_route: TRUE
+    parameters:
+      node:
+        type: entity:node

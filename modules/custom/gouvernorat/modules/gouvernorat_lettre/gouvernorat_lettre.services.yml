@@ -1,0 +1,16 @@
+services:
+  gouvernorat_lettre.expediteur:
+    class: Drupal\gouvernorat_lettre\Service\Expediteur
+    arguments: ['@config.factory', '@logger.channel.gouvernorat_lettre']
+  gouvernorat_lettre.abonnes:
+    class: Drupal\gouvernorat_lettre\Service\Abonnes
+    arguments: ['@database', '@gouvernorat_lettre.expediteur', '@gouvernorat_lettre.courriel', '@email.validator', '@datetime.time']
+  gouvernorat_lettre.courriel:
+    class: Drupal\gouvernorat_lettre\Service\Courriel
+    arguments: ['@renderer', '@entity_type.manager', '@config.factory', '@file_url_generator', '@extension.list.theme']
+  gouvernorat_lettre.envois:
+    class: Drupal\gouvernorat_lettre\Service\Envois
+    arguments: ['@database', '@gouvernorat_lettre.expediteur', '@gouvernorat_lettre.courriel', '@config.factory', '@state', '@datetime.time', '@logger.channel.gouvernorat_lettre']
+  logger.channel.gouvernorat_lettre:
+    parent: logger.channel_base
+    arguments: ['gouvernorat_lettre']

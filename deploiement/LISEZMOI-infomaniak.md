@@ -26,6 +26,13 @@ Ce dossier est fermé aux visiteurs (`.htaccess` : `Require all denied`).
       (serveur mail.kinshasa.cd, port 465, SSL). Reporter son mot de passe
       dans `settings.local.php` et vérifier que l'hébergement autorise les
       connexions sortantes vers mail.kinshasa.cd sur le port 465.
+- [ ] Lettre d'information : reporter le mot de passe de **lettre@kinshasa.cd**
+      (`$settings['gouvernorat_lettre_mot_de_passe']`) dans
+      `settings.local.php`. Les abonnés sont dans la base : ils suivent la
+      copie de la base, rien à exporter à part.
+- [ ] Délivrabilité : vérifier que les enregistrements DNS **SPF**, **DKIM**
+      et **DMARC** de kinshasa.cd autorisent mail.kinshasa.cd, sinon les
+      lettres risquent d'arriver en indésirables.
 - [ ] Créer la boîte **securite@kinshasa.cd** (ou équivalent) pour
       `security.txt`, et désigner qui la relève.
 
@@ -92,6 +99,10 @@ de l'adresse principale.
 
 Ouvrir `/admin/config/system/smtp`, envoyer un courriel de test, puis
 envoyer un message depuis `/contact` et vérifier sa réception.
+
+Lettre d'information : s'inscrire depuis le pied de page avec une adresse de
+test, confirmer, puis ouvrir *Contenu › Lettre d'information* et envoyer un
+essai d'une lettre. Les envois restants partent par le cron (`cron.sh`).
 
 ## 6 bis. Assistant virtuel
 

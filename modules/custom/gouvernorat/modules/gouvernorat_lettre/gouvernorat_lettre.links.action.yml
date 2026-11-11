@@ -1,0 +1,7 @@
+gouvernorat_lettre.rediger:
+  title: 'Rédiger une lettre'
+  route_name: node.add
+  route_parameters:
+    node_type: lettre
+  appears_on:
+    - gouvernorat_lettre.abonnes

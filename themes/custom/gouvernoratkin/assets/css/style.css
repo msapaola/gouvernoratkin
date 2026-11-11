@@ -1404,6 +1404,60 @@ p:last-child {
   margin: 10px 0 0;
 }
 
+.footer-newsletter .newsletter-statut--erreur {
+  color: #ffd2d2;
+}
+
+/* Pages /lettre-d-information, confirmation et désabonnement
+   (module gouvernorat_lettre). */
+.lettre-inscription {
+  max-width: 640px;
+  margin: 2.5rem auto 4rem;
+  padding: 0 16px;
+}
+
+.lettre-inscription input[type="email"] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #cdd7e6;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.lettre-inscription input[type="email"]:focus {
+  border-color: var(--mainColor);
+  outline: 2px solid rgba(16, 66, 147, 0.2);
+}
+
+.lettre-inscription .form-submit,
+.lettre-inscription .btn-primary {
+  margin-top: 1rem;
+  padding: 0.75rem 1.6rem;
+  border: 0;
+  border-radius: 8px;
+  background-color: var(--mainColor);
+  color: var(--whiteColor);
+  font-weight: 600;
+}
+
+.lettre-inscription .form-submit:hover,
+.lettre-inscription .btn-primary:hover {
+  background-color: var(--blackColor);
+}
+
+.lettre-inscription .lettre-presentation {
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.lettre-inscription .lettre-note {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #5b6472;
+}
+
 .validation-danger {
   color: var(--accentColor);
 }

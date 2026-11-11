@@ -86,6 +86,14 @@ $config['smtp.settings']['smtp_password'] = '<MOT_DE_PASSE_DE_site@kinshasa.cd>'
 $settings['gouvernorat_assistant_cle_api'] = '<CLE_API_ANTHROPIC>';
 
 // ---------------------------------------------------------------------------
+// Lettre d'information (module gouvernorat_lettre)
+// ---------------------------------------------------------------------------
+// La lettre part de sa propre boîte, lettre@kinshasa.cd (même serveur
+// mail.kinshasa.cd, port 465, SSL : réglages dans la configuration exportée).
+// Sans ce mot de passe, ni confirmation d'inscription ni lettre ne part.
+$settings['gouvernorat_lettre_mot_de_passe'] = '<MOT_DE_PASSE_DE_lettre@kinshasa.cd>';
+
+// ---------------------------------------------------------------------------
 // Performances (rappel : déjà dans la configuration exportée)
 // ---------------------------------------------------------------------------
 $config['system.performance']['css']['preprocess'] = TRUE;

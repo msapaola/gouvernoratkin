@@ -1,0 +1,11 @@
+name: Gouvernorat Lettre d'information
+description: "Abonnements à la lettre d'information (avec confirmation par courriel), rédaction et envoi des lettres depuis l'adresse lettre@kinshasa.cd."
+package: 'Gouvernorat de Kinshasa'
+type: module
+core_version_requirement: ^10.3 || ^11
+configure: gouvernorat_lettre.reglages
+dependencies:
+  - drupal:node
+  - drupal:text
+  - drupal:media
+  - drupal:image

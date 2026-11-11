@@ -1,0 +1,12 @@
+gouvernorat_lettre.abonnes:
+  title: "Lettre d'information"
+  description: "Abonnés, lettres envoyées et envoi."
+  route_name: gouvernorat_lettre.abonnes
+  parent: system.admin_content
+  weight: 20
+
+gouvernorat_lettre.reglages:
+  title: "Lettre d'information"
+  description: "Expéditeur, adresse de réponse, cadence d'envoi."
+  route_name: gouvernorat_lettre.reglages
+  parent: system.admin_config_services

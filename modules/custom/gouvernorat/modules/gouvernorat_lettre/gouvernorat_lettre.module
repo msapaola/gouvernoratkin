@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * @file
+ * Lettre d'information du Gouvernorat de Kinshasa.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function gouvernorat_lettre_theme(): array {
+  return [
+    'gouvernorat_lettre_courriel' => [
+      'variables' => [
+        'titre' => '',
+        'corps' => '',
+        'articles' => [],
+        'bouton' => NULL,
+        'apres' => '',
+        'accueil' => '',
+        'logo' => '',
+        'desabonnement' => NULL,
+        'annee' => '',
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_cron().
+ *
+ * Envoie ce qui reste en file (dans la limite horaire) et efface les
+ * demandes d'inscription jamais confirmées.
+ */
+function gouvernorat_lettre_cron(): void {
+  \Drupal::service('gouvernorat_lettre.envois')->traiter(40);
+  \Drupal::service('gouvernorat_lettre.abonnes')->purger();
+}

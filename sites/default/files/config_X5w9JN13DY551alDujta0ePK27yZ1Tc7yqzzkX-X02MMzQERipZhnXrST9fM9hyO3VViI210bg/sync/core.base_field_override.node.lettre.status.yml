@@ -1,0 +1,22 @@
+uuid: 36eb63fc-e9cd-4f00-a7fb-bf6cc2a7c538
+langcode: fr
+status: true
+dependencies:
+  config:
+    - node.type.lettre
+id: node.lettre.status
+field_name: status
+entity_type: node
+bundle: lettre
+label: Publié
+description: ''
+required: false
+translatable: true
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean

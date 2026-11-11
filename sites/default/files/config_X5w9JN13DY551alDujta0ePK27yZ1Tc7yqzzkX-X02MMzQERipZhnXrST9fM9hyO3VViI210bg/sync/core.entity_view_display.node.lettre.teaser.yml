@@ -1,0 +1,34 @@
+uuid: 745caec7-17b4-48ce-827f-4c3b007ca74d
+langcode: fr
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.lettre.body
+    - field.field.node.lettre.field_lettre_articles
+    - node.type.lettre
+  module:
+    - text
+    - user
+id: node.lettre.teaser
+targetEntityType: node
+bundle: lettre
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  addtoany: true
+  field_lettre_articles: true
+  langcode: true

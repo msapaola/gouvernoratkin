@@ -284,26 +284,51 @@
         });
     });
 
-    // Formulaire d'abonnement du pied de page.
-    // Le thème d'origine envoyait les adresses saisies vers la liste Mailchimp
-    // de son éditeur (hibootstrap), et non vers le Gouvernorat : ce branchement
-    // est retiré. Tant qu'un service de lettre d'information n'est pas
-    // choisi, le formulaire n'envoie rien et le dit clairement.
-    // Le texte indicatif du champ était en anglais (« Your Email »), dans le
-    // bloc du pied de page.
-    $(".newsletter-form input[type=email], .newsletter-form input[name=EMAIL]")
+    // Formulaire d'abonnement du pied de page : envoyé au module
+    // « Lettre d'information » (gouvernorat_lettre), qui répond en JSON.
+    // L'adresse reçoit un courriel pour confirmer l'inscription.
+    $(".newsletter-form input[type=email], .newsletter-form input[name=EMAIL], .newsletter-form input[name=courriel]")
         .attr("placeholder", "Votre adresse de courriel")
-        .attr("aria-label", "Votre adresse de courriel");
+        .attr("aria-label", "Votre adresse de courriel")
+        .attr("autocomplete", "email");
     $(".newsletter-form").on("submit", function (event) {
         event.preventDefault();
-        var message = "Les inscriptions à la lettre d'information ouvriront prochainement.";
-        $("#validator-newsletter, #validator-newsletter-2")
-            .removeClass().addClass("validation-success").text(message);
         var $form = $(this);
+        var $champ = $form.find("input[type=email], input[name=EMAIL], input[name=courriel]").first();
+        var $bouton = $form.find("button, input[type=submit]").first();
         if (!$form.find(".newsletter-statut").length) {
-            $form.append('<p class="newsletter-statut" role="status"></p>');
+            $form.append('<p class="newsletter-statut" role="status" aria-live="polite"></p>');
         }
-        $form.find(".newsletter-statut").text(message);
+        var afficher = function (message, ok) {
+            $form.find(".newsletter-statut").text(message).toggleClass("newsletter-statut--erreur", !ok);
+            $("#validator-newsletter, #validator-newsletter-2").removeClass()
+                .addClass(ok ? "validation-success" : "validation-danger").text("");
+        };
+        var adresse = $.trim($champ.val() || "");
+        if (!adresse || ($champ[0].checkValidity && !$champ[0].checkValidity())) {
+            afficher("Indiquez une adresse de courriel valide.", false);
+            $champ.trigger("focus");
+            return;
+        }
+        var base = (window.drupalSettings && window.drupalSettings.path && window.drupalSettings.path.baseUrl) || "/";
+        $bouton.prop("disabled", true);
+        afficher("Envoi en cours…", true);
+        $.ajax({
+            url: base + "lettre/inscription",
+            method: "POST",
+            data: { courriel: adresse },
+            dataType: "json",
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        }).done(function (reponse) {
+            afficher(reponse.message, true);
+            $champ.val("");
+        }).fail(function (xhr) {
+            var message = (xhr.responseJSON && xhr.responseJSON.message) ||
+                "L'inscription n'a pas pu aboutir pour le moment. Merci de réessayer plus tard.";
+            afficher(message, false);
+        }).always(function () {
+            $bouton.prop("disabled", false);
+        });
     });
 
     // Liens ouverts dans un nouvel onglet (constat S10 du diagnostic) : la page
