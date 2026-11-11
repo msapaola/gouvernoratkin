@@ -250,71 +250,84 @@ function gouvernorat_pages_deploy_culture_structures() {
  * l'ancienne version reste dans les révisions du bloc. Si le bloc devient
  * vide, sa colonne disparaît du pied de page (gabarit du thème).
  */
-function gouvernorat_pages_deploy_retrait_newsletter(): string {
-  $motif = "/newsletter|abonn|abonez|lettre d.information|inscri|adresse de courriel|your email|subscribe/iu";
+function gouvernorat_pages_deploy_retrait_abonnement(): string {
+  // Mots propres à l'abonnement ; un texte de plus de 120 caractères n'est
+  // jamais retiré (ce n'est pas un titre ou une accroche d'abonnement).
+  $motif = "/newsletter|abonnez|abonnement|s.abonner|abonez|lettre d.information|adresse de courriel|your email|subscribe/iu";
   $stockage = \Drupal::entityTypeManager()->getStorage('block_content');
-  $ids = [];
-  foreach (['newsletter', 'abonn', 'Abonn', 'abonez', 'Abonez', 'subscribe'] as $mot) {
-    $ids += \Drupal::entityQuery('block_content')
-      ->accessCheck(FALSE)
-      ->condition('body.value', $mot, 'CONTAINS')
-      ->execute();
-  }
+  // Tous les blocs de contenu : ils sont peu nombreux.
+  $ids = \Drupal::entityQuery('block_content')->accessCheck(FALSE)->execute();
   $rapport = [];
-  foreach ($stockage->loadMultiple($ids) as $bloc) {
-    $dom = \Drupal\Component\Utility\Html::load($bloc->get('body')->value);
-    $xpath = new \DOMXPath($dom);
-    $retires = [];
-
-    // 1. Formulaires d'abonnement (champ de courriel).
-    foreach (iterator_to_array($xpath->query('//form[contains(@class, "newsletter") or .//input[@type="email" or @name="EMAIL"]]')) as $formulaire) {
-      $formulaire->parentNode->removeChild($formulaire);
-      $retires[] = 'formulaire';
-    }
-
-    // 2. Éléments dont tout le texte parle d'abonnement, sans lien ni image
-    // (les plus englobants d'abord).
-    $ne_parle_que_d_abonnement = function (\DOMNode $element) use ($xpath, $motif): bool {
-      if ($xpath->query('.//a|.//img|.//iframe|.//video', $element)->length > 0) {
-        return FALSE;
-      }
-      $trouve = FALSE;
-      foreach ($xpath->query('.//text()', $element) as $texte) {
-        $valeur = trim($texte->nodeValue);
-        if ($valeur === '') {
-          continue;
-        }
-        if (!preg_match($motif, $valeur)) {
-          return FALSE;
-        }
-        $trouve = TRUE;
-      }
-      return $trouve;
-    };
-    foreach (iterator_to_array($xpath->query('//body//*')) as $element) {
-      // Déjà retiré avec un parent ?
-      if (!$element->parentNode || $xpath->query('ancestor::body', $element)->length === 0) {
+  foreach ($stockage->loadMultiple($ids) as $original) {
+    foreach ($original->getTranslationLanguages() as $langue) {
+      $bloc = $original->getTranslation($langue->getId());
+      if (!$bloc->hasField('body') || $bloc->get('body')->isEmpty()) {
         continue;
       }
-      if ($ne_parle_que_d_abonnement($element)) {
-        $retires[] = '« ' . mb_substr(trim(preg_replace('/\s+/u', ' ', $element->textContent)), 0, 80) . ' »';
-        $element->parentNode->removeChild($element);
-      }
-    }
+      $dom = \Drupal\Component\Utility\Html::load($bloc->get('body')->value);
+      $xpath = new \DOMXPath($dom);
+      $retires = [];
+      $parents = [];
 
-    // 3. Conteneurs devenus vides.
-    foreach (array_reverse(iterator_to_array($xpath->query('//body//div|//body//section'))) as $element) {
-      if ($element->parentNode && trim($element->textContent) === '' && $xpath->query('.//img|.//a|.//iframe|.//video|.//i', $element)->length === 0) {
-        $element->parentNode->removeChild($element);
+      // 1. Formulaires d'abonnement (champ de courriel).
+      foreach (iterator_to_array($xpath->query('//form[contains(@class, "newsletter") or .//input[@type="email" or @name="EMAIL"]]')) as $formulaire) {
+        $parents[] = $formulaire->parentNode;
+        $formulaire->parentNode->removeChild($formulaire);
+        $retires[] = 'formulaire';
       }
-    }
 
-    if ($retires) {
+      // 2. Éléments courts dont tout le texte parle d'abonnement, sans lien
+      // ni image (les plus englobants d'abord).
+      $abonnement_seul = function (\DOMNode $element) use ($xpath, $motif): bool {
+        if ($xpath->query('.//a|.//img|.//iframe|.//video', $element)->length > 0) {
+          return FALSE;
+        }
+        if (mb_strlen(trim($element->textContent)) > 120) {
+          return FALSE;
+        }
+        $trouve = FALSE;
+        foreach ($xpath->query('.//text()', $element) as $texte) {
+          $valeur = trim($texte->nodeValue);
+          if ($valeur === '') {
+            continue;
+          }
+          if (!preg_match($motif, $valeur)) {
+            return FALSE;
+          }
+          $trouve = TRUE;
+        }
+        return $trouve;
+      };
+      foreach (iterator_to_array($xpath->query('//body//*')) as $element) {
+        if (!$element->parentNode || $xpath->query('ancestor::body', $element)->length === 0) {
+          continue;
+        }
+        if ($abonnement_seul($element)) {
+          $retires[] = '« ' . mb_substr(trim(preg_replace('/\s+/u', ' ', $element->textContent)), 0, 80) . ' »';
+          $parents[] = $element->parentNode;
+          $element->parentNode->removeChild($element);
+        }
+      }
+      if (!$retires) {
+        continue;
+      }
+
+      // 3. Conteneurs vidés par ce retrait (et seulement ceux-là).
+      foreach ($parents as $parent) {
+        while ($parent && $parent->nodeName !== 'body' && $parent->parentNode
+          && trim($parent->textContent) === ''
+          && $xpath->query('.//img|.//a|.//iframe|.//video|.//i', $parent)->length === 0) {
+          $suivant = $parent->parentNode;
+          $suivant->removeChild($parent);
+          $parent = $suivant;
+        }
+      }
+
       $bloc->get('body')->value = \Drupal\Component\Utility\Html::serialize($dom);
       $bloc->setNewRevision(TRUE);
       $bloc->setRevisionLogMessage("Partie « S'abonner » (newsletter) retirée.");
       $bloc->save();
-      $rapport[] = $bloc->label() . ' : ' . implode(', ', $retires);
+      $rapport[] = $bloc->label() . ' (' . $langue->getId() . ') : ' . implode(', ', $retires);
     }
   }
   return $rapport
