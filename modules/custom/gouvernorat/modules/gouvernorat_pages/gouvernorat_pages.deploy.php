@@ -240,56 +240,84 @@ function gouvernorat_pages_deploy_culture_structures() {
 }
 
 /**
- * Retire le formulaire d'abonnement à la newsletter du pied de page.
+ * Retire du pied de page tout ce qui parle d'abonnement à la newsletter.
  *
- * Le formulaire (hérité du thème d'origine) est écrit dans un bloc de
- * contenu. Sont retirés : le formulaire, et les titres ou paragraphes qui
- * parlent de la newsletter. Le reste du bloc est conservé. L'ancienne
- * version reste dans les révisions du bloc.
+ * La partie (hérité du thème d'origine) est écrite dans un bloc de contenu :
+ * titre « S'abonner », phrase « Abonnez-vous à notre Newsletter », champ
+ * « Votre adresse de courriel » et bouton « Abonnez-vous ». Sont retirés :
+ * les formulaires d'abonnement, puis tout élément dont le texte ne parle que
+ * d'abonnement. Le reste du bloc (liens, réseaux sociaux…) est conservé ;
+ * l'ancienne version reste dans les révisions du bloc. Si le bloc devient
+ * vide, sa colonne disparaît du pied de page (gabarit du thème).
  */
 function gouvernorat_pages_deploy_retrait_newsletter(): string {
+  $motif = "/newsletter|abonn|abonez|lettre d.information|inscri|adresse de courriel|your email|subscribe/iu";
   $stockage = \Drupal::entityTypeManager()->getStorage('block_content');
-  $ids = \Drupal::entityQuery('block_content')
-    ->accessCheck(FALSE)
-    ->condition('body.value', 'newsletter', 'CONTAINS')
-    ->execute();
+  $ids = [];
+  foreach (['newsletter', 'abonn', 'Abonn', 'abonez', 'Abonez', 'subscribe'] as $mot) {
+    $ids += \Drupal::entityQuery('block_content')
+      ->accessCheck(FALSE)
+      ->condition('body.value', $mot, 'CONTAINS')
+      ->execute();
+  }
   $rapport = [];
   foreach ($stockage->loadMultiple($ids) as $bloc) {
     $dom = \Drupal\Component\Utility\Html::load($bloc->get('body')->value);
     $xpath = new \DOMXPath($dom);
     $retires = [];
-    $a_retirer = [];
-    foreach ($xpath->query('//form[contains(concat(" ", normalize-space(@class), " "), " newsletter-form ")]') as $noeud) {
-      $a_retirer[] = $noeud;
+
+    // 1. Formulaires d'abonnement (champ de courriel).
+    foreach (iterator_to_array($xpath->query('//form[contains(@class, "newsletter") or .//input[@type="email" or @name="EMAIL"]]')) as $formulaire) {
+      $formulaire->parentNode->removeChild($formulaire);
+      $retires[] = 'formulaire';
     }
-    foreach ($xpath->query('//h1|//h2|//h3|//h4|//h5|//h6|//p') as $noeud) {
-      $texte = trim($noeud->textContent);
-      $dans_formulaire = $xpath->query('ancestor::form', $noeud)->length > 0;
-      if (!$dans_formulaire && preg_match("/newsletter|lettre d.information|abonne|inscri/iu", $texte) && $xpath->query('.//a', $noeud)->length === 0) {
-        $a_retirer[] = $noeud;
+
+    // 2. Éléments dont tout le texte parle d'abonnement, sans lien ni image
+    // (les plus englobants d'abord).
+    $ne_parle_que_d_abonnement = function (\DOMNode $element) use ($xpath, $motif): bool {
+      if ($xpath->query('.//a|.//img|.//iframe|.//video', $element)->length > 0) {
+        return FALSE;
+      }
+      $trouve = FALSE;
+      foreach ($xpath->query('.//text()', $element) as $texte) {
+        $valeur = trim($texte->nodeValue);
+        if ($valeur === '') {
+          continue;
+        }
+        if (!preg_match($motif, $valeur)) {
+          return FALSE;
+        }
+        $trouve = TRUE;
+      }
+      return $trouve;
+    };
+    foreach (iterator_to_array($xpath->query('//body//*')) as $element) {
+      // Déjà retiré avec un parent ?
+      if (!$element->parentNode || $xpath->query('ancestor::body', $element)->length === 0) {
+        continue;
+      }
+      if ($ne_parle_que_d_abonnement($element)) {
+        $retires[] = '« ' . mb_substr(trim(preg_replace('/\s+/u', ' ', $element->textContent)), 0, 80) . ' »';
+        $element->parentNode->removeChild($element);
       }
     }
-    foreach ($a_retirer as $noeud) {
-      if ($noeud->parentNode) {
-        $retires[] = $noeud->nodeName === 'form' ? 'formulaire' : '« ' . mb_substr(trim($noeud->textContent), 0, 80) . ' »';
-        $noeud->parentNode->removeChild($noeud);
+
+    // 3. Conteneurs devenus vides.
+    foreach (array_reverse(iterator_to_array($xpath->query('//body//div|//body//section'))) as $element) {
+      if ($element->parentNode && trim($element->textContent) === '' && $xpath->query('.//img|.//a|.//iframe|.//video|.//i', $element)->length === 0) {
+        $element->parentNode->removeChild($element);
       }
     }
-    // Conteneurs devenus vides.
-    foreach (iterator_to_array($xpath->query('//*[contains(@class, "newsletter")]')) as $noeud) {
-      if (trim($noeud->textContent) === '' && $xpath->query('.//img|.//a|.//iframe', $noeud)->length === 0 && $noeud->parentNode) {
-        $noeud->parentNode->removeChild($noeud);
-      }
-    }
+
     if ($retires) {
       $bloc->get('body')->value = \Drupal\Component\Utility\Html::serialize($dom);
       $bloc->setNewRevision(TRUE);
-      $bloc->setRevisionLogMessage('Formulaire de newsletter retiré.');
+      $bloc->setRevisionLogMessage("Partie « S'abonner » (newsletter) retirée.");
       $bloc->save();
       $rapport[] = $bloc->label() . ' : ' . implode(', ', $retires);
     }
   }
   return $rapport
-    ? 'Newsletter retirée de ' . implode(' ; ', $rapport) . '. Ancienne version dans les révisions du bloc.'
-    : 'Aucun formulaire de newsletter trouvé dans les blocs de contenu.';
+    ? 'Abonnement à la newsletter retiré de ' . implode(' ; ', $rapport) . '. Ancienne version dans les révisions du bloc.'
+    : "Aucune mention d'abonnement trouvée dans les blocs de contenu.";
 }
