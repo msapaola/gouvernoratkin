@@ -7,6 +7,7 @@
 #}
 {% if resultat %}
 <article class="resultat-carte resultat-carte--{{ resultat.type_classe }}">
+  <span class="resultat-numero" aria-label="Résultat {{ resultat.numero }}">{{ resultat.numero }}</span>
   <div class="resultat-texte">
     <p class="resultat-type">
       <span class="resultat-badge">{{ resultat.type }}</span>

@@ -560,7 +560,14 @@ function gouvernoratkin_preprocess_views_view_fields__page_de_recherche(array &$
     ];
   }
 
+  // Numéro du résultat, qui continue d'une page à l'autre (11, 12… en page 2).
+  $vue = $variables['view'];
+  $par_page = (int) $vue->getItemsPerPage();
+  $page = $vue->pager ? (int) $vue->pager->getCurrentPage() : 0;
+  $numero = $page * $par_page + (int) ($variables['row']->index ?? 0) + 1;
+
   $variables['resultat'] = [
+    'numero' => $numero,
     'type' => $types[$bundle] ?? 'Page',
     'type_classe' => \Drupal\Component\Utility\Html::getClass($bundle),
     'titre' => $node->label(),

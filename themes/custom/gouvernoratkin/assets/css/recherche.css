@@ -179,6 +179,21 @@
   border-left-color: #1f8a4c;
 }
 
+.resultat-numero {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  min-width: 2.2rem;
+  height: 2.2rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background-color: var(--mainColor);
+  color: var(--whiteColor);
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
 .resultat-texte {
   flex: 1 1 auto;
   min-width: 0;
@@ -478,9 +493,24 @@ body.recherche-ouverte {
   }
 
   .resultat-carte {
-    flex-direction: column-reverse;
-    gap: 0.85rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
     padding: 1rem 1.1rem;
+  }
+
+  /* Téléphone : image en haut, puis numéro et texte côte à côte. */
+  .resultat-image {
+    order: -1;
+  }
+
+  .resultat-numero {
+    min-width: 1.9rem;
+    height: 1.9rem;
+    font-size: 0.85rem;
+  }
+
+  .resultat-texte {
+    flex-basis: calc(100% - 2.65rem);
   }
 
   .resultat-image {
