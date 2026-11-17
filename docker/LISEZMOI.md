@@ -30,6 +30,7 @@ Fichiers de ce dossier :
 | `deployer.sh` | mise à jour du site |
 | `sauvegarder.sh` | sauvegarde de la base et des fichiers |
 | `import/` | export de base à importer au premier démarrage |
+| `RESUME-VPS.md` | résumé d'une page pour préparer le serveur |
 
 ---
 
