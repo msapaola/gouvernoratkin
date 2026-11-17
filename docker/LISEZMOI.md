@@ -7,7 +7,7 @@ Le site tourne dans **un seul conteneur**, qui contient :
 | **Caddy** | Reçoit le trafic (ports 80 et 443) et gère le HTTPS : certificats Let's Encrypt obtenus et renouvelés automatiquement |
 | **Apache + PHP 8.3** | Fait tourner Drupal. Apache lit les `.htaccess` du projet (redirections, dossiers interdits, protection des fichiers) |
 | **MariaDB** | La base de données. Il ne démarre pas si `DB_HOST` désigne un serveur externe |
-| **cron** | Lance `drush cron` toutes les heures (recherche, nettoyage) |
+| **cron** | Lance `drush cron` toutes les heures (recherche, nettoyage). Le cron « automatique » de Drupal est coupé dans le conteneur |
 
 Le code est **dans l'image** : chaque mise à jour reconstruit l'image. Les
 **données** sont dans des **volumes**, qui survivent aux mises à jour :
@@ -57,8 +57,16 @@ bloquent l'envoi de courriels par défaut.
 
 ## 2. Récupérer le projet et le régler
 
+Le dépôt est privé : le serveur a besoin d'un accès en lecture. Le plus
+simple est une **clé de déploiement** : sur le serveur,
+`ssh-keygen -t ed25519 -f ~/.ssh/gouvernoratkin`, puis coller la clé publique
+(`~/.ssh/gouvernoratkin.pub`) dans GitHub › dépôt › Settings › Deploy keys,
+en lecture seule.
+
 ```bash
-git clone -b claude/jolly-bohr-l0c6sp git@github.com:msapaola/gouvernoratkin.git
+GIT_SSH_COMMAND='ssh -i ~/.ssh/gouvernoratkin' \
+  git clone -b claude/jolly-bohr-l0c6sp git@github.com:msapaola/gouvernoratkin.git
+git -C gouvernoratkin config core.sshCommand 'ssh -i ~/.ssh/gouvernoratkin'
 cd gouvernoratkin/docker
 cp .env.exemple .env
 chmod 600 .env
@@ -73,6 +81,8 @@ Dans `.env` :
   de mot de passe déjà envoyés restent valables.
 - **`DB_PREFIX=cu68_`** : garder ce préfixe si la base est importée telle quelle.
 - **`SMTP_PASSWORD`** et **`ANTHROPIC_API_KEY`** : les mêmes qu'aujourd'hui.
+- **`NOINDEX=1`** pour un site de test (les moteurs de recherche ne
+  l'indexent pas), **`NOINDEX=0`** pour le site public.
 - **`SITE_ADDRESS`** : laisser `:80` pour les essais. Mettre
   `kinshasa.cd, www.kinshasa.cd` le jour de la bascule (voir l'étape 5).
 
@@ -115,10 +125,18 @@ toute la base.
 ```bash
 docker compose exec site drush site:install --existing-config -y
 docker compose exec site drush cim -y
+docker compose exec site drush deploy:hook -y
 ```
 
-Le `cim` final efface les petites différences de libellés créées par
-l'installation des traductions.
+- `cim` remet les libellés que l'installation des traductions a modifiés.
+  Une quinzaine de différences mineures restent ensuite affichées par
+  `config:status` (réglages que Drupal ajoute de lui-même à une installation
+  neuve) : elles sont sans effet sur le site.
+- `deploy:hook` crée les contenus de départ : textes de l'accueil et des
+  autres pages, page À propos, mot du gouverneur, chiffres clés,
+  coordonnées, fiches des membres. **Sans lui, l'accueil et les en-têtes
+  restent vides.** Les photos des membres sont à ajouter ensuite dans leurs
+  fiches.
 
 ## 4. Essayer avant de basculer
 

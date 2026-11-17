@@ -65,6 +65,11 @@ if ($cle = $env('ANTHROPIC_API_KEY')) {
   $settings['gouvernorat_assistant_cle_api'] = $cle;
 }
 
+// Tâches planifiées : lancées par le conteneur (docker/cron.sh). Le cron
+// « automatique » de Drupal, déclenché pendant la visite d'un internaute,
+// ferait doublon et ralentirait cette visite : il est coupé.
+$config['automated_cron.settings']['interval'] = 0;
+
 // Production : fichiers CSS/JS regroupés, erreurs cachées aux visiteurs.
 $config['system.performance']['css']['preprocess'] = TRUE;
 $config['system.performance']['js']['preprocess'] = TRUE;
