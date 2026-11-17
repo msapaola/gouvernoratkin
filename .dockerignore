@@ -1,22 +1,28 @@
-# Ce qui n'entre pas dans l'image Docker.
+# Ce qui n'entre JAMAIS dans l'image Docker (contexte de construction).
+
+# Historique, outils.
 .git
 .github
 .claude
 **/.DS_Store
-*.sql
-*.sql.gz
-*.zip
-*.tar.gz
-*.log
+**/*.log
 
-# Réglages et données du site de test / de développement.
+# Secrets, exports de base et sauvegardes du serveur.
+docker/.env
+docker/import/
+docker/sauvegardes/
+**/*.sql
+**/*.sql.gz
+**/*.tgz
+**/*.tar.gz
+**/*.zip
+
+# Réglages locaux d'un site de test ou de développement.
 sites/default/settings.php
 sites/default/settings.local.php
-sites/default/files/*
-# … sauf la configuration exportée, rangée ailleurs dans l'image.
-!sites/default/files/config_*
 
-# Fichiers propres au VPS (secrets, sauvegardes, base à importer).
-docker/.env
-docker/import
-docker/sauvegardes
+# Fichiers téléversés : ils vivent dans le volume gouvernorat_fichiers…
+sites/default/files/*
+# … sauf la configuration exportée, que l'image range hors du site
+# (/var/www/config/sync).
+!sites/default/files/config_*

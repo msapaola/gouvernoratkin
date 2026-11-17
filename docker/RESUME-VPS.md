@@ -1,278 +1,163 @@
-# Site du Gouvernorat de Kinshasa — préparer le VPS (Docker)
+# Site du Gouvernorat de Kinshasa — résumé pour le VPS
 
-Résumé complet pour installer le site sur un serveur privé virtuel (VPS).
-Le guide détaillé est dans `docker/LISEZMOI.md` (même dossier).
-
----
-
-## 1. En bref
-
-- Le site (Drupal 11, PHP 8.3) tourne dans **un seul conteneur Docker** qui
-  contient tout :
-
-  | Service | Rôle |
-  |---|---|
-  | Caddy | ports 80 et 443, HTTPS automatique (Let's Encrypt) |
-  | Apache + PHP 8.3 | fait tourner Drupal (les `.htaccess` du projet s'appliquent) |
-  | MariaDB 10.11 | base de données (désactivée si la base est externe) |
-  | cron | `drush cron` toutes les heures |
-
-- **Le code est dans l'image** (reconstruite à chaque mise à jour).
-  **Les données sont dans 4 volumes** qui survivent aux mises à jour :
-
-  | Volume Docker | Contenu |
-  |---|---|
-  | `gouvernorat_fichiers` | images et documents téléversés |
-  | `gouvernorat_prives` | fichiers privés |
-  | `gouvernorat_base` | base de données |
-  | `gouvernorat_certificats` | certificats HTTPS |
-
-- **Aucun secret dans le dépôt** : tout est dans le fichier `docker/.env` du
-  serveur (jamais versionné, jamais envoyé par message).
-- Les courriels partent toujours par `mail.kinshasa.cd` (compte
-  site@kinshasa.cd), pas depuis le VPS.
+Tout ce qu'il faut pour installer le site sur le VPS (Nginx Proxy Manager,
+réseaux `proxy` et `ia`, projets dans `/opt/stacks/`). Guide détaillé :
+`docker/LISEZMOI.md`.
 
 ---
 
-## 2. Ce qu'il faut avant de commencer
+## 1. Architecture
 
-### Le serveur
+| Conteneur | Image | Réseaux | Mémoire | Ports publiés |
+|---|---|---|---|---|
+| `gouvernorat-web` | construite (`php:8.3.36-apache-bookworm`) : Apache + PHP 8.3 + cron horaire (supervisord) | `proxy` (ext.), `ia` (ext.), `interne` | 3 Go | aucun (Apache sur 80, joint par NPM) |
+| `gouvernorat-db` | `mariadb:10.11.19` | `interne` seulement | 1 Go | aucun |
 
-| Élément | Valeur conseillée |
-|---|---|
-| Système | Ubuntu 24.04 LTS |
-| Processeur / mémoire | 2 vCPU, 4 Go de RAM (minimum 2 Go) |
-| Disque | 40 Go |
-| Ports entrants ouverts | 22 (SSH), 80 (HTTP), 443 (HTTPS, TCP et UDP) |
-| Connexions sortantes nécessaires | `mail.kinshasa.cd` port **465** (courriels) ; `api.anthropic.com` port 443 (assistant) ; `github.com` (code) ; registre Docker et dépôts Debian (construction de l'image) |
+- HTTPS et certificats : **Nginx Proxy Manager**, Proxy Host vers
+  `gouvernorat-web:80`.
+- Volumes (projet Compose `gouvernorat`) : `gouvernorat_fichiers`
+  (téléversements), `gouvernorat_prives` (fichiers privés), `gouvernorat_base`
+  (base de données).
+- Secrets : uniquement dans `/opt/stacks/gouvernorat/docker/.env` (chmod 600,
+  jamais dans Git).
+- Courriels : par `mail.kinshasa.cd:465` (compte site@kinshasa.cd).
+- **Ne jamais lancer `docker compose down -v`** (supprime base et fichiers).
 
-Certains hébergeurs bloquent l'envoi de courriels par défaut : demander
-l'ouverture du port 465 sortant si besoin.
+## 2. À rassembler avant de commencer
 
-### Les informations à rassembler
-
-| Information | Où la trouver | Va dans |
+| Information | Où la trouver | Variable de `.env` |
 |---|---|---|
-| **Sel de hachage** (`hash_salt`) | `settings.php` du site actuel : `grep hash_salt sites/default/settings.php` | `HASH_SALT` |
-| **Mot de passe de site@kinshasa.cd** | gestionnaire de la messagerie kinshasa.cd | `SMTP_PASSWORD` |
-| **Clé de l'API de l'assistant** | `settings.php` actuel, ou console Anthropic | `ANTHROPIC_API_KEY` |
-| **Mot de passe de la base** | à créer : `openssl rand -base64 24` | `DB_PASSWORD` |
-| **Préfixe des tables** | `cu68_` (base actuelle) | `DB_PREFIX` |
-| **Noms de domaine** | `kinshasa.cd`, `www.kinshasa.cd` | `DOMAINES`, `SITE_ADDRESS` |
-| **Accès au dépôt GitHub** (privé) | clé de déploiement, voir 3.2 | — |
-| **Accès au gestionnaire DNS** de kinshasa.cd | registraire du domaine | bascule (étape 3.7) |
+| Sel de hachage | ancien serveur : `grep hash_salt sites/default/settings.php` | `HASH_SALT` |
+| Mot de passe de site@kinshasa.cd | messagerie kinshasa.cd | `SMTP_PASSWORD` |
+| Clé de l'assistant | ancien `settings.php` ou console Anthropic | `ANTHROPIC_API_KEY` |
+| Mot de passe de la base | `openssl rand -base64 24` | `DB_PASSWORD` |
+| Export de la base + archive des fichiers | ancien serveur (étape 4) | — |
+| Accès en lecture au dépôt | clé de déploiement GitHub (étape 3) | — |
+| Accès DNS de kinshasa.cd et à l'interface de NPM | — | — |
 
-Reprendre le **même** `hash_salt` : les liens de réinitialisation de mot de
-passe déjà envoyés restent valables.
+Sorties nécessaires depuis le VPS : `mail.kinshasa.cd:465`,
+`api.anthropic.com:443`, `github.com`, et pour construire l'image le registre
+Docker, les dépôts Debian et `pecl.php.net`.
 
----
-
-## 3. Installation pas à pas
-
-### 3.1 Préparer le serveur
+## 3. Installation
 
 ```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y git ufw fail2ban unattended-upgrades
+# 3.1 Réseaux partagés (une fois pour tout le VPS, s'ils manquent)
+docker network create proxy
+docker network create ia
 
-# Pare-feu : SSH, HTTP, HTTPS seulement.
-sudo ufw allow OpenSSH
-sudo ufw allow 80
-sudo ufw allow 443
-sudo ufw enable
+# 3.2 Code, avec une clé de déploiement en lecture seule
+sudo mkdir -p /opt/stacks/gouvernorat && sudo chown "$USER": /opt/stacks/gouvernorat
+ssh-keygen -t ed25519 -f ~/.ssh/gouvernorat_deploy -N ""
+cat ~/.ssh/gouvernorat_deploy.pub
+#   → GitHub › msapaola/gouvernoratkin › Settings › Deploy keys (sans « write access »)
+GIT_SSH_COMMAND='ssh -i ~/.ssh/gouvernorat_deploy' \
+  git clone -b main git@github.com:msapaola/gouvernoratkin.git /opt/stacks/gouvernorat
+git -C /opt/stacks/gouvernorat config core.sshCommand 'ssh -i ~/.ssh/gouvernorat_deploy'
 
-# Docker (dépôt officiel), puis se déconnecter et se reconnecter.
-curl -fsSL https://get.docker.com | sudo sh
-sudo usermod -aG docker "$USER"
+# 3.3 Réglages
+cd /opt/stacks/gouvernorat/docker
+cp .env.exemple .env && chmod 600 .env && nano .env
 ```
 
-Se connecter au serveur **par clé SSH uniquement** (mot de passe et
-connexion root désactivés).
+Contenu de `.env` pour la phase d'essai :
 
-### 3.2 Récupérer le projet (dépôt privé)
-
-```bash
-# Clé de déploiement, en lecture seule.
-ssh-keygen -t ed25519 -f ~/.ssh/gouvernoratkin -N ""
-cat ~/.ssh/gouvernoratkin.pub
-# → la coller dans GitHub › msapaola/gouvernoratkin › Settings › Deploy keys
-#   (sans cocher « Allow write access »).
-
-GIT_SSH_COMMAND='ssh -i ~/.ssh/gouvernoratkin' \
-  git clone -b claude/jolly-bohr-l0c6sp git@github.com:msapaola/gouvernoratkin.git
-git -C gouvernoratkin config core.sshCommand 'ssh -i ~/.ssh/gouvernoratkin'
+```
+DOMAINES=staging.kinshasa.cd
+NOINDEX=1
+DB_HOST=db
+DB_PORT=3306
+DB_NAME=drupal
+DB_USER=drupal
+DB_PASSWORD=<généré>
+DB_PREFIX=cu68_
+HASH_SALT=<valeur de l'ancien settings.php>
+CRON_INTERVALLE=3600
+AFFICHER_ERREURS=0
+SMTP_PASSWORD=<mot de passe de site@kinshasa.cd>
+ANTHROPIC_API_KEY=<clé de l'assistant>
+OLLAMA_BASE_URL=http://ollama:11434
 ```
 
-### 3.3 Remplir les réglages
+## 4. Reprise des données
 
-```bash
-cd gouvernoratkin/docker
-cp .env.exemple .env
-chmod 600 .env
-nano .env
-```
-
-Contenu de `docker/.env` :
-
-| Variable | Valeur pour la mise en service | Rôle |
-|---|---|---|
-| `SITE_ADDRESS` | `:80` pendant les essais, puis `kinshasa.cd, www.kinshasa.cd` | adresse servie par Caddy ; un nom de domaine déclenche le HTTPS automatique |
-| `DOMAINES` | `kinshasa.cd,www.kinshasa.cd` (+ l'adresse IP du VPS pendant les essais) | noms acceptés par Drupal ; un autre nom reçoit une erreur 400 |
-| `NOINDEX` | `0` (site public) ; `1` pour un serveur de test | interdit l'indexation par les moteurs de recherche |
-| `DB_HOST` | `127.0.0.1` | base dans le conteneur ; autre valeur = base externe |
-| `DB_PORT` | `3306` | |
-| `DB_NAME` | `drupal` | |
-| `DB_USER` | `drupal` | |
-| `DB_PASSWORD` | mot de passe généré | obligatoire |
-| `DB_PREFIX` | `cu68_` | préfixe des tables de la base actuelle |
-| `HASH_SALT` | valeur du site actuel | obligatoire |
-| `CRON_INTERVALLE` | `3600` | secondes entre deux passages du cron |
-| `AFFICHER_ERREURS` | `0` | `1` seulement pour un dépannage |
-| `SMTP_PASSWORD` | mot de passe de site@kinshasa.cd | envoi des courriels |
-| `ANTHROPIC_API_KEY` | clé de l'assistant | vide = assistant masqué |
-
-Sans `HASH_SALT` ou `DB_PASSWORD`, le conteneur refuse de démarrer.
-
-### 3.4 Exporter la base et les fichiers du site actuel
-
-Sur l'hébergement actuel (dans `public_html`) :
+Sur l'ancien serveur (`public_html`) :
 
 ```bash
 vendor/bin/drush sql:dump --gzip --result-file=../export-site.sql
 tar czf ../fichiers-site.tar.gz -C sites/default/files \
-  --exclude=./css --exclude=./js --exclude=./php --exclude=./styles \
-  --exclude='./config_*' .
+  --exclude=./css --exclude=./js --exclude=./php --exclude=./styles --exclude='./config_*' .
 ```
 
-Copier `export-site.sql.gz` et `fichiers-site.tar.gz` sur le VPS (`scp`),
-dans le dossier qui contient `gouvernoratkin/`.
-
-### 3.5 Démarrer et importer
+Sur le VPS, après `scp` des deux fichiers dans `~` :
 
 ```bash
-# La base : importée automatiquement au premier démarrage (base vide).
-mv ~/export-site.sql.gz ~/gouvernoratkin/docker/import/
+cd /opt/stacks/gouvernorat/docker
+mv ~/export-site.sql.gz import/ && chmod 644 import/export-site.sql.gz   # lisible par MariaDB
 
-cd ~/gouvernoratkin/docker
-docker compose up -d --build            # 5 à 10 minutes la première fois
-docker compose logs -f site             # attendre « import de export-site.sql.gz »
-                                        # puis Ctrl+C
+docker compose up -d --build
+docker compose logs -f db      # import, puis « ready for connections »
+docker compose logs -f web     # « démarrage d'Apache et du cron »
 
-# Les fichiers : copiés dans le volume.
-docker compose cp ~/fichiers-site.tar.gz site:/tmp/
-docker compose exec site bash -c \
-  'tar xzf /tmp/fichiers-site.tar.gz -C /var/www/html/sites/default/files \
-   && chown -R www-data:www-data /var/www/html/sites/default/files \
-   && rm /tmp/fichiers-site.tar.gz'
+docker compose cp ~/fichiers-site.tar.gz web:/tmp/
+docker compose exec web bash -c 'tar xzf /tmp/fichiers-site.tar.gz -C /var/www/html/sites/default/files && chown -R www-data:www-data /var/www/html/sites/default/files && rm /tmp/fichiers-site.tar.gz'
 
-# Mises à jour de la base, configuration, caches, index de recherche.
-docker compose exec site drush deploy -y
-docker compose exec site drush search:index
+docker compose exec web drush deploy -y
+docker compose exec web drush search:index
+docker compose exec web drush config:status     # attendu : aucune différence
 
-# Les exports contiennent toute la base : les supprimer.
-rm ~/gouvernoratkin/docker/import/export-site.sql.gz ~/fichiers-site.tar.gz
+rm import/export-site.sql.gz ~/fichiers-site.tar.gz
 ```
 
-### 3.6 Essayer avant de basculer
+Pendant l'import, `db` reste « starting » et `web` attend (ni drush ni cron).
 
-Ouvrir `http://ADRESSE_IP_DU_VPS` (adresse IP ajoutée à `DOMAINES`, puis
-`docker compose up -d`). Vérifier :
+## 5. Essais : staging.kinshasa.cd
 
-- [ ] l'accueil, un article, la recherche, la page Contact ;
-- [ ] l'envoi d'un message depuis `/contact` (il doit arriver à contact@gouv.kinshasa.cd) ;
-- [ ] l'assistant virtuel ;
-- [ ] la connexion à l'administration (`/user/login`) ;
-- [ ] `docker compose exec site drush config:status` → aucune différence ;
-- [ ] `docker compose exec site supervisorctl status` → 4 services `RUNNING`.
+1. DNS : A `staging.kinshasa.cd` → IP du VPS.
+2. NPM › Proxy Host : `staging.kinshasa.cd` → `http` · `gouvernorat-web` · `80` ;
+   Block Common Exploits, Websockets Support ; SSL : nouveau certificat,
+   Force SSL, HTTP/2.
+3. Vérifier : accueil, article, recherche, Contact (message reçu à
+   contact@gouv.kinshasa.cd), assistant, connexion admin, adresses en
+   `https://` sans boucle, vraie IP des visiteurs dans *Rapports › Messages
+   récents*, `docker compose ps` : les deux « healthy ».
 
-### 3.7 Basculer le domaine (HTTPS)
+## 6. Bascule
 
-1. La veille : baisser la durée de cache (TTL) des enregistrements DNS
-   (par exemple 300 secondes).
-2. Faire pointer `kinshasa.cd` et `www.kinshasa.cd` (enregistrements A, et
-   AAAA si IPv6) vers l'adresse IP du VPS.
-3. Dans `.env` : `SITE_ADDRESS=kinshasa.cd, www.kinshasa.cd` et retirer
-   l'adresse IP de `DOMAINES`, puis `docker compose up -d`.
-4. Caddy obtient les certificats en quelques secondes ; `http://` redirige
-   vers `https://`.
-5. Garder l'ancien hébergement quelques jours en secours.
+1. TTL DNS baissé la veille ; puis A `kinshasa.cd` et `www.kinshasa.cd` → IP
+   du VPS.
+2. NPM : ajouter ces domaines (Proxy Host vers `gouvernorat-web:80`),
+   nouveau certificat SSL, Force SSL.
+3. `.env` : `DOMAINES=kinshasa.cd,www.kinshasa.cd` (+ `staging.kinshasa.cd`
+   si conservé) et `NOINDEX=0` ; puis `docker compose up -d web`.
+4. SPF, DKIM, DMARC de kinshasa.cd : autoriser `mail.kinshasa.cd`.
+5. Garder l'ancien hébergement quelques jours.
 
-Vérifier aussi que les enregistrements **SPF, DKIM et DMARC** de kinshasa.cd
-autorisent `mail.kinshasa.cd`, sinon les courriels du site risquent d'arriver
-en indésirables.
-
----
-
-## 4. Au quotidien
-
-Toutes les commandes se lancent dans `~/gouvernoratkin/docker`.
+## 7. Au quotidien (dans `/opt/stacks/gouvernorat/docker`)
 
 | Besoin | Commande |
 |---|---|
-| Mettre à jour le site (nouveau code) | `./deployer.sh` (pull, reconstruction, affiche `config:status`, demande confirmation avant `drush deploy`) |
-| Commande drush | `docker compose exec site drush cr` (ou `cst`, `cim`, `uli`, `watchdog:show`…) |
-| Journaux en direct | `docker compose logs -f site` |
-| État des services | `docker compose exec site supervisorctl status` |
-| Redémarrer | `docker compose restart site` |
-| Arrêter | `docker compose down` (les données restent) |
-| Sauvegarder | `./sauvegarder.sh` |
-| Mises à jour de sécurité (PHP, Apache, MariaDB, Caddy) | une fois par mois : `docker compose build --pull && docker compose up -d` |
+| Mettre à jour le site | `./deployer.sh` (ne reconstruit que `web`, ne touche jamais à `db`) |
+| drush | `docker compose exec web drush …` |
+| État, journaux | `docker compose ps` · `docker compose logs -f web` · `docker compose logs -f db` |
+| Redémarrer | `docker compose restart web` |
+| Sauvegarder | `./sauvegarder.sh` (base par `mariadb-dump` + fichiers publics et privés, 14 jours) |
+| Restaurer | `./restaurer.sh sauvegardes/base-….sql.gz [sauvegardes/fichiers-….tar.gz]` |
+| Sécurité de l'image `web` | `docker compose build --pull web && docker compose up -d web` |
 
-**Ne jamais lancer `docker compose down -v`** : `-v` supprime les volumes,
-donc la base et les fichiers.
-
-### Sauvegardes
-
-Automatiques chaque nuit (`crontab -e`) :
+Sauvegarde de nuit (`crontab -e`), à copier ensuite **hors du VPS** :
 
 ```
-17 2 * * * cd /home/UTILISATEUR/gouvernoratkin/docker && ./sauvegarder.sh >> sauvegardes/journal.txt 2>&1
+17 2 * * * cd /opt/stacks/gouvernorat/docker && ./sauvegarder.sh >> sauvegardes/journal.txt 2>&1
 ```
 
-- Résultat : `docker/sauvegardes/base-DATE.sql.gz` et
-  `fichiers-DATE.tar.gz`, gardés 14 jours.
-- **Copier ce dossier hors du serveur** (autre serveur, stockage objet) :
-  une sauvegarde restée sur le VPS disparaît avec lui.
+## 8. Dépannage rapide
 
-Restaurer :
-
-```bash
-docker compose cp sauvegardes/base-DATE.sql.gz site:/tmp/
-docker compose exec site bash -c 'drush sql:drop -y && gunzip -c /tmp/base-DATE.sql.gz | drush sql:cli && rm /tmp/base-DATE.sql.gz'
-docker compose exec -T site tar xzf - -C /var/www/html/sites/default < sauvegardes/fichiers-DATE.tar.gz
-docker compose exec site drush cr
-```
-
----
-
-## 5. En cas de problème
-
-| Symptôme | Cause probable | Que faire |
-|---|---|---|
-| Le conteneur s'arrête aussitôt | `HASH_SALT` ou `DB_PASSWORD` vide | remplir `.env`, puis `docker compose up -d` |
-| « Bad Request » (erreur 400) | le nom ou l'adresse utilisés ne sont pas dans `DOMAINES` | les ajouter, puis `docker compose up -d` |
-| Pas de certificat HTTPS | DNS pas encore propagé, ou ports 80/443 fermés | `dig kinshasa.cd`, vérifier le pare-feu, puis `docker compose logs site` |
-| La base n'a pas été importée | le volume `gouvernorat_base` contenait déjà une base | l'import n'a lieu que sur une base vide ; à la toute première installation seulement, recommencer avec `docker compose down -v` (efface tout) |
-| Les courriels ne partent pas | port 465 sortant bloqué, ou mauvais `SMTP_PASSWORD` | `docker compose exec site drush watchdog:show --type=smtp` |
-| L'assistant n'apparaît pas | `ANTHROPIC_API_KEY` vide ou sortie vers api.anthropic.com bloquée | vérifier `.env` et le pare-feu de l'hébergeur |
-| Page d'erreur générique | voir le détail | `docker compose exec site drush watchdog:show --count=20` |
-
----
-
-## 6. Fichiers du dossier `docker/`
-
-| Fichier | Rôle |
+| Symptôme | Que faire |
 |---|---|
-| `Dockerfile` | recette de l'image (PHP 8.3 + Apache, extensions, MariaDB, Caddy, supervisord) |
-| `compose.yaml` | lancement : service `site`, ports 80/443, 4 volumes, `.env` |
-| `.env.exemple` | modèle des réglages à copier en `.env` |
-| `settings.php` | réglages Drupal du conteneur, lus dans `.env` (proxy, noms de domaine, secrets, cron automatique coupé) |
-| `entrypoint.sh` | démarrage : vérifications, création de la base, import au premier démarrage |
-| `supervisord.conf` | les 4 services du conteneur |
-| `Caddyfile`, `apache-site.conf`, `php.ini` | réglages de Caddy, d'Apache et de PHP (512 Mo, envois 64 Mo, 90 s par requête) |
-| `cron.sh`, `drush.sh` | cron horaire ; `drush` toujours exécuté par l'utilisateur du serveur web |
-| `deployer.sh` | mise à jour du site |
-| `sauvegarder.sh` | sauvegarde de la base et des fichiers |
-| `import/` | dépôt de l'export de base pour le premier démarrage |
-| `LISEZMOI.md` | guide détaillé |
-| `.htaccess` | interdit l'accès web à ce dossier sur l'hébergement actuel |
+| `web` redémarre en boucle | `HASH_SALT` ou `DB_PASSWORD` vide dans `.env` |
+| `web` attend « table cu68_users absente » | `docker compose logs db` ; « Permission denied » → `chmod 644 import/*.sql.gz`, puis (1re installation seulement) `docker compose down && docker volume rm gouvernorat_base && docker compose up -d` |
+| 502 dans NPM | `docker compose ps` ; NPM bien sur le réseau `proxy` |
+| Erreur 400 | ajouter le nom à `DOMAINES`, puis `docker compose up -d web` |
+| Adresses en `http://` / boucle | NPM doit joindre `gouvernorat-web:80` par le réseau `proxy` |
+| Courriels | port 465 sortant ; `docker compose exec web drush watchdog:show --type=smtp` |

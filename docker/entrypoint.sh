@@ -1,7 +1,13 @@
 #!/bin/bash
-# Démarrage du conteneur : vérifie les réglages, prépare les dossiers et,
-# si la base est dans le conteneur, l'initialise (et importe un export
-# placé dans /docker-entrypoint-initdb.d au tout premier démarrage).
+# Démarrage du service « web » : vérifie les réglages, prépare les dossiers,
+# puis attend que la base (service « db ») réponde ET contienne le site
+# avant de lancer Apache et le cron.
+#
+# Pourquoi attendre une table : au premier démarrage, « db » importe l'export
+# de docker/import/ ; tant que l'import n'est pas fini, ni drush ni le cron ne
+# doivent toucher à la base. Pour un site neuf (sans export), la table
+# n'existe qu'après « drush site:install » : le conteneur attend, et
+# « docker compose exec web drush … » reste possible pendant ce temps.
 set -euo pipefail
 
 journal() { echo "[démarrage] $*"; }
@@ -11,72 +17,37 @@ if [ -z "${HASH_SALT:-}" ] || [ -z "${DB_PASSWORD:-}" ]; then
   exit 1
 fi
 
-DB_HOST="${DB_HOST:-127.0.0.1}"
+DB_HOST="${DB_HOST:-db}"
+DB_PORT="${DB_PORT:-3306}"
 DB_NAME="${DB_NAME:-drupal}"
 DB_USER="${DB_USER:-drupal}"
-case "$DB_HOST" in
-  127.0.0.1|localhost) export DB_INTERNE=true ;;
-  *) export DB_INTERNE=false ;;
-esac
+DB_PREFIX="${DB_PREFIX:-}"
+TABLE_TEMOIN="${DB_PREFIX}users"
 
 # Dossiers écrits par le site (volumes) : propriété du serveur web.
-mkdir -p /var/www/html/sites/default/files /var/www/private /data
+mkdir -p /var/www/html/sites/default/files /var/www/private
 chown www-data:www-data /var/www/html/sites/default/files /var/www/private
 
-mysql_pret() {
-  for _ in $(seq 1 60); do
-    mariadb-admin --socket=/run/mysqld/mysqld.sock ping >/dev/null 2>&1 && return 0
-    sleep 1
-  done
-  return 1
-}
+# Le mot de passe passe par l'environnement, pas par la ligne de commande
+# (qui serait visible dans la liste des processus).
+export MYSQL_PWD="$DB_PASSWORD"
+client=(mariadb -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" --connect-timeout=5 -N -B)
 
-if [ "$DB_INTERNE" = true ]; then
-  mkdir -p /run/mysqld && chown mysql:mysql /run/mysqld
-  chown -R mysql:mysql /var/lib/mysql
-  if [ ! -d /var/lib/mysql/mysql ]; then
-    journal "première mise en route : création de la base de données"
-    mariadb-install-db --user=mysql --datadir=/var/lib/mysql --skip-test-db >/dev/null
+journal "attente de la base ${DB_NAME} sur ${DB_HOST}:${DB_PORT}…"
+until "${client[@]}" -e 'SELECT 1' "$DB_NAME" >/dev/null 2>&1; do
+  sleep 3
+done
+
+journal "base joignable ; attente de la table ${TABLE_TEMOIN} (import ou installation)…"
+attente=0
+until [ "$("${client[@]}" -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = '${TABLE_TEMOIN}'" "$DB_NAME" 2>/dev/null || echo 0)" = "1" ]; do
+  if [ $((attente % 60)) -eq 0 ]; then
+    journal "table ${TABLE_TEMOIN} absente : import en cours, ou site à installer (voir docker/LISEZMOI.md)"
   fi
+  sleep 5
+  attente=$((attente + 5))
+done
+unset MYSQL_PWD
 
-  # Démarrage provisoire, sans réseau, pour les réglages et l'import.
-  mariadbd --user=mysql --datadir=/var/lib/mysql --skip-networking \
-    --socket=/run/mysqld/mysqld.sock >/tmp/mariadb-init.log 2>&1 &
-  mysql_pret || { cat /tmp/mariadb-init.log; exit 1; }
-
-  # Base et utilisateur du site (le mot de passe suit le fichier .env).
-  # Apostrophes et barres obliques inverses du mot de passe protégées.
-  MDP="${DB_PASSWORD//\\/\\\\}"
-  MDP="${MDP//\'/\'\'}"
-  mariadb --socket=/run/mysqld/mysqld.sock <<SQL
-CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${MDP}';
-CREATE USER IF NOT EXISTS '${DB_USER}'@'127.0.0.1' IDENTIFIED BY '${MDP}';
-ALTER USER '${DB_USER}'@'localhost' IDENTIFIED BY '${MDP}';
-ALTER USER '${DB_USER}'@'127.0.0.1' IDENTIFIED BY '${MDP}';
-GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'localhost';
-GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'127.0.0.1';
-FLUSH PRIVILEGES;
-SQL
-
-  # Import d'un export (.sql ou .sql.gz) si la base est encore vide.
-  TABLES=$(mariadb --socket=/run/mysqld/mysqld.sock -N -e \
-    "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='${DB_NAME}'")
-  if [ "$TABLES" = "0" ]; then
-    for f in /docker-entrypoint-initdb.d/*.sql /docker-entrypoint-initdb.d/*.sql.gz; do
-      [ -f "$f" ] || continue
-      journal "import de $(basename "$f") dans la base ${DB_NAME}"
-      case "$f" in
-        *.gz) gunzip -c "$f" | mariadb --socket=/run/mysqld/mysqld.sock "$DB_NAME" ;;
-        *) mariadb --socket=/run/mysqld/mysqld.sock "$DB_NAME" < "$f" ;;
-      esac
-    done
-  fi
-
-  mariadb-admin --socket=/run/mysqld/mysqld.sock shutdown
-  wait || true
-else
-  journal "base de données externe : ${DB_HOST}"
-fi
-
+journal "site présent dans la base : démarrage d'Apache et du cron"
 exec "$@"

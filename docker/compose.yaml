@@ -1,39 +1,90 @@
-# Site du Gouvernorat de Kinshasa — un seul conteneur.
+# Site du Gouvernorat de Kinshasa — deux services : « web » (Apache + PHP +
+# cron) et « db » (MariaDB). Nginx Proxy Manager, sur le réseau « proxy »,
+# reçoit les visites et gère le HTTPS : aucun port n'est publié ici.
 #
-#   cd docker
+#   cd /opt/stacks/gouvernorat/docker
 #   cp .env.exemple .env      (puis remplir .env)
 #   docker compose up -d --build
 #
+# Prérequis : réseaux externes « proxy » et « ia » (docker network create …).
 # Mode d'emploi complet : docker/LISEZMOI.md
 
+# Nom de projet fixe : volumes gouvernorat_fichiers, gouvernorat_prives et
+# gouvernorat_base, quel que soit le dossier d'où la commande est lancée.
 name: gouvernorat
 
 services:
-  site:
+  db:
+    image: mariadb:10.11.19
+    container_name: gouvernorat-db
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: ${DB_NAME:-drupal}
+      MARIADB_USER: ${DB_USER:-drupal}
+      MARIADB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD manquant dans docker/.env}
+      # Mot de passe root aléatoire, jamais utilisé : le site et les
+      # sauvegardes passent par le compte du site.
+      MARIADB_RANDOM_ROOT_PASSWORD: "1"
+      # Après un changement de version mineure de l'image, mise à niveau des
+      # tables système au démarrage.
+      MARIADB_AUTO_UPGRADE: "1"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+      - --max-allowed-packet=64M
+      - --innodb-buffer-pool-size=512M
+    volumes:
+      - base:/var/lib/mysql
+      # Export à importer au premier démarrage, si la base est vide
+      # (export-site.sql.gz, tables préfixées cu68_ conservées telles quelles).
+      - ./import:/docker-entrypoint-initdb.d:ro
+    networks:
+      - interne
+    mem_limit: 1g
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      # Un gros export peut prendre longtemps à importer : pendant ce temps,
+      # le serveur n'accepte pas de connexion et « web » attend.
+      start_period: 2h
+      start_interval: 10s
+
+  web:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    image: gouvernorat-kinshasa:latest
+    image: gouvernorat-web:latest
+    container_name: gouvernorat-web
     restart: unless-stopped
     env_file: .env
-    ports:
-      - "80:80"
-      - "443:443"
-      - "443:443/udp"
+    environment:
+      DB_HOST: db
+    depends_on:
+      db:
+        condition: service_healthy
     volumes:
       # Images et documents téléversés.
       - fichiers:/var/www/html/sites/default/files
       # Fichiers privés (hors de la racine web).
       - prives:/var/www/private
-      # Base de données (si elle est dans le conteneur).
-      - base:/var/lib/mysql
-      # Certificats HTTPS obtenus par Caddy.
-      - certificats:/data
-      # Export de base à importer au premier démarrage (.sql ou .sql.gz).
-      - ./import:/docker-entrypoint-initdb.d:ro
+    networks:
+      - proxy
+      - ia
+      - interne
+    mem_limit: 3g
+
+networks:
+  # Créés une fois pour tout le VPS (docker network create proxy / ia).
+  proxy:
+    external: true
+  ia:
+    external: true
+  # Réseau privé du projet : « web » et « db » seulement.
+  interne:
 
 volumes:
   fichiers:
   prives:
   base:
-  certificats:

@@ -17,7 +17,7 @@ $databases['default']['default'] = [
   'driver' => 'mysql',
   'namespace' => 'Drupal\\mysql\\Driver\\Database\\mysql',
   'autoload' => 'core/modules/mysql/src/Driver/Database/mysql/',
-  'host' => $env('DB_HOST', '127.0.0.1'),
+  'host' => $env('DB_HOST', 'db'),
   'port' => $env('DB_PORT', '3306'),
   'database' => $env('DB_NAME', 'drupal'),
   'username' => $env('DB_USER', 'drupal'),
@@ -48,11 +48,20 @@ $settings['trusted_host_patterns'] = array_map(
   explode(',', $env('DOMAINES', 'localhost'))
 );
 
-// Caddy, dans le même conteneur, transmet les visites : Drupal doit lire
-// l'adresse réelle du visiteur (limites anti-abus) et savoir si la visite
-// est en HTTPS.
+// Nginx Proxy Manager transmet les visites par le réseau Docker « proxy ».
+// Son adresse IP change d'un redémarrage à l'autre : Drupal croit les
+// en-têtes X-Forwarded-* seulement si la connexion vient d'une plage privée
+// Docker. Il génère alors des adresses en https://, reconnaît le HTTPS (pas
+// de boucle de redirection, pas de contenu mixte) et enregistre l'adresse
+// réelle du visiteur (journaux, limites anti-abus du contact et de
+// l'assistant). Une connexion d'ailleurs ne peut pas usurper ces en-têtes.
 $settings['reverse_proxy'] = TRUE;
-$settings['reverse_proxy_addresses'] = ['127.0.0.1'];
+$settings['reverse_proxy_addresses'] = ['172.16.0.0/12', '10.0.0.0/8'];
+$settings['reverse_proxy_trusted_headers'] =
+  \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_FOR |
+  \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_HOST |
+  \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_PORT |
+  \Symfony\Component\HttpFoundation\Request::HEADER_X_FORWARDED_PROTO;
 
 // Site de test : pas d'indexation par les moteurs de recherche.
 $settings['gouvernorat_noindex'] = $env('NOINDEX', '0') === '1';
@@ -64,6 +73,11 @@ if ($motDePasse = $env('SMTP_PASSWORD')) {
 if ($cle = $env('ANTHROPIC_API_KEY')) {
   $settings['gouvernorat_assistant_cle_api'] = $cle;
 }
+
+// Ollama, joint en interne par le réseau Docker « ia » (sans passer par le
+// proxy, sans clé). Réglage mis à disposition du chatbot : l'assistant actuel
+// n'utilise que l'API d'Anthropic et ne le lit pas encore.
+$settings['gouvernorat_assistant_ollama_url'] = $env('OLLAMA_BASE_URL', 'http://ollama:11434');
 
 // Tâches planifiées : lancées par le conteneur (docker/cron.sh). Le cron
 // « automatique » de Drupal, déclenché pendant la visite d'un internaute,

@@ -77,6 +77,5 @@ sites/*/files/asset_injector/
 
 # --- Docker : secrets, exports de base et sauvegardes du serveur ---
 docker/.env
-docker/import/*
-!docker/import/.gitkeep
+docker/import/*.sql*
 docker/sauvegardes/
