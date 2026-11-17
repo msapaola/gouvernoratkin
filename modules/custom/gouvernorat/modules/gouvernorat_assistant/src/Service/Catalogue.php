@@ -35,7 +35,6 @@ class Catalogue {
     'page_a_propos' => ['Page', NULL],
     'membre' => ['Fiche officielle d\'un membre (exécutif provincial ou cabinet)', NULL],
     'article' => ['Actualité', 120],
-    'evenement' => ['Événement', 30],
     'video' => ['Vidéo', 30],
   ];
 
@@ -194,7 +193,7 @@ class Catalogue {
         if (in_array($e['type'], self::TYPES_DE_REFERENCE, TRUE)) {
           $score = (int) round($score * 1.5) + 8;
         }
-        elseif ($e['type'] === self::TYPES['article'][0] || $e['type'] === self::TYPES['evenement'][0]) {
+        elseif ($e['type'] === self::TYPES['article'][0]) {
           $score = (int) round($score * 0.8);
         }
       }
@@ -238,7 +237,7 @@ class Catalogue {
     }
     $types = [
       'demarche' => ['service_au_citoyen'],
-      'actualite' => ['article', 'evenement'],
+      'actualite' => ['article'],
       'page' => ['page', 'page_a_propos'],
       'membre' => ['membre'],
     ][$type] ?? array_keys(self::TYPES);

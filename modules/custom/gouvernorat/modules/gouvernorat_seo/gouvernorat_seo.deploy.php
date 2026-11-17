@@ -113,3 +113,31 @@ function gouvernorat_seo_deploy_corrections_contenus() {
 
   return $corriges ? 'Textes corrigés : ' . implode(', ', $corriges) . '.' : 'Aucun texte à corriger.';
 }
+
+/**
+ * Retire les liens de menu et adresses de l'ancienne rubrique Événements.
+ *
+ * Le type de contenu « Événement », ses vues (/evenements) et son bloc ont
+ * été supprimés ; les liens de menu vers /evenements mèneraient à une page
+ * introuvable.
+ */
+function gouvernorat_seo_deploy_retrait_evenements(): string {
+  $retires = [];
+  $stockage = \Drupal::entityTypeManager()->getStorage('menu_link_content');
+  $ids = \Drupal::entityQuery('menu_link_content')
+    ->accessCheck(FALSE)
+    ->condition('link.uri', ['internal:/evenements', 'internal:/evenements/', 'base:evenements', 'route:view.evenements.page_1'], 'IN')
+    ->execute();
+  foreach ($stockage->loadMultiple($ids) as $lien) {
+    $retires[] = 'lien de menu « ' . $lien->label() . ' »';
+    $lien->delete();
+  }
+  $alias = \Drupal::entityTypeManager()->getStorage('path_alias');
+  foreach ($alias->loadByProperties(['alias' => '/evenements']) as $a) {
+    $retires[] = 'adresse ' . $a->getAlias();
+    $a->delete();
+  }
+  return $retires
+    ? 'Événements : ' . implode(', ', $retires) . ' : retiré(s).'
+    : 'Événements : aucun lien de menu ni adresse à retirer.';
+}

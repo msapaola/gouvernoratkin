@@ -503,7 +503,6 @@ function gouvernoratkin_preprocess_views_view_fields__page_de_recherche(array &$
   }
   $types = [
     'article' => 'Actualité',
-    'evenement' => 'Événement',
     'gallery' => 'Galerie photos',
     'video' => 'Vidéo',
     'service_au_citoyen' => 'Démarche',
@@ -553,7 +552,7 @@ function gouvernoratkin_preprocess_views_view_fields__page_de_recherche(array &$
   }
 
   $date = NULL;
-  if (in_array($bundle, ['article', 'evenement', 'gallery', 'video'], TRUE)) {
+  if (in_array($bundle, ['article', 'gallery', 'video'], TRUE)) {
     $date = [
       'texte' => \Drupal::service('date.formatter')->format($node->getCreatedTime(), 'custom', 'j F Y'),
       'iso' => date('Y-m-d', $node->getCreatedTime()),

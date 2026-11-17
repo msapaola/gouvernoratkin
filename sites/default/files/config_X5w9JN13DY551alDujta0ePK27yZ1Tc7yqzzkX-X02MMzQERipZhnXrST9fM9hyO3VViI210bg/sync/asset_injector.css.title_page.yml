@@ -29,6 +29,6 @@ conditions:
   request_path:
     id: request_path
     negate: false
-    pages: "/actualites\r\n/taxonomy/term/*\r\n/evenements\r\n/culture-et-patrimoine\r\n/cabinet-du-gouverneur\r\n/ministeres-provinciaux\r\n/executif-provincial"
+    pages: "/actualites\r\n/taxonomy/term/*\r\n/culture-et-patrimoine\r\n/cabinet-du-gouverneur\r\n/ministeres-provinciaux\r\n/executif-provincial"
 contexts: {  }
 conditions_require_all: true

@@ -40,18 +40,6 @@
 {% endif %} 
 <!-- Single Post Gallery Area End -->
 
-<!-- Upcoming Events area Start -->
-{% if page.events %}
-        <section class="container pt-100">
-            <div class="default-section-title default-section-title-middle">
-             <h2>Événements à venir</h2>
-              <p>Kinshasa Action : Ne Manquez Rien !</p>
-             </div>
-                {{ page.events }}
-        </section>
-{% endif %} 
-<!-- Upcoming Events Area End -->
-
 <!-- Blog Details Area Start -->
 {% if page.singlepost %}
  <section class="{{ singlepost_classes }}">
@@ -71,12 +59,7 @@
 {% endif %}  
 <!-- Blog Details Area End -->
 
-<!-- Events Details area Start --> 
-{% if page.singlepostevents %}
-        <section class="event-details pb-100">
-             {{ page.singlepostevents }}
-        </section>
-{% endif %}       
+       
 
 </main>
 

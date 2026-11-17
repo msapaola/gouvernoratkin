@@ -22,11 +22,9 @@ regions:
   content: "content"
   singlepost: "Single Post"
   singlepost_sidebar: "Single Post Sidebar"
-  singlepostevents: "Single Post Events"
   singlepostgallery: "Single Post Gallery"
   services: "Services"
   sondage: "Sondage"
-  events: "Events"
   footer: "Footer"
   popup: "popup"
  
