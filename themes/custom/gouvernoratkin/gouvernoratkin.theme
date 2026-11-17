@@ -184,14 +184,13 @@ function _gouvernoratkin_get_services_categories_tree() {
  * Implements hook_preprocess_page().
  */
 function gouvernoratkin_preprocess_page(&$variables) {
-  // Titre et chapô des pages du compte (page--compte.html.twig).
-  $compte = [
-    'user.login' => ['Connexion', "Espace réservé aux équipes du Gouvernorat qui publient et mettent à jour le site."],
-    'user.pass' => ['Mot de passe oublié', "Indiquez l'adresse de courriel ou le nom d'utilisateur de votre compte : un lien pour choisir un nouveau mot de passe vous sera envoyé."],
-  ];
+  // Pages du compte (page--compte.html.twig). Titres et textes : bloc
+  // « Textes des autres pages » (sections entete_connexion,
+  // entete_mot_de_passe) ; à défaut, le titre de la page selon Drupal.
   $route_compte = \Drupal::routeMatch()->getRouteName();
-  if (isset($compte[$route_compte])) {
-    [$variables['compte_titre'], $variables['compte_accroche']] = $compte[$route_compte];
+  if (in_array($route_compte, ['user.login', 'user.pass'], TRUE)) {
+    $route = \Drupal::routeMatch()->getRouteObject();
+    $variables['compte_titre'] = $route ? \Drupal::service('title_resolver')->getTitle(\Drupal::request(), $route) : '';
     $variables['compte_route'] = $route_compte;
   }
 

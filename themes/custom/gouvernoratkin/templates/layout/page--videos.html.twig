@@ -26,17 +26,19 @@
 
       <div class="page-entete__contenu">
         <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
-        <p class="surtitre">En vidéo</p>
-        <h1 class="page-entete__titre">Le Gouvernorat en vidéo</h1>
-        <p class="page-entete__accroche">
-          Événements, inaugurations, discours et reportages de la Ville-Province
-          de Kinshasa, publiés sur la chaîne YouTube du Gouvernorat.
-        </p>
+        {% set entete = textes.entete_videos %}
+        {% if entete.surtitre %}<p class="surtitre">{{ entete.surtitre }}</p>{% endif %}
+        {% if entete.titre %}<h1 class="page-entete__titre">{{ entete.titre }}</h1>{% endif %}
+        {% if entete.corps %}<div class="page-entete__accroche">{{ entete.corps }}</div>{% endif %}
+        {% if entete.liens %}
         <p class="videos-entete__chaine">
-          <a href="https://www.youtube.com/@GouvernoratdeKinshasa" class="bouton bouton--youtube" target="_blank" rel="noopener">
-            <i class="fab fa-youtube" aria-hidden="true"></i> Voir la chaîne YouTube<span class="visually-hidden"> (nouvel onglet)</span>
+          {% for lien in entete.liens %}
+          <a href="{{ lien.url }}" class="bouton bouton--youtube"{% if lien.externe %} target="_blank" rel="noopener"{% endif %}>
+            <i class="fab fa-youtube" aria-hidden="true"></i> {{ lien.titre }}{% if lien.externe %}<span class="visually-hidden"> (nouvel onglet)</span>{% endif %}
           </a>
+          {% endfor %}
         </p>
+        {% endif %}
       </div>
     </div>
   </header>

@@ -3,6 +3,6 @@ langcode: fr
 status: true
 dependencies: {  }
 id: page_accueil
-label: "Page d'accueil"
+label: 'Textes du site'
 revision: true
-description: "Les textes de la page d'accueil, section par section. Un seul bloc de ce type suffit : il n'a pas besoin d'être placé, le thème le lit directement."
+description: "Les textes de l'accueil et des autres pages (en-têtes, encadrés, pied de page), section par section. Chaque section indique sa « partie de la page ». Ces blocs n'ont pas besoin d'être placés : le thème les lit directement."

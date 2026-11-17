@@ -31,13 +31,10 @@
 
       <div class="page-entete__contenu">
         <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
-        <p class="surtitre">Nous écrire</p>
-        <h1 class="page-entete__titre">Contacter le Gouvernorat</h1>
-        <p class="page-entete__accroche">
-          Une question sur une démarche, une suggestion ou un signalement ?
-          Écrivez-nous : votre message est transmis aux services du
-          Gouvernorat de Kinshasa, qui vous répondent par courriel.
-        </p>
+        {% set entete = textes.entete_contact %}
+        {% if entete.surtitre %}<p class="surtitre">{{ entete.surtitre }}</p>{% endif %}
+        {% if entete.titre %}<h1 class="page-entete__titre">{{ entete.titre }}</h1>{% endif %}
+        {% if entete.corps %}<div class="page-entete__accroche">{{ entete.corps }}</div>{% endif %}
       </div>
     </div>
   </header>
@@ -49,7 +46,7 @@
 
         <aside class="col-lg-4" aria-label="{{ 'Coordonnées et informations'|t }}">
           {% if coordonnees %}
-            <h2 class="contact-coord__titre" id="contact-coord-titre">Nos coordonnées</h2>
+            {% if textes.contact_coordonnees.titre %}<h2 class="contact-coord__titre" id="contact-coord-titre">{{ textes.contact_coordonnees.titre }}</h2>{% endif %}
 
             <ul class="contact-coord">
               {% if coordonnees.adresse %}
@@ -97,16 +94,21 @@
             {% endif %}
           {% endif %}
 
+          {% set renvoi = textes.contact_demarche %}
+          {% if renvoi.titre %}
           <div class="contact-renvoi">
-            <h3>Une démarche administrative ?</h3>
-            <p>Pièces à fournir, coûts et lieux de dépôt sont décrits dans les fiches des services aux citoyens.</p>
-            <a href="/services-aux-citoyens" class="lien-suite">Voir les services aux citoyens<i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            <h3>{{ renvoi.titre }}</h3>
+            {{ renvoi.corps }}
+            {% for lien in renvoi.liens %}
+              <a href="{{ lien.url }}" class="lien-suite">{{ lien.titre }}<i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+            {% endfor %}
           </div>
+          {% endif %}
         </aside>
 
         <div class="col-lg-8">
           <div class="contact-carte">
-            <h2 class="contact-carte__titre">Envoyer un message</h2>
+            {% if textes.contact_formulaire.titre %}<h2 class="contact-carte__titre">{{ textes.contact_formulaire.titre }}</h2>{% endif %}
             <p class="contact-carte__aide">Les champs marqués d'un astérisque (<span class="contact-carte__etoile">*</span>) sont obligatoires.</p>
             {{ page.content }}
           </div>

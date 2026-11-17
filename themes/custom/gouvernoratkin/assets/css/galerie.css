@@ -19,10 +19,6 @@
 
 /* L'ancien bandeau — dégradé bleu et frise en damier — est remplacé par
    l'entête commun aux autres pages. */
-.gal-corps .page-header {
-  display: none;
-}
-
 .gal-corps .footer {
   background: none;
   color: inherit;

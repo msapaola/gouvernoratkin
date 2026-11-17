@@ -38,6 +38,66 @@ settings:
     -
       value: appel
       label: 'Appel aux démarches (bas de page)'
+    -
+      value: reseaux
+      label: 'Réseaux sociaux (liens)'
+    -
+      value: entete_actualites
+      label: 'Page Actualités : en-tête'
+    -
+      value: entete_galerie
+      label: 'Page Galerie photo : en-tête'
+    -
+      value: entete_videos
+      label: 'Page Vidéos : en-tête'
+    -
+      value: entete_video
+      label: "Fiche d'une vidéo : surtitre"
+    -
+      value: entete_services
+      label: 'Page Services aux citoyens : en-tête'
+    -
+      value: services_aide
+      label: 'Services aux citoyens : encadré « Besoin d’aide ? »'
+    -
+      value: entete_contact
+      label: 'Page Contact : en-tête'
+    -
+      value: contact_coordonnees
+      label: 'Page Contact : titre des coordonnées'
+    -
+      value: contact_demarche
+      label: 'Page Contact : encadré démarches'
+    -
+      value: contact_formulaire
+      label: 'Page Contact : titre du formulaire'
+    -
+      value: entete_executif
+      label: 'Page Exécutif provincial : en-tête'
+    -
+      value: suite_executif
+      label: 'Page Exécutif provincial : « Poursuivre la découverte »'
+    -
+      value: entete_cabinet
+      label: 'Page Cabinet du gouverneur : en-tête'
+    -
+      value: cabinet_mot
+      label: 'Page Cabinet du gouverneur : titre du mot'
+    -
+      value: suite_cabinet
+      label: 'Page Cabinet du gouverneur : « Poursuivre la découverte »'
+    -
+      value: entete_connexion
+      label: 'Page Connexion : en-tête'
+    -
+      value: entete_mot_de_passe
+      label: 'Page Mot de passe oublié : en-tête'
+    -
+      value: compte_aide
+      label: 'Pages Connexion et Mot de passe : texte pour les citoyens'
+    -
+      value: pied_credit
+      label: 'Pied de page : mention de réalisation'
   allowed_values_function: ''
 module: options
 locked: false

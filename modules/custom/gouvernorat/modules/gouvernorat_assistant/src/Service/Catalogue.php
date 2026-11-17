@@ -53,10 +53,27 @@ class Catalogue {
   ];
 
   /**
-   * Pages principales dont le texte affiché est repris dans le catalogue
-   * (les autres sont des listes : actualités, démarches, vidéos…).
+   * Parties des blocs « Textes du site » affichées sur chaque page principale
+   * (module gouvernorat_accueil) : leur texte est repris dans le catalogue.
    */
-  const PAGES_A_LIRE = ['/', '/executif-provincial', '/cabinet-du-gouverneur'];
+  const PARTIES = [
+    '/' => ['bandeau', 'reseaux', 'acces', 'actualites', 'videos', 'apropos', 'chiffres', 'galerie', 'demarches', 'appel'],
+    '/services-aux-citoyens' => ['entete_services', 'services_aide'],
+    '/actualites' => ['entete_actualites'],
+    '/videos' => ['entete_videos'],
+    '/all-gallery' => ['entete_galerie'],
+    '/executif-provincial' => ['entete_executif', 'suite_executif'],
+    '/cabinet-du-gouverneur' => ['entete_cabinet', 'cabinet_mot', 'suite_cabinet'],
+    '/contact' => ['entete_contact', 'contact_coordonnees', 'contact_demarche'],
+  ];
+
+  /**
+   * Membres affichés sur les pages de l'exécutif et du cabinet.
+   */
+  const INSTANCES = [
+    '/executif-provincial' => ['gouvernorat', 'ministres', 'secretariat'],
+    '/cabinet-du-gouverneur' => ['cabinet'],
+  ];
 
   /**
    * Types de contenu de référence : quand ils répondent à la question, ils
@@ -95,9 +112,9 @@ class Catalogue {
     foreach (self::PAGES as $chemin => [$titre, $resume]) {
       $url = $chemin === '/' ? Url::fromRoute('<front>') : $this->validateur->getUrlIfValidWithoutAccessCheck($chemin);
       if ($url) {
-        // Pages institutionnelles : leur texte est écrit dans les gabarits du
-        // thème, pas dans la base ; il est lu tel qu'un visiteur le voit.
-        $texte = in_array($chemin, self::PAGES_A_LIRE, TRUE) ? $this->texteAffiche($chemin) : '';
+        // Texte des pages principales : lu dans la base (blocs « Textes du
+        // site », mot du gouverneur, chiffres clés, coordonnées, membres).
+        $texte = $this->textePage($chemin);
         $entrees[] = $this->entree($titre, $url->toString(), 'Page principale', '', $resume, trim($resume . "\n" . $texte));
       }
     }
@@ -348,23 +365,12 @@ class Catalogue {
       ];
     }
 
-    // Pages de l'exécutif et du cabinet : la liste des membres en fonction.
-    $instances = [
-      '/executif-provincial' => ['Exécutif provincial', ['gouvernorat', 'ministres', 'secretariat']],
-      '/cabinet-du-gouverneur' => ['Cabinet du gouverneur', ['cabinet']],
-    ];
-    if (isset($instances[$chemin])) {
-      [$titre, $valeurs] = $instances[$chemin];
-      $stockage = $this->entityTypeManager->getStorage('node');
-      $ids = $stockage->getQuery()->accessCheck(FALSE)
-        ->condition('type', 'membre')->condition('status', 1)
-        ->condition('field_membre_instance', $valeurs, 'IN')
-        ->sort('field_membre_ordre')->sort('title')->execute();
-      $lignes = [];
-      foreach ($stockage->loadMultiple($ids) as $membre) {
-        $lignes[] = '- [' . $membre->label() . '](' . $membre->toUrl()->toString() . ') : ' . $membre->get('field_membre_fonction')->value;
-      }
-      return ['titre' => $titre, 'url' => $chemin, 'type' => 'Page principale', 'date' => '', 'texte' => "Membres en fonction :\n" . implode("\n", $lignes)];
+    // Pages de l'exécutif et du cabinet : leur présentation et la liste des
+    // membres en fonction, avec l'adresse de chaque fiche.
+    $titres = ['/executif-provincial' => 'Exécutif provincial', '/cabinet-du-gouverneur' => 'Cabinet du gouverneur'];
+    if (isset(self::INSTANCES[$chemin])) {
+      $texte = $this->textePage($chemin, FALSE);
+      return ['titre' => $titres[$chemin], 'url' => $chemin, 'type' => 'Page principale', 'date' => '', 'texte' => trim($texte . "\n\n" . $this->membres(self::INSTANCES[$chemin], TRUE))];
     }
 
     // Une page principale (liste, page institutionnelle) : sa description.
@@ -411,90 +417,88 @@ class Catalogue {
   }
 
   /**
-   * Texte visible d'une page du site, tel qu'un visiteur anonyme le voit.
+   * Texte propre d'une page principale, lu dans la base.
    *
-   * La page est construite par une sous-requête interne, sous l'identité
-   * d'un visiteur anonyme ; seul le contenu principal (<main>) est gardé.
-   * Les messages en attente de la personne connectée sont préservés. En
-   * cas d'échec, le texte est vide et seule la description de la page sert.
+   * Sections des blocs « Textes du site » affichées sur la page, et pour
+   * l'accueil le mot du gouverneur et les chiffres clés, pour le contact les
+   * coordonnées, pour l'exécutif et le cabinet la liste des membres.
    */
-  protected function texteAffiche(string $chemin): string {
-    $permutateur = \Drupal::service('account_switcher');
-    $messager = \Drupal::messenger();
-    $messages = $messager->all();
-    $permutateur->switchTo(new \Drupal\Core\Session\AnonymousUserSession());
-    // Drupal retient, le temps d'une requête, si la page en cours est
-    // l'accueil. Sans remise à zéro, après la lecture de l'accueil, toutes
-    // les pages suivantes seraient construites avec le gabarit de l'accueil.
-    // Le service est un décorateur (path_alias) qui enveloppe celui du
-    // cœur : chacun garde sa propre mémoire, les deux sont remises à zéro.
-    $oublierAccueil = static function () {
-      $objet = \Drupal::service('path.matcher');
-      for ($niveau = 0; $objet && $niveau < 5; $niveau++) {
-        try {
-          $objet = \Closure::bind(function () {
-            if (property_exists($this, 'isCurrentFrontPage')) {
-              $this->isCurrentFrontPage = NULL;
-            }
-            return property_exists($this, 'decorated') ? $this->decorated : NULL;
-          }, $objet, get_class($objet))();
-        }
-        catch (\Throwable $e) {
-          // Structure différente dans une future version de Drupal : sans
-          // conséquence grave, seul le texte des pages en pâtirait.
-          $objet = NULL;
+  protected function textePage(string $chemin, bool $avecMembres = TRUE): string {
+    $morceaux = [];
+    $sections = [];
+    $blocs = $this->entityTypeManager->getStorage('block_content')->loadByProperties(['type' => 'page_accueil', 'status' => 1]);
+    ksort($blocs);
+    foreach ($blocs as $bloc) {
+      foreach ($bloc->get('field_accueil_sections')->referencedEntities() as $section) {
+        $cle = $section->get('field_sec_cle')->value;
+        if ($cle && $section->isPublished() && !isset($sections[$cle])) {
+          $sections[$cle] = $section;
         }
       }
-    };
-    $oublierAccueil();
-    try {
-      $courante = \Drupal::request();
-      // Seule l'adresse est reprise : recopier les variables serveur de la
-      // requête en cours ferait servir la page d'accueil pour toute adresse.
-      $requete = \Symfony\Component\HttpFoundation\Request::create($courante->getSchemeAndHttpHost() . $courante->getBasePath() . $chemin, 'GET');
-      $reponse = \Drupal::service('http_kernel')->handle($requete, \Symfony\Component\HttpKernel\HttpKernelInterface::SUB_REQUEST, FALSE);
-      $html = $reponse->getStatusCode() === 200 ? (string) $reponse->getContent() : '';
     }
-    catch (\Throwable $e) {
-      $html = '';
+    foreach (self::PARTIES[$chemin] ?? [] as $cle) {
+      if (isset($sections[$cle])) {
+        $morceaux[] = $this->texteParagraphe($sections[$cle]);
+      }
     }
-    finally {
-      $oublierAccueil();
-      $permutateur->switchBack();
-      $messager->deleteAll();
-      foreach ($messages as $type => $liste) {
-        foreach ($liste as $message) {
-          $messager->addMessage($message, $type);
+
+    $autres = ['/' => ['mot_gouverneur', 'chiffres_cles'], '/contact' => ['coordonnees']][$chemin] ?? [];
+    foreach ($autres as $type) {
+      foreach ($this->entityTypeManager->getStorage('block_content')->loadByProperties(['type' => $type, 'status' => 1]) as $bloc) {
+        foreach ($bloc->getFields(FALSE) as $nom => $champ) {
+          if (!str_starts_with($nom, 'field_') || $champ->isEmpty()) {
+            continue;
+          }
+          if ($champ->getFieldDefinition()->getType() === 'entity_reference_revisions') {
+            foreach ($champ->referencedEntities() as $paragraphe) {
+              $morceaux[] = $this->texteParagraphe($paragraphe);
+            }
+          }
+          elseif (in_array($champ->getFieldDefinition()->getType(), ['string', 'string_long', 'text', 'text_long', 'text_with_summary', 'email', 'telephone'], TRUE)) {
+            $morceaux[] = implode("\n", array_column($champ->getValue(), 'value'));
+          }
         }
       }
     }
 
-    if ($html === '') {
-      return '';
+    if ($avecMembres && isset(self::INSTANCES[$chemin])) {
+      $morceaux[] = $this->membres(self::INSTANCES[$chemin]);
     }
-    // Seul le texte propre de la page compte : les listes automatiques
-    // (dernières actualités, vidéos, galerie, rendues par des vues) sont
-    // retirées, sans quoi l'accueil « contiendrait » le titre de chaque
-    // actualité récente et passerait devant l'article lui-même.
-    $document = new \DOMDocument();
-    libxml_use_internal_errors(TRUE);
-    $document->loadHTML('<?xml encoding="UTF-8">' . $html);
-    libxml_clear_errors();
-    $xpath = new \DOMXPath($document);
-    $principal = $xpath->query('//main')->item(0);
-    if (!$principal) {
-      return '';
+    return Unicode::truncate($this->texteBrut(implode("\n", array_filter($morceaux))), 8000, TRUE, TRUE);
+  }
+
+  /**
+   * Membres en fonction d'une ou plusieurs instances, une ligne chacun.
+   *
+   * @param string[] $instances
+   *   Valeurs du champ field_membre_instance.
+   * @param bool $liens
+   *   TRUE : lignes « - [Nom](adresse) : fonction », pour lirePage().
+   */
+  protected function membres(array $instances, bool $liens = FALSE): string {
+    $stockage = $this->entityTypeManager->getStorage('node');
+    $ids = $stockage->getQuery()->accessCheck(FALSE)
+      ->condition('type', 'membre')->condition('status', 1)
+      ->condition('field_membre_instance', $instances, 'IN')
+      ->sort('field_membre_ordre')->sort('title')->execute();
+    $lignes = [];
+    foreach ($stockage->loadMultiple($ids) as $membre) {
+      $nom = $liens ? '[' . $membre->label() . '](' . $membre->toUrl()->toString() . ')' : $membre->label();
+      $ligne = '- ' . $nom . ' : ' . $membre->get('field_membre_fonction')->value;
+      $instance = $membre->get('field_membre_instance')->value;
+      if (defined('GOUVERNORAT_INSTITUTIONS_LIBELLES') && isset(GOUVERNORAT_INSTITUTIONS_LIBELLES[$instance])) {
+        $ligne .= ' (' . GOUVERNORAT_INSTITUTIONS_LIBELLES[$instance] . ')';
+      }
+      // Description affichée sur la carte du membre, et son mot s'il en a un
+      // (« Le mot du cabinet »).
+      foreach (['field_membre_description', 'field_membre_mot'] as $champ) {
+        if ($membre->hasField($champ) && !$membre->get($champ)->isEmpty()) {
+          $ligne .= "\n  " . trim(preg_replace('/\s+/u', ' ', strip_tags((string) $membre->get($champ)->value)));
+        }
+      }
+      $lignes[] = $ligne;
     }
-    $a_retirer = $xpath->query('.//script | .//style | .//noscript | .//svg | .//nav | .//form | .//*[contains(concat(" ", normalize-space(@class), " "), " views-element-container ")] | .//*[contains(concat(" ", normalize-space(@class), " "), " view ")]', $principal);
-    foreach (iterator_to_array($a_retirer) as $noeud) {
-      $noeud->parentNode?->removeChild($noeud);
-    }
-    $morceaux = [];
-    foreach ($xpath->query('.//text()', $principal) as $texte) {
-      $morceaux[] = $texte->nodeValue;
-    }
-    $texte = trim(preg_replace('/\s+/u', ' ', implode(' ', $morceaux)));
-    return Unicode::truncate($texte, 8000, TRUE, TRUE);
+    return $lignes ? "Membres en fonction :\n" . implode("\n", $lignes) : '';
   }
 
   /**
@@ -640,6 +644,10 @@ class Catalogue {
       if ($paragraphe->hasField($champ) && !$paragraphe->get($champ)->isEmpty()) {
         $morceaux[] = $paragraphe->get($champ)->value;
       }
+    }
+    // Libellés des liens et boutons (« Vos démarches administratives »…).
+    if ($paragraphe->hasField('field_sec_liens') && !$paragraphe->get('field_sec_liens')->isEmpty()) {
+      $morceaux[] = implode(' · ', array_filter(array_column($paragraphe->get('field_sec_liens')->getValue(), 'title')));
     }
     if ($paragraphe->hasField('field_sec_liste') && !$paragraphe->get('field_sec_liste')->isEmpty()) {
       $morceaux[] = implode(', ', array_column($paragraphe->get('field_sec_liste')->getValue(), 'value'));

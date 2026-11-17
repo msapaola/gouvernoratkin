@@ -45,13 +45,10 @@
 
       <div class="page-entete__contenu">
         <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
-        <p class="surtitre">Vos démarches</p>
-        <h1 class="page-entete__titre">Services aux citoyens</h1>
-        <p class="page-entete__accroche">
-          Retrouvez l'ensemble des démarches et services proposés par le
-          Gouvernorat de Kinshasa à la population kinoise : pièces à fournir,
-          étapes et lieux de dépôt.
-        </p>
+        {% set entete = textes.entete_services %}
+        {% if entete.surtitre %}<p class="surtitre">{{ entete.surtitre }}</p>{% endif %}
+        {% if entete.titre %}<h1 class="page-entete__titre">{{ entete.titre }}</h1>{% endif %}
+        {% if entete.corps %}<div class="page-entete__accroche">{{ entete.corps }}</div>{% endif %}
       </div>
     </div>
   </header>

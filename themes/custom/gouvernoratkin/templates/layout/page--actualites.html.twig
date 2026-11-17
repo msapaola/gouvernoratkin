@@ -27,12 +27,10 @@
 
       <div class="page-entete__contenu">
         <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
-        <p class="surtitre">Vie de la ville</p>
-        <h1 class="page-entete__titre">Actualités du Gouvernorat</h1>
-        <p class="page-entete__accroche">
-          Communiqués, décisions et annonces officielles de la Ville-Province de
-          Kinshasa, publiés au fil de l'actualité de la capitale.
-        </p>
+        {% set entete = textes.entete_actualites %}
+        {% if entete.surtitre %}<p class="surtitre">{{ entete.surtitre }}</p>{% endif %}
+        {% if entete.titre %}<h1 class="page-entete__titre">{{ entete.titre }}</h1>{% endif %}
+        {% if entete.corps %}<div class="page-entete__accroche">{{ entete.corps }}</div>{% endif %}
       </div>
     </div>
   </header>

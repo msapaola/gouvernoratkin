@@ -35,13 +35,10 @@
 
       <div class="page-entete__contenu">
         <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
-        <p class="surtitre">Gouvernance</p>
-        <h1 class="page-entete__titre">Le cabinet du gouverneur</h1>
-        <p class="page-entete__accroche">
-          Le cabinet assiste le gouverneur dans la conduite de l'action publique
-          provinciale : préparation des décisions, coordination des services et
-          suivi de leur mise en œuvre au bénéfice des Kinoises et des Kinois.
-        </p>
+        {% set entete = textes.entete_cabinet %}
+        {% if entete.surtitre %}<p class="surtitre">{{ entete.surtitre }}</p>{% endif %}
+        {% if entete.titre %}<h1 class="page-entete__titre">{{ entete.titre }}</h1>{% endif %}
+        {% if entete.corps %}<div class="page-entete__accroche">{{ entete.corps }}</div>{% endif %}
       </div>
     </div>
   </header>
@@ -66,7 +63,7 @@
             </div>
             <div class="membres-mot__texte">
               <p class="surtitre">{{ auteur.fonction }}</p>
-              <h2 class="membres-section__titre" id="membres-mot-titre">Le mot du cabinet</h2>
+              <h2 class="membres-section__titre" id="membres-mot-titre">{{ textes.cabinet_mot.titre }}</h2>
               <blockquote class="membres-mot__citation">
                 {% for paragraphe in auteur.mot %}
                   <p>{{ paragraphe }}</p>
@@ -93,19 +90,20 @@
   </div>
 
   {# ================= POURSUIVRE ================= #}
+  {% if textes.suite_cabinet.titre %}
   <section class="page-appel" aria-labelledby="suite-titre">
     <div class="container">
-      <h2 class="page-appel__titre" id="suite-titre">Poursuivre la découverte</h2>
-      <p class="page-appel__texte">
-        L'exécutif provincial et les structures de la Ville-Province complètent
-        l'organisation du Gouvernorat de Kinshasa.
-      </p>
+      {% set suite = textes.suite_cabinet %}
+      <h2 class="page-appel__titre" id="suite-titre">{{ suite.titre }}</h2>
+      {% if suite.corps %}<div class="page-appel__texte">{{ suite.corps }}</div>{% endif %}
       <div class="page-appel__actions">
-        <a href="/executif-provincial" class="bouton bouton--clair">L'exécutif provincial</a>
-        <a href="/structuresville" class="bouton bouton--fantome">Les structures de la ville</a>
+        {% for lien in suite.liens %}
+          <a href="{{ lien.url }}" class="bouton {{ loop.first ? 'bouton--clair' : 'bouton--fantome' }}">{{ lien.titre }}</a>
+        {% endfor %}
       </div>
     </div>
   </section>
+  {% endif %}
 
 </main>
 

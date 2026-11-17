@@ -10,14 +10,16 @@
  * invisible pour les lecteurs d'écran, et la page ne ressemblait à aucune
  * autre.
  *
- * Variables (gouvernoratkin_preprocess_page) : compte_titre,
- * compte_accroche, compte_route.
+ * Variables : compte_titre et compte_route (gouvernoratkin_preprocess_page),
+ * textes.entete_connexion, entete_mot_de_passe et compte_aide (bloc « Textes
+ * des autres pages », module gouvernorat_accueil).
  */
 #}
 {{ attach_library('gouvernoratkin/compte') }}
 
 {% include "@gouvernoratkin/layout/partials/site-header.html.twig" with { sans_fil_ariane: true } %}
 
+{% set entete = compte_route == 'user.pass' ? textes.entete_mot_de_passe : textes.entete_connexion %}
 <main id="main-content" role="main">
 
   <header class="page-entete">
@@ -25,14 +27,14 @@
       <nav aria-label="{{ 'Fil d’Ariane'|t }}">
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/"><i class="fas fa-home" aria-hidden="true"></i> Accueil</a></li>
-          <li class="breadcrumb-item active" aria-current="page">{{ compte_titre }}</li>
+          <li class="breadcrumb-item active" aria-current="page">{{ entete.titre ?: compte_titre }}</li>
         </ol>
       </nav>
       <div class="page-entete__contenu">
         <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
-        <p class="surtitre">Espace de la rédaction</p>
-        <h1 class="page-entete__titre">{{ compte_titre }}</h1>
-        <p class="page-entete__accroche">{{ compte_accroche }}</p>
+        {% if entete.surtitre %}<p class="surtitre">{{ entete.surtitre }}</p>{% endif %}
+        <h1 class="page-entete__titre">{{ entete.titre ?: compte_titre }}</h1>
+        {% if entete.corps %}<div class="page-entete__accroche">{{ entete.corps }}</div>{% endif %}
       </div>
     </div>
   </header>
@@ -51,11 +53,13 @@
         </div>
       </div>
 
-      <p class="compte-aide">
-        Vous êtes citoyen et cherchez une information ou une démarche ?
-        <a href="/services-aux-citoyens">Services aux citoyens</a> ·
-        <a href="/contact">Nous écrire</a>
-      </p>
+      {% set aide = textes.compte_aide %}
+      {% if aide.corps or aide.liens %}
+      <div class="compte-aide">
+        {{ aide.corps }}
+        {% for lien in aide.liens %}<a href="{{ lien.url }}">{{ lien.titre }}</a>{% if not loop.last %} · {% endif %}{% endfor %}
+      </div>
+      {% endif %}
     </div>
   </section>
 

@@ -94,7 +94,11 @@ function gouvernorat_seo_organisation(string $id, string $accueil): array {
       'name' => 'Kinshasa',
       'containedInPlace' => ['@type' => 'Country', 'name' => 'République démocratique du Congo'],
     ],
-    'sameAs' => GOUVERNORAT_SEO_RESEAUX,
+    // Comptes officiels : section « Réseaux sociaux » du bloc « Page
+    // d'accueil » (modifiable par la rédaction), sinon la liste ci-dessus.
+    'sameAs' => (function_exists('gouvernorat_accueil_sections') && !empty(gouvernorat_accueil_sections()['reseaux']['liens']))
+      ? array_values(array_column(gouvernorat_accueil_sections()['reseaux']['liens'], 'url'))
+      : GOUVERNORAT_SEO_RESEAUX,
   ];
 
   if (function_exists('gouvernorat_contact_coordonnees') && ($coordonnees = gouvernorat_contact_coordonnees())) {

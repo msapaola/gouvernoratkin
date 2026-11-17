@@ -9,8 +9,10 @@
  * n'existaient pas dans la base (donc invisibles pour tout outil qui lit les
  * contenus de Drupal, comme l'assistant). Ils vivent désormais dans des blocs
  * de contenu, que la rédaction modifie dans Contenu › Blocs :
- * - « Page d'accueil » (type page_accueil) : une section par partie de la
- *   page (bandeau, accès rapide, titres des actualités, À propos…) ;
+ * - « Textes du site » (type page_accueil) : une section par partie de page
+ *   (bandeau, accès rapide, À propos… de l'accueil ; en-têtes des pages
+ *   Actualités, Contact…, encadrés, pied de page). Deux blocs de ce type
+ *   existent : « Page d'accueil » et « Textes des autres pages » ;
  * - « Mot du gouverneur » (type mot_gouverneur) ;
  * - « Chiffres clés » (type chiffres_cles).
  *
@@ -49,6 +51,8 @@ function gouvernorat_accueil_paragraphes(?string $texte): array {
 /**
  * Implements hook_preprocess_HOOK() for page templates.
  *
+ * Variables fournies à tous les gabarits de page :
+ * - textes : les sections des blocs « Textes du site », par partie de page.
  * Variables fournies à page--front.html.twig :
  * - accueil : les sections du bloc « Page d'accueil », par partie de la page
  *   (accueil.bandeau, accueil.acces…), voir gouvernorat_accueil_sections() ;
@@ -58,15 +62,19 @@ function gouvernorat_accueil_paragraphes(?string $texte): array {
  * pas affichée.
  */
 function gouvernorat_accueil_preprocess_page(array &$variables) {
+  // Toute modification d'un bloc de contenu doit rafraîchir les pages, y
+  // compris dans le cache des pages servies aux visiteurs anonymes.
+  $variables['#cache']['tags'][] = 'block_content_list';
+
+  // Textes des pages (en-têtes, encadrés, pied de page) : variable textes,
+  // une entrée par partie de page (textes.entete_contact…).
+  $variables['textes'] = gouvernorat_accueil_sections();
+
   if (!\Drupal::service('path.matcher')->isFrontPage()) {
     return;
   }
 
-  // Toute modification d'un bloc de contenu doit rafraîchir l'accueil, y
-  // compris dans le cache des pages servies aux visiteurs anonymes.
-  $variables['#cache']['tags'][] = 'block_content_list';
-
-  $variables['accueil'] = gouvernorat_accueil_sections();
+  $variables['accueil'] = $variables['textes'];
 
   if ($bloc = gouvernorat_accueil_bloc('mot_gouverneur')) {
     $portrait = NULL;
@@ -103,7 +111,7 @@ function gouvernorat_accueil_preprocess_page(array &$variables) {
 }
 
 /**
- * Sections du bloc « Page d'accueil », indexées par partie de la page.
+ * Sections des blocs « Textes du site », indexées par partie de page.
  *
  * Chaque section : surtitre, titre, corps (texte mis en forme), liens
  * (titre, url, externe), image (url, alt), legende et elements (cartes :
@@ -111,12 +119,25 @@ function gouvernorat_accueil_preprocess_page(array &$variables) {
  * publiée est absente : le gabarit n'affiche alors pas ses textes.
  */
 function gouvernorat_accueil_sections(): array {
-  $bloc = gouvernorat_accueil_bloc('page_accueil');
-  if (!$bloc || !$bloc->hasField('field_accueil_sections')) {
-    return [];
+  $sections = &drupal_static(__FUNCTION__);
+  if (isset($sections)) {
+    return $sections;
   }
   $sections = [];
-  foreach ($bloc->get('field_accueil_sections')->referencedEntities() as $section) {
+  $storage = \Drupal::entityTypeManager()->getStorage('block_content');
+  $ids = $storage->getQuery()
+    ->accessCheck(FALSE)
+    ->condition('type', 'page_accueil')
+    ->condition('status', 1)
+    ->sort('id')
+    ->execute();
+  $parties = [];
+  foreach ($storage->loadMultiple($ids) as $bloc) {
+    if ($bloc->hasField('field_accueil_sections')) {
+      array_push($parties, ...$bloc->get('field_accueil_sections')->referencedEntities());
+    }
+  }
+  foreach ($parties as $section) {
     $cle = $section->get('field_sec_cle')->value;
     if (!$cle || isset($sections[$cle]) || !$section->isPublished()) {
       continue;
@@ -194,4 +215,17 @@ function gouvernorat_accueil_liens(ParagraphInterface $paragraphe): array {
     ];
   }
   return $liens;
+}
+
+/**
+ * Implements hook_preprocess_HOOK() for node templates.
+ *
+ * La fiche d'une démarche affiche la colonne des services (encadré « Besoin
+ * d'aide ? ») : elle reçoit aussi les textes du site.
+ */
+function gouvernorat_accueil_preprocess_node(array &$variables) {
+  if ($variables['node']->bundle() === 'service_au_citoyen') {
+    $variables['textes'] = gouvernorat_accueil_sections();
+    $variables['#cache']['tags'][] = 'block_content_list';
+  }
 }

@@ -76,16 +76,27 @@
       </div>
       {% endif %}
 
+      {# Réseaux sociaux : section « Réseaux sociaux » (liens). L'icône est
+         choisie d'après l'adresse du compte. #}
+      {% set reseaux = accueil.reseaux %}
+      {% if reseaux.liens %}
       <div class="hero__reseaux">
-        <span class="hero__reseaux-libelle">Nous suivre</span>
+        {% if reseaux.surtitre %}<span class="hero__reseaux-libelle">{{ reseaux.surtitre }}</span>{% endif %}
         <ul class="reseaux">
-          <li><a href="https://x.com/gouvernoratk" class="reseaux__lien" aria-label="{{ 'Nous suivre sur X'|t }}" rel="noopener"><i class="fab fa-twitter" aria-hidden="true"></i></a></li>
-          <li><a href="https://www.facebook.com/GouvKinshasa" class="reseaux__lien" aria-label="{{ 'Nous suivre sur Facebook'|t }}" rel="noopener"><i class="fab fa-facebook-f" aria-hidden="true"></i></a></li>
-          <li><a href="https://www.instagram.com/gouvernoratk" class="reseaux__lien" aria-label="{{ 'Nous suivre sur Instagram'|t }}" rel="noopener"><i class="fab fa-instagram" aria-hidden="true"></i></a></li>
-          <li><a href="https://youtube.com/@gouvernoratdekinshasa" class="reseaux__lien" aria-label="{{ 'Nous suivre sur YouTube'|t }}" rel="noopener"><i class="fab fa-youtube" aria-hidden="true"></i></a></li>
-          <li><a href="https://www.tiktok.com/@gouvernoratk" class="reseaux__lien" aria-label="{{ 'Nous suivre sur TikTok'|t }}" rel="noopener"><i class="fab fa-tiktok" aria-hidden="true"></i></a></li>
+          {% for lien in reseaux.liens %}
+            {% set icone = 'x.com' in lien.url or 'twitter.com' in lien.url ? 'fab fa-twitter'
+              : 'facebook.com' in lien.url ? 'fab fa-facebook-f'
+              : 'instagram.com' in lien.url ? 'fab fa-instagram'
+              : 'youtube.com' in lien.url ? 'fab fa-youtube'
+              : 'tiktok.com' in lien.url ? 'fab fa-tiktok'
+              : 'linkedin.com' in lien.url ? 'fab fa-linkedin-in'
+              : 'whatsapp' in lien.url ? 'fab fa-whatsapp'
+              : 'fas fa-link' %}
+            <li><a href="{{ lien.url }}" class="reseaux__lien" aria-label="{{ reseaux.surtitre ? reseaux.surtitre ~ ' sur ' }}{{ lien.titre }}" rel="noopener"><i class="{{ icone }}" aria-hidden="true"></i></a></li>
+          {% endfor %}
         </ul>
       </div>
+      {% endif %}
      </div>
 
      {# Mise en avant : l'article portant la catégorie « À la une ».

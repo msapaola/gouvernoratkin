@@ -228,3 +228,119 @@ function gouvernorat_accueil_deploy_sections_accueil(): string {
   $bloc->save();
   return "Bloc « Page d'accueil » créé avec " . count($sections) . ' sections (Contenu › Blocs).';
 }
+
+/**
+ * Recopie les textes des autres pages dans un bloc « Textes du site ».
+ *
+ * En-têtes des pages Actualités, Galerie, Vidéos, Services aux citoyens,
+ * Contact, Exécutif provincial, Cabinet du gouverneur, Connexion et Mot de
+ * passe oublié ; encadrés et « Poursuivre la découverte » ; mention du pied
+ * de page. Les réseaux sociaux de l'accueil rejoignent le bloc « Page
+ * d'accueil ». Textes repris mot pour mot des gabarits. Une partie déjà
+ * présente dans un bloc n'est pas recréée.
+ */
+function gouvernorat_accueil_deploy_textes_autres_pages(): string {
+  $storage = \Drupal::entityTypeManager()->getStorage('block_content');
+  $existantes = function_exists('gouvernorat_accueil_sections') ? array_keys(gouvernorat_accueil_sections()) : [];
+  $html = fn (string ...$paragraphes): array => [
+    'value' => '<p>' . implode('</p><p>', $paragraphes) . '</p>',
+    'format' => 'basic_html',
+  ];
+  $entete = fn (string $surtitre, string $titre, string $texte, array $liens = []): array => [
+    'field_sec_surtitre' => $surtitre,
+    'field_sec_titre' => $titre,
+    'field_sec_corps' => $html($texte),
+    'field_sec_liens' => $liens,
+  ];
+
+  $parties = [
+    'entete_actualites' => $entete('Vie de la ville', 'Actualités du Gouvernorat', "Communiqués, décisions et annonces officielles de la Ville-Province de Kinshasa, publiés au fil de l'actualité de la capitale."),
+    'entete_galerie' => $entete('En images', 'Galerie photo du Gouvernorat', 'Les activités et les événements de la Ville-Province de Kinshasa, racontés en images.'),
+    'entete_videos' => $entete('En vidéo', 'Le Gouvernorat en vidéo', 'Événements, inaugurations, discours et reportages de la Ville-Province de Kinshasa, publiés sur la chaîne YouTube du Gouvernorat.', [
+      ['uri' => 'https://www.youtube.com/@GouvernoratdeKinshasa', 'title' => 'Voir la chaîne YouTube'],
+    ]),
+    'entete_video' => ['field_sec_surtitre' => 'Vidéo'],
+    'entete_services' => $entete('Vos démarches', 'Services aux citoyens', "Retrouvez l'ensemble des démarches et services proposés par le Gouvernorat de Kinshasa à la population kinoise : pièces à fournir, étapes et lieux de dépôt."),
+    'services_aide' => [
+      'field_sec_titre' => "Besoin d'aide ?",
+      'field_sec_corps' => $html('Contactez nos agents pour vous accompagner dans vos démarches.'),
+      'field_sec_liens' => [['uri' => 'internal:/contact', 'title' => 'Nous contacter']],
+    ],
+    'entete_contact' => $entete('Nous écrire', 'Contacter le Gouvernorat', 'Une question sur une démarche, une suggestion ou un signalement ? Écrivez-nous : votre message est transmis aux services du Gouvernorat de Kinshasa, qui vous répondent par courriel.'),
+    'contact_coordonnees' => ['field_sec_titre' => 'Nos coordonnées'],
+    'contact_demarche' => [
+      'field_sec_titre' => 'Une démarche administrative ?',
+      'field_sec_corps' => $html('Pièces à fournir, coûts et lieux de dépôt sont décrits dans les fiches des services aux citoyens.'),
+      'field_sec_liens' => [['uri' => 'internal:/services-aux-citoyens', 'title' => 'Voir les services aux citoyens']],
+    ],
+    'contact_formulaire' => ['field_sec_titre' => 'Envoyer un message'],
+    'entete_executif' => $entete('Gouvernance', "L'exécutif provincial", "Le gouverneur et les ministres provinciaux conduisent l'action de la Ville-Province de Kinshasa. Chacun porte un portefeuille et répond des politiques publiques menées dans son domaine auprès des Kinoises et des Kinois."),
+    'suite_executif' => [
+      'field_sec_titre' => 'Poursuivre la découverte',
+      'field_sec_corps' => $html("Le cabinet du gouverneur et les structures de la Ville-Province complètent l'organisation de l'exécutif provincial."),
+      'field_sec_liens' => [
+        ['uri' => 'internal:/cabinet-du-gouverneur', 'title' => 'Le cabinet du gouverneur'],
+        ['uri' => 'internal:/structuresville', 'title' => 'Les structures de la ville'],
+      ],
+    ],
+    'entete_cabinet' => $entete('Gouvernance', 'Le cabinet du gouverneur', "Le cabinet assiste le gouverneur dans la conduite de l'action publique provinciale : préparation des décisions, coordination des services et suivi de leur mise en œuvre au bénéfice des Kinoises et des Kinois."),
+    'cabinet_mot' => ['field_sec_titre' => 'Le mot du cabinet'],
+    'suite_cabinet' => [
+      'field_sec_titre' => 'Poursuivre la découverte',
+      'field_sec_corps' => $html("L'exécutif provincial et les structures de la Ville-Province complètent l'organisation du Gouvernorat de Kinshasa."),
+      'field_sec_liens' => [
+        ['uri' => 'internal:/executif-provincial', 'title' => "L'exécutif provincial"],
+        ['uri' => 'internal:/structuresville', 'title' => 'Les structures de la ville'],
+      ],
+    ],
+    'entete_connexion' => $entete('Espace de la rédaction', 'Connexion', 'Espace réservé aux équipes du Gouvernorat qui publient et mettent à jour le site.'),
+    'entete_mot_de_passe' => $entete('Espace de la rédaction', 'Mot de passe oublié', "Indiquez l'adresse de courriel ou le nom d'utilisateur de votre compte : un lien pour choisir un nouveau mot de passe vous sera envoyé."),
+    'compte_aide' => [
+      'field_sec_corps' => $html('Vous êtes citoyen et cherchez une information ou une démarche ?'),
+      'field_sec_liens' => [
+        ['uri' => 'internal:/services-aux-citoyens', 'title' => 'Services aux citoyens'],
+        ['uri' => 'internal:/contact', 'title' => 'Nous écrire'],
+      ],
+    ],
+    'pied_credit' => ['field_sec_corps' => $html('powered by Agence pour le Développement du Numérique de Kinshasa (APDNK)')],
+  ];
+
+  $sections = [];
+  foreach ($parties as $cle => $valeurs) {
+    if (!in_array($cle, $existantes, TRUE)) {
+      $sections[] = _gouvernorat_accueil_section($cle, $valeurs);
+    }
+  }
+  $messages = [];
+  if ($sections) {
+    $storage->create([
+      'type' => 'page_accueil',
+      'info' => 'Textes des autres pages',
+      'reusable' => TRUE,
+      'field_accueil_sections' => $sections,
+    ])->save();
+    $messages[] = "Bloc « Textes des autres pages » créé avec " . count($sections) . ' sections.';
+  }
+
+  // Réseaux sociaux de l'accueil : ajoutés au bloc « Page d'accueil ».
+  if (!in_array('reseaux', $existantes, TRUE)) {
+    $accueil = $storage->loadByProperties(['type' => 'page_accueil', 'info' => "Page d'accueil"]);
+    if ($accueil = reset($accueil)) {
+      $accueil->get('field_accueil_sections')->appendItem(_gouvernorat_accueil_section('reseaux', [
+        'field_sec_surtitre' => 'Nous suivre',
+        'field_sec_liens' => [
+          ['uri' => 'https://x.com/gouvernoratk', 'title' => 'X'],
+          ['uri' => 'https://www.facebook.com/GouvKinshasa', 'title' => 'Facebook'],
+          ['uri' => 'https://www.instagram.com/gouvernoratk', 'title' => 'Instagram'],
+          ['uri' => 'https://www.youtube.com/@GouvernoratdeKinshasa', 'title' => 'YouTube'],
+          ['uri' => 'https://www.tiktok.com/@gouvernoratk', 'title' => 'TikTok'],
+        ],
+      ]));
+      $accueil->setNewRevision(TRUE);
+      $accueil->save();
+      $messages[] = "Section « Réseaux sociaux » ajoutée au bloc « Page d'accueil ».";
+    }
+  }
+  drupal_static_reset('gouvernorat_accueil_sections');
+  return $messages ? implode(' ', $messages) : 'Toutes les parties existent déjà : rien à faire.';
+}

@@ -69,17 +69,22 @@
     {% endfor %}
   </ul>
 
+  {% set aide = textes.services_aide %}
+  {% if aide.titre %}
   <div class="sidebar-help-box">
     <div class="sidebar-help-icon">
       <i class="fas fa-headset" aria-hidden="true"></i>
     </div>
     <div class="sidebar-help-content">
-      <h3>Besoin d'aide ?</h3>
-      <p>Contactez nos agents pour vous accompagner dans vos démarches.</p>
-      <a href="/contact" class="sidebar-help-btn">
-        <i class="fas fa-envelope me-2" aria-hidden="true"></i>Nous contacter
+      <h3>{{ aide.titre }}</h3>
+      {{ aide.corps }}
+      {% for lien in aide.liens %}
+      <a href="{{ lien.url }}" class="sidebar-help-btn">
+        <i class="fas fa-envelope me-2" aria-hidden="true"></i>{{ lien.titre }}
       </a>
+      {% endfor %}
     </div>
   </div>
+  {% endif %}
 
 </div>

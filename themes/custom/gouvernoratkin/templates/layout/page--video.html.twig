@@ -29,7 +29,7 @@
 
       <div class="page-entete__contenu">
         <p class="page-entete__filet" aria-hidden="true"><span></span><span></span><span></span></p>
-        <p class="surtitre">Vidéo</p>
+        {% if textes.entete_video.surtitre %}<p class="surtitre">{{ textes.entete_video.surtitre }}</p>{% endif %}
         <h1 class="page-entete__titre">{{ node.label }}</h1>
         <p class="page-entete__accroche">
           <time datetime="{{ node.createdtime|format_date('html_datetime') }}">Publiée le {{ node.createdtime|format_date('custom', 'j F Y') }}</time>

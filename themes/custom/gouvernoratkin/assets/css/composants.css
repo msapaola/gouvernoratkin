@@ -328,3 +328,25 @@
 .pager .page-link .visually-hidden {
   position: absolute;
 }
+
+/* Textes saisis dans les blocs « Textes du site » : ils arrivent en
+   paragraphes, qui gardent l'apparence prévue par chaque gabarit. */
+.page-entete__accroche p,
+.page-appel__texte p {
+  font: inherit;
+  color: inherit;
+  line-height: inherit;
+  margin: 0 0 0.6em;
+}
+
+.page-entete__accroche p:last-child,
+.page-appel__texte p:last-child {
+  margin-bottom: 0;
+}
+
+.compte-aide p {
+  display: inline;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+}

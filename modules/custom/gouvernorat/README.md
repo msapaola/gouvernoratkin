@@ -11,7 +11,7 @@ désactiver une fonction sans toucher aux autres.
 
 | Sous-module | Rôle |
 |---|---|
-| `gouvernorat_accueil` | Mot du gouverneur et chiffres clés de l'accueil, modifiables dans Contenu › Blocs |
+| `gouvernorat_accueil` | Textes du site modifiables dans Contenu › Blocs : accueil (bandeau, cartes, À propos…), en-têtes et encadrés des autres pages, pied de page, réseaux sociaux ; mot du gouverneur et chiffres clés |
 | `gouvernorat_assistant` | Assistant virtuel (Claude, modèle Haiku) qui répond aux visiteurs et les oriente vers les pages du site |
 | `gouvernorat_contact` | Page Contact : coordonnées modifiables, formulaire allégé |
 | `gouvernorat_institutions` | Fiches « Membre », pages Exécutif provincial et Cabinet du gouverneur |
