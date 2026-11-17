@@ -23,7 +23,7 @@ Fichiers de ce dossier :
 
 | Fichier | Rôle |
 |---|---|
-| `../Dockerfile` | recette de l'image |
+| `Dockerfile` | recette de l'image |
 | `compose.yaml` | lancement du conteneur, ports, volumes |
 | `.env.exemple` | réglages à copier en `.env` (secrets : jamais dans Git) |
 | `settings.php` | réglages Drupal du conteneur, lus dans `.env` |

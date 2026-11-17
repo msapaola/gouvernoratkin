@@ -11,6 +11,7 @@
 #              serveur externe) ;
 #   - une tâche qui lance « drush cron » à intervalle régulier.
 # Le tout est piloté par supervisord. Mode d'emploi : docker/LISEZMOI.md.
+# Construction depuis la racine du projet : docker build -f docker/Dockerfile .
 
 FROM caddy:2.8 AS caddy
 

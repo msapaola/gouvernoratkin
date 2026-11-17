@@ -12,7 +12,7 @@ services:
   site:
     build:
       context: ..
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     image: gouvernorat-kinshasa:latest
     restart: unless-stopped
     env_file: .env
