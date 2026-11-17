@@ -87,7 +87,5 @@ module:
 theme:
   olivero: 0
   claro: 0
-  radix: 0
-  gouvernorat: 0
   gouvernoratkin: 0
 profile: standard
