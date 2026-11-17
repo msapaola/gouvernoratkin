@@ -1,0 +1,19 @@
+uuid: e05d1111-5b6d-4d4e-9158-d0901aa568e5
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_surtitre
+    - paragraphs.paragraphs_type.sec_accueil
+id: paragraph.sec_accueil.field_sec_surtitre
+field_name: field_sec_surtitre
+entity_type: paragraph
+bundle: sec_accueil
+label: Surtitre
+description: 'Petit texte au-dessus du titre.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

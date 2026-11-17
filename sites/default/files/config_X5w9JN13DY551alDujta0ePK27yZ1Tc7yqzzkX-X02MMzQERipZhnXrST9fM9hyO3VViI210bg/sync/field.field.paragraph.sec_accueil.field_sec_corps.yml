@@ -1,0 +1,24 @@
+uuid: 8665f40b-90b5-4ebe-89b5-506497ed3a6a
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_corps
+    - filter.format.basic_html
+    - paragraphs.paragraphs_type.sec_accueil
+  module:
+    - text
+id: paragraph.sec_accueil.field_sec_corps
+field_name: field_sec_corps
+entity_type: paragraph
+bundle: sec_accueil
+label: Texte
+description: "Accroche du bandeau, paragraphes d'À propos, texte de l'appel."
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - basic_html
+field_type: text_long

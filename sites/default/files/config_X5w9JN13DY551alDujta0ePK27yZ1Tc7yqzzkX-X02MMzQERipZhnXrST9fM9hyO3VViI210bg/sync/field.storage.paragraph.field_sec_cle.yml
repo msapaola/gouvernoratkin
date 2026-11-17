@@ -1,0 +1,48 @@
+uuid: e421a1fb-7441-4bdb-9ab2-26080e7fc9d7
+langcode: fr
+status: true
+dependencies:
+  module:
+    - options
+    - paragraphs
+id: paragraph.field_sec_cle
+field_name: field_sec_cle
+entity_type: paragraph
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: bandeau
+      label: 'Bandeau (haut de page)'
+    -
+      value: acces
+      label: 'Accès rapide (cartes)'
+    -
+      value: actualites
+      label: Actualités
+    -
+      value: videos
+      label: Vidéos
+    -
+      value: apropos
+      label: 'À propos de Kinshasa'
+    -
+      value: chiffres
+      label: 'Chiffres clés (titres)'
+    -
+      value: galerie
+      label: 'Galerie photo'
+    -
+      value: demarches
+      label: 'Démarches les plus demandées'
+    -
+      value: appel
+      label: 'Appel aux démarches (bas de page)'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

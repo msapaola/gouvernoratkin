@@ -1,0 +1,38 @@
+uuid: d7098a57-df38-45ed-aefe-431aa02b35c4
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_image
+    - paragraphs.paragraphs_type.sec_accueil
+  module:
+    - image
+id: paragraph.sec_accueil.field_sec_image
+field_name: field_sec_image
+entity_type: paragraph
+bundle: sec_accueil
+label: Image
+description: 'Photo de la section À propos. Laisser vide pour garder la photo actuelle du thème.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: accueil
+  file_extensions: 'png jpg jpeg webp'
+  max_filesize: '5 MB'
+  max_resolution: ''
+  min_resolution: ''
+  alt_field: true
+  alt_field_required: true
+  title_field: false
+  title_field_required: false
+  default_image:
+    uuid: null
+    alt: ''
+    title: ''
+    width: null
+    height: null
+field_type: image

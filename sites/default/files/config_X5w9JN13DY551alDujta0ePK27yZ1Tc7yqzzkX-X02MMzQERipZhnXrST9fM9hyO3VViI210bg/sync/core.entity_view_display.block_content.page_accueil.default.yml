@@ -1,0 +1,25 @@
+uuid: 903e6380-0cb9-4f64-81bd-0d8992f02b4f
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_content.type.page_accueil
+    - field.field.block_content.page_accueil.field_accueil_sections
+  module:
+    - entity_reference_revisions
+id: block_content.page_accueil.default
+targetEntityType: block_content
+bundle: page_accueil
+mode: default
+content:
+  field_accueil_sections:
+    type: entity_reference_revisions_entity_view
+    label: hidden
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  langcode: true

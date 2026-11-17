@@ -1,5 +1,5 @@
 name: Gouvernorat Accueil
-description: "Textes de la page d'accueil modifiables par la rédaction : mot du gouverneur et chiffres clés."
+description: "Textes de la page d'accueil modifiables par la rédaction : sections (bandeau, accès rapide, À propos…), mot du gouverneur et chiffres clés."
 package: 'Gouvernorat de Kinshasa'
 type: module
 core_version_requirement: ^10.1 || ^11

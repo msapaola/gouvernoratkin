@@ -1,0 +1,28 @@
+uuid: 79ca448e-894b-4291-8037-2234db6bf420
+langcode: fr
+status: true
+dependencies:
+  config:
+    - block_content.type.page_accueil
+    - field.storage.block_content.field_accueil_sections
+    - paragraphs.paragraphs_type.sec_accueil
+  module:
+    - entity_reference_revisions
+id: block_content.page_accueil.field_accueil_sections
+field_name: field_accueil_sections
+entity_type: block_content
+bundle: page_accueil
+label: Sections
+description: "L'ordre des sections ici n'a pas d'effet : chacune s'affiche à sa place, selon sa « partie de la page »."
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      sec_accueil: sec_accueil
+    negate: 0
+    target_bundles_drag_drop: {  }
+field_type: entity_reference_revisions

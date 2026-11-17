@@ -1,0 +1,19 @@
+uuid: b625faf6-177e-4e04-9d9e-d27afb5a26fd
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_titre
+    - paragraphs.paragraphs_type.sec_accueil
+id: paragraph.sec_accueil.field_sec_titre
+field_name: field_sec_titre
+entity_type: paragraph
+bundle: sec_accueil
+label: Titre
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

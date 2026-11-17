@@ -1,0 +1,21 @@
+uuid: a8c48845-6449-499c-9fd8-d46a8aaf050a
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_couleur
+    - paragraphs.paragraphs_type.sec_carte
+  module:
+    - options
+id: paragraph.sec_carte.field_sec_couleur
+field_name: field_sec_couleur
+entity_type: paragraph
+bundle: sec_carte
+label: Couleur
+description: "Couleur de l'icône ou de la carte."
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

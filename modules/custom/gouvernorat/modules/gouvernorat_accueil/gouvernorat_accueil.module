@@ -4,11 +4,13 @@
  * @file
  * Textes de la page d'accueil modifiables par la rédaction.
  *
- * Le mot du gouverneur et les chiffres clés étaient écrits en dur dans
- * page--front.html.twig : seule une personne modifiant le code pouvait les
- * mettre à jour, et ils n'existaient pas dans la base (donc invisibles pour
- * tout outil qui lit les contenus de Drupal). Ils vivent désormais dans deux
- * blocs de contenu, que la rédaction modifie dans Contenu › Blocs :
+ * Les textes de l'accueil étaient écrits en dur dans page--front.html.twig :
+ * seule une personne modifiant le code pouvait les mettre à jour, et ils
+ * n'existaient pas dans la base (donc invisibles pour tout outil qui lit les
+ * contenus de Drupal, comme l'assistant). Ils vivent désormais dans des blocs
+ * de contenu, que la rédaction modifie dans Contenu › Blocs :
+ * - « Page d'accueil » (type page_accueil) : une section par partie de la
+ *   page (bandeau, accès rapide, titres des actualités, À propos…) ;
  * - « Mot du gouverneur » (type mot_gouverneur) ;
  * - « Chiffres clés » (type chiffres_cles).
  *
@@ -19,6 +21,7 @@
 
 use Drupal\block_content\BlockContentInterface;
 use Drupal\image\Entity\ImageStyle;
+use Drupal\paragraphs\ParagraphInterface;
 
 /**
  * Renvoie le plus récent bloc publié d'un type donné.
@@ -47,6 +50,8 @@ function gouvernorat_accueil_paragraphes(?string $texte): array {
  * Implements hook_preprocess_HOOK() for page templates.
  *
  * Variables fournies à page--front.html.twig :
+ * - accueil : les sections du bloc « Page d'accueil », par partie de la page
+ *   (accueil.bandeau, accueil.acces…), voir gouvernorat_accueil_sections() ;
  * - gouverneur : nom, fonction, paragraphes (liste), portrait (url, alt) ;
  * - chiffres : items (liste de { valeur, libelle }), source.
  * Une variable reste vide si aucun bloc n'est publié : la section n'est alors
@@ -60,6 +65,8 @@ function gouvernorat_accueil_preprocess_page(array &$variables) {
   // Toute modification d'un bloc de contenu doit rafraîchir l'accueil, y
   // compris dans le cache des pages servies aux visiteurs anonymes.
   $variables['#cache']['tags'][] = 'block_content_list';
+
+  $variables['accueil'] = gouvernorat_accueil_sections();
 
   if ($bloc = gouvernorat_accueil_bloc('mot_gouverneur')) {
     $portrait = NULL;
@@ -93,4 +100,98 @@ function gouvernorat_accueil_preprocess_page(array &$variables) {
       'source' => $bloc->get('field_chiffres_source')->value,
     ];
   }
+}
+
+/**
+ * Sections du bloc « Page d'accueil », indexées par partie de la page.
+ *
+ * Chaque section : surtitre, titre, corps (texte mis en forme), liens
+ * (titre, url, externe), image (url, alt), legende et elements (cartes :
+ * icone, titre, texte, corps, lien, couleur). Une partie sans section
+ * publiée est absente : le gabarit n'affiche alors pas ses textes.
+ */
+function gouvernorat_accueil_sections(): array {
+  $bloc = gouvernorat_accueil_bloc('page_accueil');
+  if (!$bloc || !$bloc->hasField('field_accueil_sections')) {
+    return [];
+  }
+  $sections = [];
+  foreach ($bloc->get('field_accueil_sections')->referencedEntities() as $section) {
+    $cle = $section->get('field_sec_cle')->value;
+    if (!$cle || isset($sections[$cle]) || !$section->isPublished()) {
+      continue;
+    }
+    $image = NULL;
+    $element = $section->get('field_sec_image')->first();
+    if ($element && $element->entity) {
+      $image = [
+        'url' => \Drupal::service('file_url_generator')->generateString($element->entity->getFileUri()),
+        'alt' => $element->alt,
+      ];
+    }
+    $cartes = [];
+    foreach ($section->get('field_sec_elements')->referencedEntities() as $carte) {
+      if ($carte->isPublished()) {
+        $cartes[] = [
+          'icone' => $carte->get('field_sec_icone')->value,
+          'titre' => $carte->get('field_sec_titre')->value,
+          'texte' => gouvernorat_accueil_texte_brut($carte, 'field_sec_corps'),
+          'corps' => gouvernorat_accueil_texte($carte, 'field_sec_corps'),
+          'lien' => gouvernorat_accueil_liens($carte)[0] ?? NULL,
+          'couleur' => $carte->hasField('field_sec_couleur') ? $carte->get('field_sec_couleur')->value : NULL,
+        ];
+      }
+    }
+    $sections[$cle] = [
+      'surtitre' => $section->get('field_sec_surtitre')->value,
+      'titre' => $section->get('field_sec_titre')->value,
+      'corps' => gouvernorat_accueil_texte($section, 'field_sec_corps'),
+      'liens' => gouvernorat_accueil_liens($section),
+      'image' => $image,
+      'legende' => $section->get('field_sec_legende')->value,
+      'elements' => $cartes,
+    ];
+  }
+  return $sections;
+}
+
+/**
+ * Texte mis en forme d'un champ, prêt à afficher (ou NULL s'il est vide).
+ */
+function gouvernorat_accueil_texte(ParagraphInterface $paragraphe, string $champ): ?array {
+  if (!$paragraphe->hasField($champ) || $paragraphe->get($champ)->isEmpty()) {
+    return NULL;
+  }
+  $valeur = $paragraphe->get($champ)->first();
+  return ['#type' => 'processed_text', '#text' => $valeur->value, '#format' => $valeur->format];
+}
+
+/**
+ * Même texte, sans mise en forme (pour les cartes).
+ */
+function gouvernorat_accueil_texte_brut(ParagraphInterface $paragraphe, string $champ): ?string {
+  if (!$paragraphe->hasField($champ) || $paragraphe->get($champ)->isEmpty()) {
+    return NULL;
+  }
+  $texte = html_entity_decode(strip_tags((string) $paragraphe->get($champ)->value), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+  return trim(preg_replace('/\s+/u', ' ', $texte));
+}
+
+/**
+ * Liens d'un paragraphe : titre, adresse, et s'il mène hors du site.
+ */
+function gouvernorat_accueil_liens(ParagraphInterface $paragraphe): array {
+  $liens = [];
+  if (!$paragraphe->hasField('field_sec_liens')) {
+    return $liens;
+  }
+  foreach ($paragraphe->get('field_sec_liens') as $lien) {
+    $url = $lien->getUrl();
+    $liens[] = [
+      'titre' => $lien->title,
+      'url' => $url->toString(),
+      'externe' => $url->isExternal(),
+    ];
+  }
+  return $liens;
 }

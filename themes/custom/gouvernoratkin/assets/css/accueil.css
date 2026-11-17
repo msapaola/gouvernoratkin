@@ -807,3 +807,18 @@
     transform: none;
   }
 }
+
+/* Textes saisis dans le bloc « Page d'accueil » : ils arrivent en
+   paragraphes, qui gardent l'apparence du bandeau et de l'appel. */
+.hero__accroche p,
+.appel__texte p {
+  font: inherit;
+  color: inherit;
+  line-height: inherit;
+  margin: 0 0 0.6em;
+}
+
+.hero__accroche p:last-child,
+.appel__texte p:last-child {
+  margin-bottom: 0;
+}

@@ -1,0 +1,8 @@
+uuid: 150dc5a4-baa6-4936-9bf5-0217277ea21b
+langcode: fr
+status: true
+dependencies: {  }
+id: page_accueil
+label: "Page d'accueil"
+revision: true
+description: "Les textes de la page d'accueil, section par section. Un seul bloc de ce type suffit : il n'a pas besoin d'être placé, le thème le lit directement."

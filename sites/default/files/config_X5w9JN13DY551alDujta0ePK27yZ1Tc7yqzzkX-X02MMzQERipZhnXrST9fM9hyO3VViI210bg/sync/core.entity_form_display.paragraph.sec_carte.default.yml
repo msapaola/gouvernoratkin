@@ -5,11 +5,14 @@ dependencies:
   config:
     - field.field.paragraph.sec_carte.field_sec_compte
     - field.field.paragraph.sec_carte.field_sec_corps
+    - field.field.paragraph.sec_carte.field_sec_couleur
     - field.field.paragraph.sec_carte.field_sec_icone
+    - field.field.paragraph.sec_carte.field_sec_liens
     - field.field.paragraph.sec_carte.field_sec_liste
     - field.field.paragraph.sec_carte.field_sec_titre
     - paragraphs.paragraphs_type.sec_carte
   module:
+    - link
     - text
 id: paragraph.sec_carte.default
 targetEntityType: paragraph
@@ -32,6 +35,12 @@ content:
       rows: 5
       placeholder: ''
     third_party_settings: {  }
+  field_sec_couleur:
+    type: options_select
+    weight: 21
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   field_sec_icone:
     type: string_textfield
     weight: 1
@@ -39,6 +48,14 @@ content:
     settings:
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  field_sec_liens:
+    type: link_default
+    weight: 20
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
     third_party_settings: {  }
   field_sec_liste:
     type: string_textfield

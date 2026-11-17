@@ -1,0 +1,21 @@
+uuid: 03d1a146-d653-4687-b42b-ff77193c7ec7
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_cle
+    - paragraphs.paragraphs_type.sec_accueil
+  module:
+    - options
+id: paragraph.sec_accueil.field_sec_cle
+field_name: field_sec_cle
+entity_type: paragraph
+bundle: sec_accueil
+label: 'Partie de la page'
+description: "Indique à quel endroit de l'accueil cette section s'affiche."
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

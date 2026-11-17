@@ -1,0 +1,28 @@
+uuid: 18fceb45-59a0-4b0b-bc53-52ec54e0fe91
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.sec_accueil.field_sec_cle
+    - field.field.paragraph.sec_accueil.field_sec_corps
+    - field.field.paragraph.sec_accueil.field_sec_elements
+    - field.field.paragraph.sec_accueil.field_sec_image
+    - field.field.paragraph.sec_accueil.field_sec_legende
+    - field.field.paragraph.sec_accueil.field_sec_liens
+    - field.field.paragraph.sec_accueil.field_sec_surtitre
+    - field.field.paragraph.sec_accueil.field_sec_titre
+    - paragraphs.paragraphs_type.sec_accueil
+id: paragraph.sec_accueil.default
+targetEntityType: paragraph
+bundle: sec_accueil
+mode: default
+content: {  }
+hidden:
+  field_sec_cle: true
+  field_sec_corps: true
+  field_sec_elements: true
+  field_sec_image: true
+  field_sec_legende: true
+  field_sec_liens: true
+  field_sec_surtitre: true
+  field_sec_titre: true

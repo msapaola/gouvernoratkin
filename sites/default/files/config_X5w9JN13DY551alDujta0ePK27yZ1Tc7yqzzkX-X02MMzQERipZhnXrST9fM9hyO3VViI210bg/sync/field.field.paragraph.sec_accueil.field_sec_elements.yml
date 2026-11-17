@@ -1,0 +1,28 @@
+uuid: fab867c0-e628-467b-a771-ca6792fa8411
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_elements
+    - paragraphs.paragraphs_type.sec_accueil
+    - paragraphs.paragraphs_type.sec_carte
+  module:
+    - entity_reference_revisions
+id: paragraph.sec_accueil.field_sec_elements
+field_name: field_sec_elements
+entity_type: paragraph
+bundle: sec_accueil
+label: Cartes
+description: "Cartes d'accès rapide, piliers d'À propos, démarches les plus demandées."
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      sec_carte: sec_carte
+    negate: 0
+    target_bundles_drag_drop: {  }
+field_type: entity_reference_revisions

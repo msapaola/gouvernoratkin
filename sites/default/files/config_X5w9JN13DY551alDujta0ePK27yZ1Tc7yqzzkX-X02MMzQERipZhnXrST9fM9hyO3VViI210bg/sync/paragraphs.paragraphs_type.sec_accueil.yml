@@ -1,0 +1,10 @@
+uuid: b8a5fa2e-1651-4600-a43d-891433ab56ec
+langcode: fr
+status: true
+dependencies: {  }
+id: sec_accueil
+label: "Section de l'accueil"
+icon_uuid: null
+icon_default: null
+description: "Une partie de la page d'accueil : textes, liens, image et cartes. La mise en page est fixée par le thème."
+behavior_plugins: {  }

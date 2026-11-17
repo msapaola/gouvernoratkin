@@ -1,0 +1,94 @@
+uuid: 051536ed-f498-4df2-b377-f9246499619c
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.sec_accueil.field_sec_cle
+    - field.field.paragraph.sec_accueil.field_sec_corps
+    - field.field.paragraph.sec_accueil.field_sec_elements
+    - field.field.paragraph.sec_accueil.field_sec_image
+    - field.field.paragraph.sec_accueil.field_sec_legende
+    - field.field.paragraph.sec_accueil.field_sec_liens
+    - field.field.paragraph.sec_accueil.field_sec_surtitre
+    - field.field.paragraph.sec_accueil.field_sec_titre
+    - paragraphs.paragraphs_type.sec_accueil
+id: paragraph.sec_accueil.default
+targetEntityType: paragraph
+bundle: sec_accueil
+mode: default
+content:
+  field_sec_cle:
+    type: options_select
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_sec_corps:
+    type: text_textarea
+    weight: 3
+    region: content
+    settings:
+      rows: 4
+      placeholder: ''
+    third_party_settings: {  }
+  field_sec_elements:
+    type: paragraphs
+    weight: 7
+    region: content
+    settings:
+      title: Carte
+      title_plural: Cartes
+      edit_mode: closed
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      add_mode: button
+      form_display_mode: default
+      default_paragraph_type: sec_carte
+      features:
+        collapse_edit_all: collapse_edit_all
+        duplicate: duplicate
+    third_party_settings: {  }
+  field_sec_image:
+    type: image_image
+    weight: 5
+    region: content
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
+    third_party_settings: {  }
+  field_sec_legende:
+    type: string_textfield
+    weight: 6
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_sec_liens:
+    type: link_default
+    weight: 4
+    region: content
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+  field_sec_surtitre:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_sec_titre:
+    type: string_textfield
+    weight: 2
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

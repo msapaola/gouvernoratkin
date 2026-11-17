@@ -87,3 +87,144 @@ function gouvernorat_accueil_deploy_contenu_initial() {
 
   return $messages ? implode(' ', $messages) : 'Les blocs de l\'accueil existaient déjà : rien à faire.';
 }
+
+/**
+ * Crée une carte (paragraphe sec_carte) pour l'accueil.
+ */
+function _gouvernorat_accueil_carte(string $icone, string $titre, string $texte, ?array $lien = NULL, ?string $couleur = NULL): Paragraph {
+  $valeurs = [
+    'type' => 'sec_carte',
+    'field_sec_icone' => $icone,
+    'field_sec_titre' => $titre,
+    'field_sec_corps' => ['value' => '<p>' . $texte . '</p>', 'format' => 'basic_html'],
+  ];
+  if ($lien) {
+    $valeurs['field_sec_liens'] = [$lien];
+  }
+  if ($couleur) {
+    $valeurs['field_sec_couleur'] = $couleur;
+  }
+  $carte = Paragraph::create($valeurs);
+  $carte->save();
+  return $carte;
+}
+
+/**
+ * Crée une section (paragraphe sec_accueil) de l'accueil.
+ */
+function _gouvernorat_accueil_section(string $cle, array $valeurs, array $cartes = []): Paragraph {
+  $section = Paragraph::create(['type' => 'sec_accueil', 'field_sec_cle' => $cle] + $valeurs);
+  if ($cartes) {
+    $section->set('field_sec_elements', $cartes);
+  }
+  $section->save();
+  return $section;
+}
+
+/**
+ * Recopie les autres textes de l'accueil dans le bloc « Page d'accueil ».
+ *
+ * Bandeau, accès rapide, titres des sections, À propos, démarches les plus
+ * demandées et appel final : les textes qui étaient écrits dans
+ * page--front.html.twig, mot pour mot, pour que l'accueil reste identique.
+ * Si un bloc de ce type existe déjà, rien n'est fait.
+ */
+function gouvernorat_accueil_deploy_sections_accueil(): string {
+  $storage = \Drupal::entityTypeManager()->getStorage('block_content');
+  if ($storage->loadByProperties(['type' => 'page_accueil'])) {
+    return "Le bloc « Page d'accueil » existe déjà : rien à faire.";
+  }
+  $html = fn (string ...$paragraphes): array => [
+    'value' => '<p>' . implode('</p><p>', $paragraphes) . '</p>',
+    'format' => 'basic_html',
+  ];
+
+  $sections = [];
+
+  $sections[] = _gouvernorat_accueil_section('bandeau', [
+    'field_sec_surtitre' => 'Bienvenue à',
+    'field_sec_titre' => 'Kinshasa',
+    'field_sec_corps' => $html("Capitale de la République Démocratique du Congo, la Ville-Province se réinvente chaque jour, mêlant tradition et modernité pour construire une ville tournée vers l'avenir."),
+    'field_sec_liens' => [
+      ['uri' => 'internal:/services-aux-citoyens', 'title' => 'Vos démarches administratives'],
+      ['uri' => 'internal:/actualites', 'title' => 'Actualités du Gouvernorat'],
+    ],
+  ]);
+
+  $sections[] = _gouvernorat_accueil_section('acces', [
+    'field_sec_titre' => 'Accéder aux rubriques du site',
+  ], [
+    _gouvernorat_accueil_carte('fas fa-hands-helping', 'Services aux citoyens', 'Démarches, pièces à fournir et lieux de dépôt, expliqués pas à pas.', ['uri' => 'internal:/services-aux-citoyens', 'title' => 'Services aux citoyens'], 'bleu'),
+    _gouvernorat_accueil_carte('fas fa-newspaper', 'Actualités', 'Communiqués, décisions et annonces officielles du Gouvernorat.', ['uri' => 'internal:/actualites', 'title' => 'Actualités'], 'rouge'),
+    _gouvernorat_accueil_carte('fas fa-landmark', 'Gouvernance', "L'exécutif provincial, le cabinet du gouverneur et les structures de la ville.", ['uri' => 'internal:/executif-provincial', 'title' => 'Gouvernance'], 'vert'),
+    _gouvernorat_accueil_carte('fas fa-monument', 'Culture et patrimoine', "L'histoire, les lieux et la vie culturelle de la capitale.", ['uri' => 'internal:/culture-et-patrimoine', 'title' => 'Culture et patrimoine'], 'jaune'),
+  ]);
+
+  $sections[] = _gouvernorat_accueil_section('actualites', [
+    'field_sec_surtitre' => 'Vie de la ville',
+    'field_sec_titre' => 'Dernières nouvelles de Kinshasa',
+    'field_sec_liens' => [['uri' => 'internal:/actualites', 'title' => 'Toutes les actualités']],
+  ]);
+
+  $sections[] = _gouvernorat_accueil_section('videos', [
+    'field_sec_surtitre' => 'En vidéo',
+    'field_sec_titre' => 'Le Gouvernorat en vidéo',
+    'field_sec_liens' => [
+      ['uri' => 'https://www.youtube.com/@GouvernoratdeKinshasa', 'title' => 'Voir la chaîne'],
+      ['uri' => 'internal:/videos', 'title' => 'Toutes les vidéos'],
+    ],
+  ]);
+
+  $sections[] = _gouvernorat_accueil_section('apropos', [
+    'field_sec_surtitre' => 'À propos',
+    'field_sec_titre' => 'Une capitale au service de ses habitants',
+    'field_sec_corps' => $html(
+      "Située sur la rive sud du majestueux fleuve Congo, Kinshasa est une métropole vibrante de plus de dix-sept millions d'habitants, à la fois capitale politique, cœur économique et pôle culturel de la République Démocratique du Congo.",
+      "Le Gouvernorat conduit la gestion et le développement de la Ville-Province avec une ambition simple : <strong>améliorer la qualité de vie des Kinoises et des Kinois</strong>, en transformant la ville en un pôle économique, culturel et technologique de premier plan en Afrique centrale."
+    ),
+    'field_sec_liens' => [['uri' => 'internal:/a-propos', 'title' => 'En savoir plus']],
+    'field_sec_legende' => "Kinshasa, métropole de plus de dix-sept millions d'habitants",
+  ], [
+    _gouvernorat_accueil_carte('fas fa-bullseye', 'Notre mission', 'Assurer une gouvernance transparente et participative pour un développement durable et équilibré de Kinshasa, tout en servant la population avec intégrité et efficacité.'),
+    _gouvernorat_accueil_carte('fas fa-eye', 'Notre vision', 'Faire de Kinshasa une métropole moderne, inclusive et résiliente, reconnue comme un pôle de développement économique, culturel et technologique africain.'),
+    _gouvernorat_accueil_carte('fas fa-hand-holding-heart', 'Nos valeurs', 'Transparence, innovation, proximité, excellence et responsabilité guident chacune des actions menées pour le bien-être des citoyens et le rayonnement de la ville.'),
+  ]);
+
+  $sections[] = _gouvernorat_accueil_section('chiffres', [
+    'field_sec_surtitre' => 'Kinshasa en bref',
+    'field_sec_titre' => 'Quelques repères',
+  ]);
+
+  $sections[] = _gouvernorat_accueil_section('galerie', [
+    'field_sec_surtitre' => 'En images',
+    'field_sec_titre' => 'Galerie photo du Gouvernorat',
+    'field_sec_liens' => [['uri' => 'internal:/all-gallery', 'title' => 'Toute la galerie']],
+  ]);
+
+  $sections[] = _gouvernorat_accueil_section('demarches', [
+    'field_sec_surtitre' => 'Kinshasa à votre service',
+    'field_sec_titre' => 'Les démarches les plus demandées',
+  ], [
+    _gouvernorat_accueil_carte('fas fa-users', 'Famille, étapes de la vie et vie sociale', 'Naissance, mariage, décès, état civil : les démarches qui accompagnent la vie des ménages kinois.', ['uri' => 'internal:/services-aux-citoyens/19', 'title' => 'Voir les démarches'], 'bleu'),
+    _gouvernorat_accueil_carte('fas fa-home', 'Habitat et logement', 'Autorisations de bâtir, titres et occupation : les démarches liées au logement et au foncier.', ['uri' => 'internal:/services-aux-citoyens/25', 'title' => 'Voir les démarches'], 'rouge'),
+    _gouvernorat_accueil_carte('fas fa-futbol', 'Loisirs et sports', 'Manifestations, équipements sportifs et vie associative : autorisations et accompagnement.', ['uri' => 'internal:/services-aux-citoyens/22', 'title' => 'Voir les démarches'], 'vert'),
+  ]);
+
+  $sections[] = _gouvernorat_accueil_section('appel', [
+    'field_sec_titre' => 'Une démarche à effectuer ?',
+    'field_sec_corps' => $html("Conditions, pièces justificatives et lieux de dépôt : retrouvez l'ensemble des démarches proposées par les services de la Ville-Province."),
+    'field_sec_liens' => [
+      ['uri' => 'internal:/services-aux-citoyens', 'title' => 'Voir les démarches'],
+      ['uri' => 'internal:/contact', 'title' => 'Nous contacter'],
+    ],
+  ]);
+
+  $bloc = BlockContent::create([
+    'type' => 'page_accueil',
+    'info' => "Page d'accueil",
+    'reusable' => TRUE,
+    'field_accueil_sections' => $sections,
+  ]);
+  $bloc->save();
+  return "Bloc « Page d'accueil » créé avec " . count($sections) . ' sections (Contenu › Blocs).';
+}

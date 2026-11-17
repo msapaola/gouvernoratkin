@@ -1,0 +1,23 @@
+uuid: 10fbbd20-e676-4c27-a355-c5725925a3db
+langcode: fr
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_sec_liens
+    - paragraphs.paragraphs_type.sec_accueil
+  module:
+    - link
+id: paragraph.sec_accueil.field_sec_liens
+field_name: field_sec_liens
+entity_type: paragraph
+bundle: sec_accueil
+label: 'Liens et boutons'
+description: 'Boutons du bandeau, lien « Toutes les actualités »… Le texte du lien est affiché tel quel.'
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  title: 1
+  link_type: 17
+field_type: link
