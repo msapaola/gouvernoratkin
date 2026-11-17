@@ -1,0 +1,39 @@
+# Site du Gouvernorat de Kinshasa — un seul conteneur.
+#
+#   cd docker
+#   cp .env.exemple .env      (puis remplir .env)
+#   docker compose up -d --build
+#
+# Mode d'emploi complet : docker/LISEZMOI.md
+
+name: gouvernorat
+
+services:
+  site:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: gouvernorat-kinshasa:latest
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      # Images et documents téléversés.
+      - fichiers:/var/www/html/sites/default/files
+      # Fichiers privés (hors de la racine web).
+      - prives:/var/www/private
+      # Base de données (si elle est dans le conteneur).
+      - base:/var/lib/mysql
+      # Certificats HTTPS obtenus par Caddy.
+      - certificats:/data
+      # Export de base à importer au premier démarrage (.sql ou .sql.gz).
+      - ./import:/docker-entrypoint-initdb.d:ro
+
+volumes:
+  fichiers:
+  prives:
+  base:
+  certificats:

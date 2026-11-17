@@ -74,3 +74,9 @@ sites/*/settings.php
 # asset_injector.*.yml, qui sont la source. Les garder en version faisait
 # coexister deux copies du meme CSS.
 sites/*/files/asset_injector/
+
+# --- Docker : secrets, exports de base et sauvegardes du serveur ---
+docker/.env
+docker/import/*
+!docker/import/.gitkeep
+docker/sauvegardes/

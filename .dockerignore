@@ -1,0 +1,22 @@
+# Ce qui n'entre pas dans l'image Docker.
+.git
+.github
+.claude
+**/.DS_Store
+*.sql
+*.sql.gz
+*.zip
+*.tar.gz
+*.log
+
+# Réglages et données du site de test / de développement.
+sites/default/settings.php
+sites/default/settings.local.php
+sites/default/files/*
+# … sauf la configuration exportée, rangée ailleurs dans l'image.
+!sites/default/files/config_*
+
+# Fichiers propres au VPS (secrets, sauvegardes, base à importer).
+docker/.env
+docker/import
+docker/sauvegardes
